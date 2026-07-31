@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRANCILIM — Sistemas Integrados</title>
+  <meta name="description" content="Portal integrado da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.">
+  <style>
+    :root{
+      --verde:#087f3f;
+      --verde-escuro:#075e35;
+      --verde-claro:#eaf7ef;
+      --azul:#0b2f4a;
+      --azul-claro:#eaf3f8;
+      --laranja:#f47721;
+      --cinza:#eef3f4;
+      --texto:#18364a;
+      --muted:#69808e;
+      --borda:#d4e1e5;
+      --branco:#ffffff;
+      --sombra:0 18px 45px rgba(22,64,82,.10);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      background:
+        linear-gradient(135deg,rgba(8,127,63,.08),transparent 35%),
+        linear-gradient(315deg,rgba(244,119,33,.08),transparent 30%),
+        #f4f8f9;
+      color:var(--texto);
+    }
+
+    .top-line{
+      height:8px;
+      background:linear-gradient(90deg,var(--laranja) 0 18%,#54bfd0 18% 42%,var(--verde) 42% 72%,#46b4a9 72% 100%);
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      padding:22px 5vw;
+      background:rgba(255,255,255,.92);
+      border-bottom:1px solid var(--borda);
+      backdrop-filter:blur(12px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-mark{
+      width:58px;
+      height:58px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(145deg,var(--verde),#39b97b);
+      color:#fff;
+      font-weight:900;
+      font-size:22px;
+      box-shadow:0 10px 22px rgba(8,127,63,.24);
+    }
+
+    .brand h1{
+      margin:0;
+      color:var(--azul);
+      font-size:24px;
+      line-height:1.05;
+    }
+
+    .brand p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 13px;
+      border-radius:999px;
+      background:var(--verde-claro);
+      color:var(--verde-escuro);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .status::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#18a85a;
+      box-shadow:0 0 0 4px rgba(24,168,90,.12);
+    }
+
+    main{
+      width:min(1180px,92vw);
+      margin:0 auto;
+      padding:62px 0 54px;
+    }
+
+    .hero{
+      text-align:center;
+      margin-bottom:38px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      padding:7px 11px;
+      border-radius:999px;
+      background:var(--azul-claro);
+      color:#17658f;
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .hero h2{
+      max-width:780px;
+      margin:18px auto 12px;
+      color:var(--azul);
+      font-size:clamp(30px,5vw,52px);
+      line-height:1.06;
+    }
+
+    .hero p{
+      max-width:760px;
+      margin:0 auto;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+    }
+
+    .systems{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:24px;
+      margin-top:34px;
+    }
+
+    .system-card{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      min-height:360px;
+      padding:30px;
+      border:1px solid var(--borda);
+      border-radius:25px;
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--sombra);
+      overflow:hidden;
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+    }
+
+    .system-card:hover{
+      transform:translateY(-5px);
+      border-color:#9dcab3;
+      box-shadow:0 24px 55px rgba(22,64,82,.15);
+    }
+
+    .system-card::after{
+      content:"";
+      position:absolute;
+      right:-70px;
+      bottom:-90px;
+      width:230px;
+      height:230px;
+      border-radius:50%;
+      opacity:.14;
+    }
+
+    .system-card.patrimonio::after{background:var(--verde)}
+    .system-card.prestacao::after{background:#17729e}
+
+    .icon{
+      display:grid;
+      place-items:center;
+      width:66px;
+      height:66px;
+      border-radius:20px;
+      font-size:30px;
+      margin-bottom:24px;
+    }
+
+    .patrimonio .icon{
+      background:var(--verde-claro);
+      color:var(--verde);
+    }
+
+    .prestacao .icon{
+      background:var(--azul-claro);
+      color:#176d98;
+    }
+
+    .system-card small{
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .system-card h3{
+      margin:9px 0 12px;
+      color:var(--azul);
+      font-size:25px;
+    }
+
+    .system-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    .features{
+      display:grid;
+      gap:8px;
+      margin:22px 0 28px;
+      padding:0;
+      list-style:none;
+    }
+
+    .features li{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      color:#496575;
+      font-size:13px;
+    }
+
+    .features li::before{
+      content:"✓";
+      display:grid;
+      place-items:center;
+      width:19px;
+      height:19px;
+      border-radius:50%;
+      background:#e8f6ee;
+      color:var(--verde);
+      font-size:11px;
+      font-weight:900;
+      flex:0 0 auto;
+    }
+
+    .access{
+      position:relative;
+      z-index:1;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-top:auto;
+      width:100%;
+      min-height:50px;
+      border-radius:14px;
+      text-decoration:none;
+      color:#fff;
+      font-weight:900;
+      transition:filter .15s ease;
+    }
+
+    .access:hover{filter:brightness(.94)}
+    .patrimonio .access{background:linear-gradient(135deg,var(--verde),#14a65c)}
+    .prestacao .access{background:linear-gradient(135deg,#0b5279,#1f88b5)}
+
+    .info-bar{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      margin-top:28px;
+      padding:17px 19px;
+      border:1px solid #cbdde4;
+      border-radius:16px;
+      background:rgba(255,255,255,.82);
+      color:#5a7380;
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .info-bar strong{color:var(--azul)}
+
+    footer{
+      padding:22px 5vw 30px;
+      text-align:center;
+      color:#768b96;
+      font-size:12px;
+    }
+
+    @media(max-width:800px){
+      header{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .systems{grid-template-columns:1fr}
+      main{padding-top:42px}
+      .system-card{min-height:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="top-line"></div>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">TR</div>
+      <div>
+        <h1>TRANCILIM</h1>
+        <p>Portal de sistemas integrados • COAFI</p>
+      </div>
+    </div>
+
+    <div class="status">Portal disponível</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="eyebrow">Secretaria do Trabalho do Ceará</span>
+      <h2>Gestão administrativa em um só lugar</h2>
+      <p>
+        Acesse os módulos de patrimônio e prestação de contas de Contratos de Gestão.
+        Cada sistema permanece independente, mas organizado dentro do mesmo portal.
+      </p>
+    </section>
+
+    <section class="systems">
+      <article class="system-card patrimonio">
+        <div class="icon">▣</div>
+        <small>Módulo patrimonial</small>
+        <h3>Sistema de Gestão Patrimonial</h3>
+        <p>Controle de bens móveis, depreciação, almoxarifado, movimentações, conciliações e relatórios.</p>
+
+        <ul class="features">
+          <li>Cadastro e acompanhamento de bens</li>
+          <li>Depreciação e fechamento mensal</li>
+          <li>Controle de almoxarifado</li>
+          <li>Pendências e relatórios gerenciais</li>
+        </ul>
+
+        <a class="access" href="./patrimonio/index.html">
+          Acessar Gestão Patrimonial →
+        </a>
+      </article>
+
+      <article class="system-card prestacao">
+        <div class="icon">✓</div>
+        <small>Contratos de Gestão</small>
+        <h3>Sistema de Prestação de Contas CG</h3>
+        <p>Gestão de contratos, pagamentos, extratos, pessoal, cronogramas, documentos e execução físico-financeira.</p>
+
+        <ul class="features">
+          <li>Cadastro e acompanhamento de contratos</li>
+          <li>Pagamentos, extratos e conciliação</li>
+          <li>Relação de pessoal e exportações</li>
+          <li>Prestação mensal, trimestral e final</li>
+        </ul>
+
+        <a class="access" href="./prestacao-contas/index.html">
+          Acessar Prestação de Contas →
+        </a>
+      </article>
+    </section>
+
+    <div class="info-bar">
+      <span>ⓘ</span>
+      <div>
+        <strong>Etapa atual:</strong> os sistemas já estão organizados dentro do TRANCILIM.
+        A conexão definitiva com o banco de dados Supabase será feita na etapa seguinte.
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Governo do Estado do Ceará • Secretaria do Trabalho • Coordenadoria Administrativo-Financeira
+  </footer>
+</body>
+</html>
