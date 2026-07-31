@@ -1,26 +1,27 @@
-# TRANCILIM
+# TRANCILIM — Portal com login compacto
 
-Portal integrado dos sistemas da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.
+## Alterações
 
-## Estrutura
+- primeira tela agora é o login;
+- logomarca oficial da Secretaria do Trabalho;
+- portal menor e mais direto;
+- retirada da apresentação longa;
+- após entrar, o usuário escolhe entre:
+  - Gestão Patrimonial;
+  - Prestação de Contas CG;
+- botão para sair do portal.
 
-- `index.html`: portal principal;
-- `patrimonio/index.html`: Sistema de Gestão Patrimonial;
-- `prestacao-contas/index.html`: Sistema de Prestação de Contas CG.
+## Atenção sobre o login
 
-## Publicação
+O login desta versão é apenas visual e provisório. Ele usa `sessionStorage` e
+não oferece autenticação segura.
 
-Envie o conteúdo desta pasta para a raiz do repositório `trancilim`.
+Não utilize senha institucional real nesta etapa.
 
-Depois, no GitHub:
-
-1. abra **Settings**;
-2. entre em **Pages**;
-3. em **Source**, selecione **Deploy from a branch**;
-4. escolha a branch **main** e a pasta **/(root)**;
-5. clique em **Save**.
+O próximo passo é conectar o formulário ao Supabase Auth.
 
 ## Banco de dados
 
-Nesta etapa os sistemas ainda utilizam o armazenamento local do navegador.
-A integração com Supabase será feita depois da publicação inicial do portal.
+Os sistemas ainda não estão gravando as informações no Supabase. Eles
+continuam usando armazenamento local do navegador (`localStorage` e
+`IndexedDB`).

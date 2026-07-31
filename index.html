@@ -3,387 +3,475 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRANCILIM — Sistemas Integrados</title>
+  <title>TRANCILIM — Portal de Sistemas</title>
   <meta name="description" content="Portal integrado da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.">
   <style>
     :root{
       --verde:#087f3f;
-      --verde-escuro:#075e35;
-      --verde-claro:#eaf7ef;
+      --verde-escuro:#076434;
+      --verde-claro:#e9f7ef;
       --azul:#0b2f4a;
+      --azul-medio:#176d98;
       --azul-claro:#eaf3f8;
       --laranja:#f47721;
-      --cinza:#eef3f4;
       --texto:#18364a;
-      --muted:#69808e;
-      --borda:#d4e1e5;
-      --branco:#ffffff;
-      --sombra:0 18px 45px rgba(22,64,82,.10);
+      --muted:#6e8390;
+      --borda:#d2e0e5;
+      --fundo:#f2f7f8;
+      --branco:#fff;
+      --erro:#b42318;
+      --sombra:0 20px 55px rgba(21,64,83,.13);
     }
 
     *{box-sizing:border-box}
 
-    body{
+    html,body{
       margin:0;
-      min-height:100vh;
+      min-height:100%;
       font-family:Inter,Segoe UI,Arial,sans-serif;
-      background:
-        linear-gradient(135deg,rgba(8,127,63,.08),transparent 35%),
-        linear-gradient(315deg,rgba(244,119,33,.08),transparent 30%),
-        #f4f8f9;
       color:var(--texto);
+      background:
+        linear-gradient(135deg,rgba(8,127,63,.09),transparent 34%),
+        linear-gradient(315deg,rgba(244,119,33,.08),transparent 30%),
+        var(--fundo);
     }
+
+    button,input{font:inherit}
 
     .top-line{
-      height:8px;
-      background:linear-gradient(90deg,var(--laranja) 0 18%,#54bfd0 18% 42%,var(--verde) 42% 72%,#46b4a9 72% 100%);
+      height:7px;
+      background:linear-gradient(
+        90deg,
+        var(--laranja) 0 18%,
+        #58bfd0 18% 42%,
+        var(--verde) 42% 72%,
+        #48b5aa 72% 100%
+      );
     }
 
-    header{
+    .screen{
+      min-height:calc(100vh - 7px);
+      display:none;
+    }
+
+    .screen.active{display:flex}
+
+    /* LOGIN */
+    #loginScreen{
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+    }
+
+    .login-card{
+      width:min(390px,100%);
+      padding:30px;
+      border:1px solid var(--borda);
+      border-radius:24px;
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--sombra);
+    }
+
+    .login-logo{
+      display:block;
+      width:150px;
+      max-height:95px;
+      object-fit:contain;
+      margin:0 auto 16px;
+    }
+
+    .login-card h1{
+      margin:0;
+      color:var(--azul);
+      font-size:26px;
+      text-align:center;
+      letter-spacing:.02em;
+    }
+
+    .login-card .subtitle{
+      margin:6px 0 24px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+
+    .field{margin-bottom:14px}
+
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      color:#536c7a;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .field input{
+      width:100%;
+      height:45px;
+      border:1px solid #cbd9df;
+      border-radius:11px;
+      padding:0 13px;
+      background:#fff;
+      color:var(--texto);
+      outline:none;
+    }
+
+    .field input:focus{
+      border-color:#55a87c;
+      box-shadow:0 0 0 3px rgba(8,127,63,.09);
+    }
+
+    .login-button{
+      width:100%;
+      min-height:47px;
+      margin-top:4px;
+      border:0;
+      border-radius:12px;
+      background:linear-gradient(135deg,var(--verde),#13a55b);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .login-error{
+      min-height:18px;
+      margin-top:10px;
+      color:var(--erro);
+      font-size:11px;
+      text-align:center;
+    }
+
+    .provisional-note{
+      margin:15px 0 0;
+      padding-top:13px;
+      border-top:1px solid #e2eaed;
+      color:#8798a1;
+      font-size:9px;
+      line-height:1.4;
+      text-align:center;
+    }
+
+    /* PORTAL */
+    #portalScreen{
+      flex-direction:column;
+    }
+
+    .portal-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:20px;
-      padding:22px 5vw;
-      background:rgba(255,255,255,.92);
+      gap:16px;
+      min-height:82px;
+      padding:14px 5vw;
       border-bottom:1px solid var(--borda);
+      background:rgba(255,255,255,.94);
       backdrop-filter:blur(12px);
     }
 
-    .brand{
+    .portal-brand{
       display:flex;
       align-items:center;
-      gap:14px;
+      gap:13px;
     }
 
-    .brand-mark{
-      width:58px;
+    .portal-logo{
+      width:108px;
       height:58px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(145deg,var(--verde),#39b97b);
-      color:#fff;
-      font-weight:900;
-      font-size:22px;
-      box-shadow:0 10px 22px rgba(8,127,63,.24);
+      object-fit:contain;
     }
 
-    .brand h1{
+    .portal-brand h1{
       margin:0;
       color:var(--azul);
-      font-size:24px;
-      line-height:1.05;
+      font-size:21px;
     }
 
-    .brand p{
+    .portal-brand p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:10px;
+    }
+
+    .user-area{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .user-name{
+      color:#5d7482;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .logout-button{
+      min-height:36px;
+      border:1px solid #cbd9df;
+      border-radius:10px;
+      padding:0 13px;
+      background:#fff;
+      color:#496575;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .portal-main{
+      width:min(860px,92vw);
+      margin:0 auto;
+      padding:48px 0;
+    }
+
+    .portal-title{
+      margin-bottom:24px;
+      text-align:center;
+    }
+
+    .portal-title h2{
+      margin:0;
+      color:var(--azul);
+      font-size:27px;
+    }
+
+    .portal-title p{
       margin:6px 0 0;
       color:var(--muted);
       font-size:12px;
     }
 
-    .status{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 13px;
-      border-radius:999px;
-      background:var(--verde-claro);
-      color:var(--verde-escuro);
-      font-size:12px;
-      font-weight:800;
-    }
-
-    .status::before{
-      content:"";
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#18a85a;
-      box-shadow:0 0 0 4px rgba(24,168,90,.12);
-    }
-
-    main{
-      width:min(1180px,92vw);
-      margin:0 auto;
-      padding:62px 0 54px;
-    }
-
-    .hero{
-      text-align:center;
-      margin-bottom:38px;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      padding:7px 11px;
-      border-radius:999px;
-      background:var(--azul-claro);
-      color:#17658f;
-      font-size:11px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.05em;
-    }
-
-    .hero h2{
-      max-width:780px;
-      margin:18px auto 12px;
-      color:var(--azul);
-      font-size:clamp(30px,5vw,52px);
-      line-height:1.06;
-    }
-
-    .hero p{
-      max-width:760px;
-      margin:0 auto;
-      color:var(--muted);
-      font-size:16px;
-      line-height:1.6;
-    }
-
     .systems{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:24px;
-      margin-top:34px;
+      gap:18px;
     }
 
     .system-card{
-      position:relative;
       display:flex;
       flex-direction:column;
-      min-height:360px;
-      padding:30px;
+      min-height:235px;
+      padding:22px;
       border:1px solid var(--borda);
-      border-radius:25px;
-      background:rgba(255,255,255,.96);
-      box-shadow:var(--sombra);
-      overflow:hidden;
-      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+      border-radius:20px;
+      background:#fff;
+      box-shadow:0 14px 34px rgba(25,68,86,.08);
+      transition:transform .16s ease,box-shadow .16s ease;
     }
 
     .system-card:hover{
-      transform:translateY(-5px);
-      border-color:#9dcab3;
-      box-shadow:0 24px 55px rgba(22,64,82,.15);
+      transform:translateY(-4px);
+      box-shadow:0 20px 42px rgba(25,68,86,.13);
     }
 
-    .system-card::after{
-      content:"";
-      position:absolute;
-      right:-70px;
-      bottom:-90px;
-      width:230px;
-      height:230px;
-      border-radius:50%;
-      opacity:.14;
-    }
-
-    .system-card.patrimonio::after{background:var(--verde)}
-    .system-card.prestacao::after{background:#17729e}
-
-    .icon{
+    .system-icon{
       display:grid;
       place-items:center;
-      width:66px;
-      height:66px;
-      border-radius:20px;
-      font-size:30px;
-      margin-bottom:24px;
+      width:48px;
+      height:48px;
+      margin-bottom:15px;
+      border-radius:15px;
+      font-size:22px;
+      font-weight:900;
     }
 
-    .patrimonio .icon{
-      background:var(--verde-claro);
+    .patrimonio .system-icon{
       color:var(--verde);
+      background:var(--verde-claro);
     }
 
-    .prestacao .icon{
+    .prestacao .system-icon{
+      color:var(--azul-medio);
       background:var(--azul-claro);
-      color:#176d98;
     }
 
     .system-card small{
       color:var(--muted);
-      font-size:11px;
+      font-size:9px;
       font-weight:900;
       text-transform:uppercase;
-      letter-spacing:.04em;
     }
 
     .system-card h3{
-      margin:9px 0 12px;
+      margin:7px 0 8px;
       color:var(--azul);
-      font-size:25px;
+      font-size:19px;
+      line-height:1.2;
     }
 
     .system-card p{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-    }
-
-    .features{
-      display:grid;
-      gap:8px;
-      margin:22px 0 28px;
-      padding:0;
-      list-style:none;
-    }
-
-    .features li{
-      display:flex;
-      align-items:center;
-      gap:9px;
-      color:#496575;
-      font-size:13px;
-    }
-
-    .features li::before{
-      content:"✓";
-      display:grid;
-      place-items:center;
-      width:19px;
-      height:19px;
-      border-radius:50%;
-      background:#e8f6ee;
-      color:var(--verde);
+      margin:0 0 18px;
+      color:#627986;
       font-size:11px;
-      font-weight:900;
-      flex:0 0 auto;
+      line-height:1.45;
     }
 
     .access{
-      position:relative;
-      z-index:1;
-      display:inline-flex;
+      display:flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
+      min-height:43px;
       margin-top:auto;
-      width:100%;
-      min-height:50px;
-      border-radius:14px;
-      text-decoration:none;
+      border-radius:11px;
       color:#fff;
+      text-decoration:none;
+      font-size:12px;
       font-weight:900;
-      transition:filter .15s ease;
     }
 
-    .access:hover{filter:brightness(.94)}
-    .patrimonio .access{background:linear-gradient(135deg,var(--verde),#14a65c)}
-    .prestacao .access{background:linear-gradient(135deg,#0b5279,#1f88b5)}
-
-    .info-bar{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
-      margin-top:28px;
-      padding:17px 19px;
-      border:1px solid #cbdde4;
-      border-radius:16px;
-      background:rgba(255,255,255,.82);
-      color:#5a7380;
-      font-size:13px;
-      line-height:1.5;
+    .patrimonio .access{
+      background:linear-gradient(135deg,var(--verde),#12a059);
     }
 
-    .info-bar strong{color:var(--azul)}
+    .prestacao .access{
+      background:linear-gradient(135deg,#0b5279,#2387b1);
+    }
 
     footer{
-      padding:22px 5vw 30px;
+      margin-top:auto;
+      padding:20px;
+      color:#83949d;
+      font-size:10px;
       text-align:center;
-      color:#768b96;
-      font-size:12px;
     }
 
-    @media(max-width:800px){
-      header{
+    @media(max-width:680px){
+      .portal-header{
         align-items:flex-start;
         flex-direction:column;
       }
 
       .systems{grid-template-columns:1fr}
-      main{padding-top:42px}
-      .system-card{min-height:auto}
+      .portal-main{padding-top:34px}
+      .user-area{width:100%;justify-content:space-between}
     }
   </style>
 </head>
 <body>
   <div class="top-line"></div>
 
-  <header>
-    <div class="brand">
-      <div class="brand-mark">TR</div>
-      <div>
-        <h1>TRANCILIM</h1>
-        <p>Portal de sistemas integrados • COAFI</p>
+  <section class="screen active" id="loginScreen">
+    <form class="login-card" id="loginForm">
+      <img class="login-logo" src="./assets/logo-ceara-set.png" alt="Governo do Estado do Ceará — Secretaria do Trabalho">
+
+      <h1>TRANCILIM</h1>
+      <p class="subtitle">Portal de sistemas integrados da COAFI</p>
+
+      <div class="field">
+        <label for="loginEmail">Usuário</label>
+        <input id="loginEmail" autocomplete="username" placeholder="Digite seu usuário" required>
       </div>
-    </div>
 
-    <div class="status">Portal disponível</div>
-  </header>
+      <div class="field">
+        <label for="loginPassword">Senha</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+      </div>
 
-  <main>
-    <section class="hero">
-      <span class="eyebrow">Secretaria do Trabalho do Ceará</span>
-      <h2>Gestão administrativa em um só lugar</h2>
-      <p>
-        Acesse os módulos de patrimônio e prestação de contas de Contratos de Gestão.
-        Cada sistema permanece independente, mas organizado dentro do mesmo portal.
+      <button class="login-button" type="submit">Entrar</button>
+      <div class="login-error" id="loginError"></div>
+
+      <p class="provisional-note">
+        Acesso provisório da publicação inicial. A autenticação segura será conectada ao Supabase.
       </p>
-    </section>
+    </form>
+  </section>
 
-    <section class="systems">
-      <article class="system-card patrimonio">
-        <div class="icon">▣</div>
-        <small>Módulo patrimonial</small>
-        <h3>Sistema de Gestão Patrimonial</h3>
-        <p>Controle de bens móveis, depreciação, almoxarifado, movimentações, conciliações e relatórios.</p>
-
-        <ul class="features">
-          <li>Cadastro e acompanhamento de bens</li>
-          <li>Depreciação e fechamento mensal</li>
-          <li>Controle de almoxarifado</li>
-          <li>Pendências e relatórios gerenciais</li>
-        </ul>
-
-        <a class="access" href="./patrimonio/index.html">
-          Acessar Gestão Patrimonial →
-        </a>
-      </article>
-
-      <article class="system-card prestacao">
-        <div class="icon">✓</div>
-        <small>Contratos de Gestão</small>
-        <h3>Sistema de Prestação de Contas CG</h3>
-        <p>Gestão de contratos, pagamentos, extratos, pessoal, cronogramas, documentos e execução físico-financeira.</p>
-
-        <ul class="features">
-          <li>Cadastro e acompanhamento de contratos</li>
-          <li>Pagamentos, extratos e conciliação</li>
-          <li>Relação de pessoal e exportações</li>
-          <li>Prestação mensal, trimestral e final</li>
-        </ul>
-
-        <a class="access" href="./prestacao-contas/index.html">
-          Acessar Prestação de Contas →
-        </a>
-      </article>
-    </section>
-
-    <div class="info-bar">
-      <span>ⓘ</span>
-      <div>
-        <strong>Etapa atual:</strong> os sistemas já estão organizados dentro do TRANCILIM.
-        A conexão definitiva com o banco de dados Supabase será feita na etapa seguinte.
+  <section class="screen" id="portalScreen">
+    <header class="portal-header">
+      <div class="portal-brand">
+        <img class="portal-logo" src="./assets/logo-ceara-set.png" alt="Secretaria do Trabalho">
+        <div>
+          <h1>TRANCILIM</h1>
+          <p>Portal de sistemas integrados • COAFI</p>
+        </div>
       </div>
-    </div>
-  </main>
 
-  <footer>
-    Governo do Estado do Ceará • Secretaria do Trabalho • Coordenadoria Administrativo-Financeira
-  </footer>
+      <div class="user-area">
+        <span class="user-name" id="currentUser"></span>
+        <button class="logout-button" type="button" id="logoutButton">Sair</button>
+      </div>
+    </header>
+
+    <main class="portal-main">
+      <div class="portal-title">
+        <h2>Selecione o sistema</h2>
+        <p>Escolha o módulo que deseja acessar.</p>
+      </div>
+
+      <section class="systems">
+        <article class="system-card patrimonio">
+          <div class="system-icon">▣</div>
+          <small>Patrimônio</small>
+          <h3>Gestão Patrimonial</h3>
+          <p>Bens móveis, depreciação, almoxarifado, movimentações e relatórios.</p>
+          <a class="access" href="./patrimonio/index.html">Acessar sistema</a>
+        </article>
+
+        <article class="system-card prestacao">
+          <div class="system-icon">✓</div>
+          <small>Contratos de Gestão</small>
+          <h3>Prestação de Contas CG</h3>
+          <p>Contratos, pagamentos, extratos, pessoal, prazos e documentos.</p>
+          <a class="access" href="./prestacao-contas/index.html">Acessar sistema</a>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      Governo do Estado do Ceará • Secretaria do Trabalho • Coordenadoria Administrativo-Financeira
+    </footer>
+  </section>
+
+  <script>
+    const SESSION_KEY = 'trancilim_portal_login_provisorio';
+
+    const loginScreen = document.getElementById('loginScreen');
+    const portalScreen = document.getElementById('portalScreen');
+    const loginForm = document.getElementById('loginForm');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginError = document.getElementById('loginError');
+    const currentUser = document.getElementById('currentUser');
+    const logoutButton = document.getElementById('logoutButton');
+
+    function showPortal(user) {
+      loginScreen.classList.remove('active');
+      portalScreen.classList.add('active');
+      currentUser.textContent = user || 'Usuário';
+    }
+
+    function showLogin() {
+      portalScreen.classList.remove('active');
+      loginScreen.classList.add('active');
+      loginPassword.value = '';
+      loginError.textContent = '';
+    }
+
+    loginForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const user = loginEmail.value.trim();
+      const password = loginPassword.value.trim();
+
+      if (!user || !password) {
+        loginError.textContent = 'Preencha usuário e senha.';
+        return;
+      }
+
+      /*
+       * Acesso visual provisório.
+       * Será substituído pelo Supabase Auth na etapa do banco de dados.
+       */
+      sessionStorage.setItem(SESSION_KEY, user);
+      showPortal(user);
+    });
+
+    logoutButton.addEventListener('click', function() {
+      sessionStorage.removeItem(SESSION_KEY);
+      showLogin();
+    });
+
+    const savedUser = sessionStorage.getItem(SESSION_KEY);
+    if (savedUser) {
+      showPortal(savedUser);
+    }
+  </script>
 </body>
 </html>
