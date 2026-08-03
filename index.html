@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="./assets/favicon-trancilim.png">
-  <title>TRANCILIM — Acesso ao Sistema</title>
+  <title>TRANCELIM — Acesso ao Sistema</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <meta name="description" content="Portal integrado de controle e gestão da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.">
   <style>
     :root{
@@ -279,6 +280,29 @@
     .portal-approved-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     .portal-approved-actions button{border:1px solid #dce6ea;background:#eef4f6;color:#0b5e91;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:800}
     @media(max-width:780px){.portal-profile-grid,.portal-profile-panels{grid-template-columns:1fr}.portal-profile-card{align-items:flex-start;flex-direction:column}.portal-profile-users-header{align-items:flex-start;flex-direction:column}}
+
+    .notification-button{position:relative;display:none;width:42px;height:42px;border:1px solid #c9d8de;border-radius:12px;background:#fff;color:var(--azul);cursor:pointer;align-items:center;justify-content:center}
+    .notification-button.active{display:inline-flex}
+    .notification-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .notification-badge{position:absolute;right:-5px;top:-6px;display:none;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#d92d20;color:#fff;font-size:10px;font-weight:900;align-items:center;justify-content:center;border:2px solid #fff}
+    .notification-badge.active{display:flex}
+    .notification-backdrop{position:fixed;inset:0;z-index:135;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(7,34,46,.48)}
+    .notification-backdrop.active{display:flex}
+    .notification-modal{width:min(760px,100%);max-height:88vh;overflow:auto;border-radius:22px;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+    .notification-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 22px;border-bottom:1px solid #dce7ea}
+    .notification-head h3{margin:0;color:var(--azul);font-size:22px}
+    .notification-close{width:38px;height:38px;border:0;border-radius:12px;background:#eef4f6;color:var(--azul);font-size:22px;font-weight:800;cursor:pointer}
+    .notification-body{padding:18px}
+    .notification-empty{padding:24px;border:1px dashed #cbd9df;border-radius:16px;color:#6d8190;text-align:center;font-size:12px}
+    .request-admin-card{padding:16px;border:1px solid #d8e4e8;border-radius:17px;background:#f8fbfc;margin-bottom:12px}
+    .request-admin-card strong{display:block;color:#0b2f4a;font-size:15px}
+    .request-admin-card span{display:block;margin-top:4px;color:#6d8190;font-size:11px;line-height:1.45}
+    .request-admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+    .request-admin-actions button{min-height:36px;padding:0 12px;border:1px solid #d6e2e6;border-radius:11px;background:#eef4f6;color:#0b5e91;font-size:11px;font-weight:800;cursor:pointer}
+    .request-admin-actions button.approve{border:0;background:linear-gradient(135deg,var(--verde),#0b9e50);color:#fff}
+    .request-admin-actions button.reject{border-color:#efb5ba;background:#fff4f5;color:#bc2436}
+    .db-status{display:none;margin-top:8px;color:#6d8190;font-size:9px;text-align:center}
+    .db-status.active{display:block}
     footer{margin-top:auto;padding:20px;color:#83949d;font-size:10px;text-align:center}
 
     @media(max-width:900px){
@@ -305,7 +329,7 @@
     }
   
 
-/* v128 - Logo TRANCILIM em alta qualidade, sem mudar dimensão/layout */
+/* v128 - Logo TRANCELIM em alta qualidade, sem mudar dimensão/layout */
 .brand-logo{
   filter:none !important;
   image-rendering:auto !important;
@@ -317,7 +341,7 @@
 
 
 
-/* v129 - Logo TRANCILIM corrigida no site: crop, tamanho, posição e texto */
+/* v129 - Logo TRANCELIM corrigida no site: crop, tamanho, posição e texto */
 .login-visual{
   padding:80px 9% 80px 7% !important;
 }
@@ -372,13 +396,13 @@
 </head>
 <body>
   <section class="screen active" id="loginScreen">
-    <aside class="login-visual" aria-label="Apresentação do TRANCILIM">
+    <aside class="login-visual" aria-label="Apresentação do TRANCELIM">
       <div class="brand-box">
         <div class="brand-logo-plate">
-          <img class="brand-logo" src="./assets/logo-trancilim.png?v=135" alt="TRANCILIM — Sistema Integrado de Controle e Gestão">
+          <img class="brand-logo" src="./assets/logo-trancilim.png?v=135" alt="TRANCELIM — Sistema Integrado de Controle e Gestão">
         </div>
         <div class="brand-intro">
-          <span>O TRANCILIM reúne, em um único portal, os sistemas internos da COAFI.</span>
+          <span>O TRANCELIM reúne, em um único portal, os sistemas internos da COAFI.</span>
           <span>Com acesso organizado por perfil, centraliza rotinas, informações e permissões para tornar a gestão mais segura, ágil e integrada.</span>
         </div>
       </div>
@@ -389,7 +413,7 @@
         <img class="institution-logo" src="./assets/logo-ceara-set.png" alt="Governo do Estado do Ceará — Secretaria do Trabalho">
 
         <form class="login-card" id="loginForm">
-          <h1>Acesso ao TRANCILIM</h1>
+          <h1>Acesso ao TRANCELIM</h1>
           <p class="subtitle">Entre com o usuário cadastrado para acessar os módulos liberados no seu perfil.</p>
 
           <div class="field">
@@ -452,6 +476,10 @@
             <input id="requestEmail" type="email" required>
           </div>
           <div class="request-field">
+            <label for="requestPassword">Crie uma senha</label>
+            <input id="requestPassword" type="password" minlength="6" autocomplete="new-password" required>
+          </div>
+          <div class="request-field">
             <label for="requestUnit">Setor / unidade</label>
             <input id="requestUnit" required>
           </div>
@@ -474,6 +502,7 @@
           <button class="request-submit" type="submit">Enviar solicitação</button>
         </div>
         <div class="request-message" id="requestMessage">Solicitação registrada. Ela ficará pendente até a análise e aprovação do administrador.</div>
+        <div class="db-status" id="requestDbStatus"></div>
       </form>
     </div>
   </div>
@@ -482,7 +511,7 @@
     <div class="portal-top-line"></div>
     <header class="portal-header">
       <div class="portal-brand" id="portalBrand">
-        <img class="portal-logo" src="./assets/logo-trancilim.png?v=135" alt="TRANCILIM">
+        <img class="portal-logo" src="./assets/logo-trancilim.png?v=135" alt="TRANCELIM">
         <div class="portal-brand-text">
           <strong>Portal de sistemas integrados</strong>
           <span>Coordenadoria Administrativo-Financeira</span>
@@ -490,6 +519,10 @@
       </div>
 
       <div class="user-area">
+        <button class="notification-button" id="notificationButton" type="button" aria-label="Solicitações pendentes">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+          <span class="notification-badge" id="notificationBadge">0</span>
+        </button>
         <div class="user-identity" id="userProfileTrigger">
           <img class="portal-avatar" id="portalAvatar" src="./assets/david-profile.png" alt="Foto do usuário">
           <div class="user-meta">
@@ -532,6 +565,19 @@
   </section>
 
   
+
+  <div class="notification-backdrop" id="notificationModal" aria-hidden="true">
+    <div class="notification-modal" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
+      <div class="notification-head">
+        <h3 id="notificationTitle">Solicitações de cadastro</h3>
+        <button class="notification-close" id="notificationClose" type="button" aria-label="Fechar">×</button>
+      </div>
+      <div class="notification-body" id="notificationList">
+        <div class="notification-empty">Nenhuma solicitação pendente.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="portal-profile-backdrop" id="portalProfileModal" aria-hidden="true">
     <div class="portal-profile-modal" role="dialog" aria-modal="true" aria-labelledby="portalProfileTitle">
       <div class="portal-profile-head">
@@ -594,53 +640,9 @@
 
   <script>
     const SESSION_KEY = 'trancilim_portal_session_v2';
-
-    /*
-     * PERFIS PROVISÓRIOS DO PORTAL
-     * Nesta fase, os usuários são definidos aqui apenas para demonstrar a lógica.
-     * Na versão definitiva, nome e módulos devem vir do Supabase após o login.
-     */
-    const ACCESS_PROFILES = [
-      {
-        id: 'david-alcantara',
-        name: 'David Pereira Alcântara',
-        firstName: 'David',
-        role: 'Administrador do portal',
-        perfil: 'Administrador',
-        permissao: 'total',
-        status: 'aprovado',
-        setor: 'COAFI',
-        email: 'david.alcantara@trabalho.ce.gov.br',
-        photo: './assets/david-profile.png',
-        admin: true,
-        aliases: [
-          'david',
-          'david pereira alcantara',
-          'david pereira alcântara',
-          'david alcantara',
-          'david alcântara',
-          'david.alcantara',
-          'david.alcantara@trabalho.ce.gov.br',
-          '8599187030'
-        ],
-        modules: ['patrimonio', 'prestacao-contas']
-      },
-      {
-        id: 'paula-ivane',
-        name: 'Paula Ivane',
-        firstName: 'Paula',
-        role: 'Acesso total ao Patrimônio',
-        perfil: 'Usuária',
-        permissao: 'total',
-        status: 'aprovado',
-        setor: 'Patrimônio',
-        email: 'paula.ivane@trabalho.ce.gov.br',
-        photo: '',
-        admin: false,
-        aliases: ['paula', 'paula ivane', 'paula.ivane', 'paula_ivane', 'paula.ivane@trabalho.ce.gov.br'],
-        modules: ['patrimonio']
-      }
-    ];
+    const SUPABASE_URL = 'https://fibangsfnfmvigwgaqgw.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_KEmyZQVDrxaP8r0Fz49Cww_T45uPkdY';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     const loginScreen = document.getElementById('loginScreen');
     const portalScreen = document.getElementById('portalScreen');
@@ -661,291 +663,310 @@
     const requestCancelButton = document.getElementById('requestCancelButton');
     const requestForm = document.getElementById('requestForm');
     const requestMessage = document.getElementById('requestMessage');
+    const requestDbStatus = document.getElementById('requestDbStatus');
     const forgotPasswordButton = document.getElementById('forgotPasswordButton');
     const portalBrand = document.getElementById('portalBrand');
     const userProfileTrigger = document.getElementById('userProfileTrigger');
     const portalProfileModal = document.getElementById('portalProfileModal');
+    const notificationButton = document.getElementById('notificationButton');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const notificationModal = document.getElementById('notificationModal');
+    const notificationList = document.getElementById('notificationList');
+
+    let currentPortalSession = null;
+    let pendingRequests = [];
+    let notificationTimer = null;
 
     function normalize(value) {
-      return String(value || '')
-        .trim()
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, ' ');
+      return String(value || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
     }
-
-
-    function sharedPhotoKey(email) {
-      return `trancilim_profile_photo_${normalize(email || 'local')}`;
-    }
-
-    function sharedPhotoFlagKey(email) {
-      return `trancilim_profile_photo_custom_${normalize(email || 'local')}`;
-    }
-
+    function sharedPhotoKey(email) { return `trancilim_profile_photo_${normalize(email || 'local')}`; }
+    function sharedPhotoFlagKey(email) { return `trancilim_profile_photo_custom_${normalize(email || 'local')}`; }
     function resolveProfilePhoto(profile) {
       const email = profile?.email || 'local';
       const cached = localStorage.getItem(sharedPhotoKey(email));
-      const custom = localStorage.getItem(sharedPhotoFlagKey(email)) === '1' || profile?.customPhoto === true;
+      const custom = localStorage.getItem(sharedPhotoFlagKey(email)) === '1';
       return custom && cached ? cached : './assets/david-profile.png';
     }
-
-    function findProfile(login) {
-      const normalizedLogin = normalize(login);
-      return ACCESS_PROFILES.find(profile =>
-        profile.aliases.some(alias => normalize(alias) === normalizedLogin)
-      ) || null;
+    function modulesFromProfile(profile) {
+      if (Array.isArray(profile?.modulos) && profile.modulos.length) return profile.modulos;
+      if (profile?.modulo_solicitado === 'ambos') return ['patrimonio', 'prestacao-contas'];
+      if (profile?.modulo_solicitado) return [profile.modulo_solicitado];
+      return [];
     }
-
-    function saveSession(profile, typedLogin) {
-      const photo = resolveProfilePhoto(profile);
-      if (profile?.email && photo) {
-        localStorage.setItem(sharedPhotoKey(profile.email), photo);
-      }
-      const session = {
+    function profileToSession(profile, authUser) {
+      const modules = modulesFromProfile(profile);
+      const name = profile.nome || authUser?.user_metadata?.nome || authUser?.email || 'Usuário';
+      return {
         id: profile.id,
-        name: profile.name,
-        firstName: profile.firstName || String(profile.name || '').split(' ')[0],
-        role: profile.role,
-        perfil: profile.perfil || profile.role,
-        permissao: profile.permissao || 'total',
-        status: profile.status || 'aprovado',
-        setor: profile.setor || 'COAFI',
-        email: profile.email || typedLogin,
-        photo,
-        admin: profile.admin,
-        login: typedLogin,
-        modules: [...profile.modules],
-        customPhoto: profile.customPhoto === true,
-        loggedAt: new Date().toISOString()
+        authUserId: authUser?.id || profile.auth_user_id,
+        name,
+        firstName: String(name).split(' ')[0],
+        role: profile.is_admin ? 'Administrador do portal' : `${profile.perfil || 'Usuário'} • ${profile.permissao || 'visualizar'}`,
+        perfil: profile.perfil || (profile.is_admin ? 'Administrador' : 'Usuário'),
+        permissao: profile.permissao || 'visualizar',
+        status: profile.status || 'pendente',
+        setor: profile.setor || '-',
+        email: profile.email || authUser?.email || '-',
+        photo: resolveProfilePhoto(profile),
+        admin: profile.is_admin === true,
+        modules
       };
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-      return session;
     }
-
-    function readSession() {
+    function savePortalSession(session) {
+      currentPortalSession = session;
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    }
+    function readPortalSession() {
       try {
         const value = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
         if (!value || !Array.isArray(value.modules)) return null;
-        if (value.email) {
-          const cached = localStorage.getItem(sharedPhotoKey(value.email));
-          const custom = localStorage.getItem(sharedPhotoFlagKey(value.email)) === '1' || value.customPhoto === true;
-          value.photo = custom && cached ? cached : './assets/david-profile.png';
-        } else if (!value.photo) {
-          value.photo = './assets/david-profile.png';
-        }
+        value.photo = resolveProfilePhoto(value);
         return value;
-      } catch (error) {
-        sessionStorage.removeItem(SESSION_KEY);
-        return null;
-      }
+      } catch (error) { return null; }
     }
-
+    async function loadProfile(authUser) {
+      const { data, error } = await supabaseClient.from('usuarios_perfis').select('*').eq('auth_user_id', authUser.id).maybeSingle();
+      if (error) throw error;
+      return data;
+    }
     function showPortal(session) {
+      savePortalSession(session);
       loginScreen.classList.remove('active');
       portalScreen.classList.add('active');
-
       currentUser.textContent = session.name || 'Usuário';
       currentAccess.textContent = session.role || 'Perfil de acesso';
-      if (portalAvatar) {
-        portalAvatar.src = session.photo || './assets/david-profile.png';
-        portalAvatar.alt = `Foto de ${session.name || 'Usuário'}`;
-      }
-      portalGreeting.textContent = `Olá, ${(session.firstName || String(session.name || 'usuário').split(' ')[0])}. Selecione o sistema`;
-
+      portalAvatar.src = session.photo || './assets/david-profile.png';
+      portalAvatar.alt = `Foto de ${session.name || 'Usuário'}`;
+      portalGreeting.textContent = `Olá, ${session.firstName || 'usuário'}. Selecione o sistema`;
       let allowedCount = 0;
       document.querySelectorAll('[data-module]').forEach(card => {
         const allowed = session.modules.includes(card.dataset.module);
         card.classList.toggle('allowed', allowed);
         if (allowed) allowedCount += 1;
       });
-
       systemsGrid.classList.toggle('single', allowedCount === 1);
       noAccess.classList.toggle('active', allowedCount === 0);
+      notificationButton.classList.toggle('active', session.admin === true);
+      if (session.admin) {
+        refreshNotifications();
+        if (!notificationTimer) notificationTimer = setInterval(refreshNotifications, 30000);
+      } else {
+        notificationBadge.classList.remove('active');
+      }
     }
-
     function showLogin(message = '') {
       portalScreen.classList.remove('active');
       loginScreen.classList.add('active');
       loginPassword.value = '';
       loginError.textContent = message;
+      notificationButton.classList.remove('active');
+      if (notificationTimer) { clearInterval(notificationTimer); notificationTimer = null; }
       setTimeout(() => loginEmail.focus(), 50);
     }
 
-    loginForm.addEventListener('submit', function(event) {
+    loginForm.addEventListener('submit', async function(event) {
       event.preventDefault();
-      loginError.textContent = '';
-
-      const typedLogin = loginEmail.value.trim();
-      const password = loginPassword.value.trim();
-
-      if (!typedLogin || !password) {
-        loginError.textContent = 'Preencha o usuário e a senha.';
-        return;
+      loginError.textContent = 'Entrando...';
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+      if (!email || !password) { loginError.textContent = 'Preencha o e-mail e a senha.'; return; }
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        const profile = await loadProfile(data.user);
+        if (!profile) { await supabaseClient.auth.signOut(); throw new Error('Seu perfil ainda não foi criado na base.'); }
+        if (profile.status !== 'aprovado') {
+          await supabaseClient.auth.signOut();
+          loginError.textContent = profile.status === 'rejeitado' ? 'Seu cadastro foi rejeitado. Fale com o administrador.' : 'Seu cadastro ainda está aguardando aprovação.';
+          return;
+        }
+        showPortal(profileToSession(profile, data.user));
+        loginError.textContent = '';
+      } catch (error) {
+        console.error(error);
+        loginError.textContent = error?.message?.includes('Invalid login') ? 'E-mail ou senha inválidos.' : (error.message || 'Não foi possível entrar.');
       }
-
-      const profile = findProfile(typedLogin);
-      if (!profile) {
-        loginError.textContent = 'Usuário ainda não cadastrado no portal. Entre em contato com o administrador.';
-        return;
-      }
-
-      /* A senha ainda é apenas visual nesta versão de demonstração. */
-      const session = saveSession(profile, typedLogin);
-      showPortal(session);
     });
 
-    logoutButton.addEventListener('click', function() {
+    logoutButton.addEventListener('click', async function() {
+      await supabaseClient.auth.signOut();
       sessionStorage.removeItem(SESSION_KEY);
+      currentPortalSession = null;
       loginEmail.value = '';
       showLogin();
     });
 
-
     function openRequestModal() {
       requestMessage.classList.remove('active');
+      requestDbStatus.classList.remove('active');
       requestModal.classList.add('active');
       requestModal.setAttribute('aria-hidden', 'false');
       setTimeout(() => document.getElementById('requestName').focus(), 50);
     }
-
     function closeRequestModal() {
       requestModal.classList.remove('active');
       requestModal.setAttribute('aria-hidden', 'true');
     }
-
     requestAccessButton.addEventListener('click', openRequestModal);
     requestCloseButton.addEventListener('click', closeRequestModal);
     requestCancelButton.addEventListener('click', closeRequestModal);
-    requestModal.addEventListener('click', function(event) {
-      if (event.target === requestModal) closeRequestModal();
-    });
+    requestModal.addEventListener('click', event => { if (event.target === requestModal) closeRequestModal(); });
 
-    requestForm.addEventListener('submit', function(event) {
+    requestForm.addEventListener('submit', async function(event) {
       event.preventDefault();
-      const requests = JSON.parse(localStorage.getItem('trancilim_access_requests') || '[]');
-      requests.push({
-        id: `request-${Date.now()}`,
-        name: document.getElementById('requestName').value.trim(),
-        email: document.getElementById('requestEmail').value.trim(),
-        unit: document.getElementById('requestUnit').value.trim(),
-        module: document.getElementById('requestModule').value,
-        reason: document.getElementById('requestReason').value.trim(),
-        status: 'PENDENTE',
-        requestedAt: new Date().toISOString()
-      });
-      localStorage.setItem('trancilim_access_requests', JSON.stringify(requests));
-      requestForm.reset();
-      requestMessage.classList.add('active');
+      const nome = document.getElementById('requestName').value.trim();
+      const email = document.getElementById('requestEmail').value.trim();
+      const password = document.getElementById('requestPassword').value;
+      const setor = document.getElementById('requestUnit').value.trim();
+      const modulo = document.getElementById('requestModule').value;
+      const justificativa = document.getElementById('requestReason').value.trim();
+      requestDbStatus.textContent = 'Enviando para a base de dados...';
+      requestDbStatus.classList.add('active');
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: { data: { nome, setor, modulo_solicitado: modulo, justificativa } }
+        });
+        if (error) throw error;
+        requestForm.reset();
+        requestMessage.classList.add('active');
+        requestDbStatus.textContent = data.session ? 'Cadastro enviado para aprovação.' : 'Cadastro enviado. Confirme o e-mail, se o Supabase solicitar.';
+      } catch (error) {
+        console.error(error);
+        requestDbStatus.textContent = error.message || 'Não foi possível enviar a solicitação.';
+      }
     });
 
+    forgotPasswordButton.addEventListener('click', async function() {
+      const email = loginEmail.value.trim();
+      if (!email) { loginError.textContent = 'Digite seu e-mail no campo de usuário e clique novamente.'; return; }
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('?')[0] });
+      loginError.textContent = error ? (error.message || 'Não foi possível enviar o e-mail.') : 'Confira seu e-mail para redefinir a senha.';
+    });
 
-    function profileInitials(name) {
-      return String(name || 'Usuário').split(' ').filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+    async function refreshNotifications() {
+      if (!currentPortalSession?.admin) return;
+      const { data, error } = await supabaseClient.from('usuarios_perfis').select('*').eq('status', 'pendente').order('created_at', { ascending: false });
+      if (error) { console.warn(error); return; }
+      pendingRequests = data || [];
+      const count = pendingRequests.length;
+      notificationBadge.textContent = String(count);
+      notificationBadge.classList.toggle('active', count > 0);
+      renderNotificationList();
+      renderProfileUsers();
     }
+    function requestedModules(profile) {
+      if (profile.modulo_solicitado === 'ambos') return ['patrimonio', 'prestacao-contas'];
+      return profile.modulo_solicitado ? [profile.modulo_solicitado] : [];
+    }
+    function renderNotificationList() {
+      if (!pendingRequests.length) {
+        notificationList.innerHTML = '<div class="notification-empty">Nenhuma solicitação pendente.</div>';
+        return;
+      }
+      notificationList.innerHTML = pendingRequests.map(item => `
+        <div class="request-admin-card">
+          <strong>${escapeHtml(item.nome || item.email)}</strong>
+          <span>${escapeHtml(item.email)} • ${escapeHtml(item.setor || '-')}</span>
+          <span>Módulo solicitado: ${escapeHtml(item.modulo_solicitado || '-')}</span>
+          <span>${escapeHtml(item.justificativa || 'Sem justificativa informada.')}</span>
+          <div class="request-admin-actions">
+            <button class="approve" onclick="approveUser('${item.id}','solicitado')">Aprovar solicitado</button>
+            <button onclick="approveUser('${item.id}','ambos')">Aprovar ambos</button>
+            <button class="reject" onclick="rejectUser('${item.id}')">Rejeitar</button>
+          </div>
+        </div>`).join('');
+    }
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+    }
+    window.approveUser = async function(id, mode) {
+      const item = pendingRequests.find(row => row.id === id);
+      if (!item) return;
+      const modulos = mode === 'ambos' ? ['patrimonio','prestacao-contas'] : requestedModules(item);
+      const { error } = await supabaseClient.from('usuarios_perfis').update({ status:'aprovado', permissao:'total', perfil:'Usuário', modulos, approved_at:new Date().toISOString(), approved_by:currentPortalSession.authUserId }).eq('id', id);
+      if (error) { alert('Erro ao aprovar: ' + error.message); return; }
+      await refreshNotifications();
+    };
+    window.rejectUser = async function(id) {
+      const { error } = await supabaseClient.from('usuarios_perfis').update({ status:'rejeitado', approved_at:new Date().toISOString(), approved_by:currentPortalSession.authUserId }).eq('id', id);
+      if (error) { alert('Erro ao rejeitar: ' + error.message); return; }
+      await refreshNotifications();
+    };
+    notificationButton.addEventListener('click', function() {
+      renderNotificationList();
+      notificationModal.classList.add('active');
+      notificationModal.setAttribute('aria-hidden','false');
+    });
+    document.getElementById('notificationClose').addEventListener('click', closeNotifications);
+    notificationModal.addEventListener('click', event => { if (event.target === notificationModal) closeNotifications(); });
+    function closeNotifications() { notificationModal.classList.remove('active'); notificationModal.setAttribute('aria-hidden','true'); }
 
+    function profileInitials(name) { return String(name || 'Usuário').split(' ').filter(Boolean).slice(0,2).map(part => part[0]).join('').toUpperCase(); }
     function fillPortalProfile(session) {
-      const user = session || readSession();
+      const user = session || currentPortalSession || readPortalSession();
       if (!user) return;
-      const name = user.name || 'Usuário';
-      const email = user.email || user.login || '-';
-      const setor = user.setor || 'COAFI';
-      const perfil = user.perfil || (user.admin ? 'Administrador' : 'Usuário');
-      const permissao = user.permissao || 'total';
-      const status = user.status || 'aprovado';
-      const photo = user.photo || './assets/david-profile.png';
       const avatarBig = document.getElementById('portalProfileAvatarBig');
-      if (avatarBig) {
-        avatarBig.innerHTML = photo ? `<img src="${photo}" alt="Foto de ${name}">` : `<span>${profileInitials(name)}</span>`;
-      }
-      const setText = (id, value) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-      };
-      setText('portalProfileNameTitle', name);
-      setText('portalProfileEmailTitle', email);
-      setText('portalProfileName', name);
-      setText('portalProfileEmail', email);
-      setText('portalProfileSetor', setor);
-      setText('portalProfilePerfil', perfil);
-      setText('portalProfilePermissao', permissao);
-      setText('portalProfileStatus', status);
-      setText('portalApprovedUserMeta', `${setor} • ${setor} • ${perfil} • Acesso ${permissao}`);
+      avatarBig.innerHTML = user.photo ? `<img src="${user.photo}" alt="Foto de ${escapeHtml(user.name)}">` : `<span>${profileInitials(user.name)}</span>`;
+      const setText = (id,value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+      setText('portalProfileNameTitle', user.name);
+      setText('portalProfileEmailTitle', user.email);
+      setText('portalProfileName', user.name);
+      setText('portalProfileEmail', user.email);
+      setText('portalProfileSetor', user.setor);
+      setText('portalProfilePerfil', user.perfil);
+      setText('portalProfilePermissao', user.permissao);
+      setText('portalProfileStatus', user.status);
+      setText('portalApprovedUserMeta', `${user.setor} • ${user.perfil} • Acesso ${user.permissao}`);
+      document.querySelector('.portal-profile-users').style.display = user.admin ? '' : 'none';
+      renderProfileUsers();
     }
-
-    function openPortalProfile() {
-      const session = readSession();
-      if (!session) return;
-      fillPortalProfile(session);
-      portalProfileModal.classList.add('active');
-      portalProfileModal.setAttribute('aria-hidden', 'false');
+    function renderProfileUsers() {
+      const panel = document.querySelector('.portal-profile-panel .portal-profile-empty');
+      if (panel && currentPortalSession?.admin) panel.textContent = pendingRequests.length ? `${pendingRequests.length} solicitação(ões) pendente(s). Use o sininho para analisar.` : 'Nenhuma solicitação pendente.';
     }
-
-    function closePortalProfile() {
-      portalProfileModal.classList.remove('active');
-      portalProfileModal.setAttribute('aria-hidden', 'true');
-    }
-
-    forgotPasswordButton?.addEventListener('click', function() {
-      loginError.textContent = 'Para recuperar a senha, fale com o administrador do sistema.';
+    function openPortalProfile() { fillPortalProfile(currentPortalSession); portalProfileModal.classList.add('active'); portalProfileModal.setAttribute('aria-hidden','false'); }
+    function closePortalProfile() { portalProfileModal.classList.remove('active'); portalProfileModal.setAttribute('aria-hidden','true'); }
+    userProfileTrigger.addEventListener('click', openPortalProfile);
+    document.getElementById('portalProfileClose').addEventListener('click', closePortalProfile);
+    portalProfileModal.addEventListener('click', event => { if (event.target === portalProfileModal) closePortalProfile(); });
+    document.getElementById('portalProfileLogout').addEventListener('click', () => logoutButton.click());
+    document.getElementById('portalProfileRemovePhoto').addEventListener('click', function() {
+      if (!currentPortalSession) return;
+      localStorage.removeItem(sharedPhotoKey(currentPortalSession.email));
+      localStorage.removeItem(sharedPhotoFlagKey(currentPortalSession.email));
+      currentPortalSession.photo = './assets/david-profile.png';
+      showPortal(currentPortalSession);
+      fillPortalProfile(currentPortalSession);
     });
-
-    portalBrand?.addEventListener('click', function() {
-      const session = readSession();
-      if (session) {
-        showPortal(session);
-      } else {
-        showLogin();
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    userProfileTrigger?.addEventListener('click', openPortalProfile);
-    document.getElementById('portalProfileClose')?.addEventListener('click', closePortalProfile);
-    portalProfileModal?.addEventListener('click', function(event) {
-      if (event.target === portalProfileModal) closePortalProfile();
-    });
-    document.getElementById('portalProfileLogout')?.addEventListener('click', function() {
-      closePortalProfile();
-      logoutButton.click();
-    });
-    document.getElementById('portalProfileRemovePhoto')?.addEventListener('click', function() {
-      const session = readSession();
-      if (!session) return;
-      localStorage.removeItem(sharedPhotoKey(session.email || session.login || 'local'));
-      localStorage.removeItem(sharedPhotoFlagKey(session.email || session.login || 'local'));
-      session.photo = './assets/david-profile.png';
-      session.customPhoto = false;
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-      showPortal(session);
-      fillPortalProfile(session);
-    });
-    document.getElementById('portalProfilePhotoInput')?.addEventListener('change', function(event) {
+    document.getElementById('portalProfilePhotoInput').addEventListener('change', function(event) {
       const file = event.target.files?.[0];
-      const session = readSession();
-      if (!file || !session) return;
+      if (!file || !currentPortalSession) return;
       const reader = new FileReader();
       reader.onload = function() {
-        localStorage.setItem(sharedPhotoKey(session.email || session.login || 'local'), reader.result);
-        localStorage.setItem(sharedPhotoFlagKey(session.email || session.login || 'local'), '1');
-        session.photo = reader.result;
-        session.customPhoto = true;
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-        showPortal(session);
-        fillPortalProfile(session);
+        localStorage.setItem(sharedPhotoKey(currentPortalSession.email), reader.result);
+        localStorage.setItem(sharedPhotoFlagKey(currentPortalSession.email), '1');
+        currentPortalSession.photo = reader.result;
+        showPortal(currentPortalSession);
+        fillPortalProfile(currentPortalSession);
       };
       reader.readAsDataURL(file);
-      event.target.value = '';
+      event.target.value='';
     });
+    portalBrand.addEventListener('click', () => { if (currentPortalSession) showPortal(currentPortalSession); });
 
-        const query = new URLSearchParams(window.location.search);
-    const savedSession = readSession();
-    if (savedSession) {
-      showPortal(savedSession);
-    } else if (query.get('acesso') === 'negado') {
-      showLogin('Seu usuário não possui autorização para acessar esse módulo.');
+    async function restoreSupabaseSession() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session?.user) { showLogin(); return; }
+      try {
+        const profile = await loadProfile(session.user);
+        if (!profile || profile.status !== 'aprovado') { await supabaseClient.auth.signOut(); showLogin('Seu cadastro ainda não está aprovado.'); return; }
+        showPortal(profileToSession(profile, session.user));
+      } catch (error) { console.error(error); showLogin('Não foi possível carregar seu perfil da base.'); }
     }
+    restoreSupabaseSession();
   </script>
 </body>
 </html>
