@@ -2291,7 +2291,7 @@ body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif
 </div>
 </div>
 <div class="user-card portal-profile-card" id="portalProfileCard" title="Abrir perfil">
-<div class="avatar" id="portalSidebarAvatar"><img src="../assets/david-profile.png" alt="Foto do perfil"></div>
+<div class="avatar" id="portalSidebarAvatar">U</div>
 <div style="min-width:0">
 <strong id="portalSidebarName">David Pereira Alcântara</strong>
 <small id="portalSidebarRole">Administrador • total</small>
@@ -13199,21 +13199,24 @@ Total bruto: ${money(a.proventos)}`)}
   function normalize(v){ return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
   function photoKey(email){ return `trancilim_profile_photo_${normalize(email||'local')}`; }
   function photoFlagKey(email){ return `trancilim_profile_photo_custom_${normalize(email||'local')}`; }
+  function isDavidProfile(email){
+    return normalize(email) === normalize('david.alcantara@trabalho.ce.gov.br');
+  }
   function getPortalUser(){
     const session=readSession();
-    const email=session?.email || 'david.alcantara@trabalho.ce.gov.br';
+    const email=session?.email || '';
     const saved=localStorage.getItem(photoKey(email));
     const custom=localStorage.getItem(photoFlagKey(email)) === '1' || session?.customPhoto === true;
     return {
-      name: session?.name || 'David Pereira Alcântara',
-      firstName: session?.firstName || String(session?.name || 'David').split(' ')[0],
-      email,
-      setor: session?.setor || 'COAFI',
-      perfil: session?.perfil || 'Administrador',
-      permissao: session?.permissao || 'total',
+      name: session?.name || 'Usuário',
+      firstName: session?.firstName || String(session?.name || 'Usuário').split(' ')[0],
+      email: email || '-',
+      setor: session?.setor || '-',
+      perfil: session?.perfil || 'Usuário',
+      permissao: session?.permissao || 'visualizar',
       status: session?.status || 'aprovado',
-      role: session?.role || 'Administrador • total',
-      photo: custom && saved ? saved : DEFAULT_PHOTO,
+      role: session?.role || 'Usuário',
+      photo: custom && saved ? saved : (isDavidProfile(email) ? DEFAULT_PHOTO : ''),
       modules: session?.modules || ['prestacao-contas']
     };
   }
@@ -13370,9 +13373,14 @@ Total bruto: ${money(a.proventos)}`)}
     const normalized = String(email).trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
     const custom = localStorage.getItem(`trancilim_profile_photo_custom_${normalized}`) === '1' || session.customPhoto === true;
     const saved = localStorage.getItem(`trancilim_profile_photo_${normalized}`);
-    const photo = custom && saved ? saved : '../assets/david-profile.png';
+    const isDavid = normalized === 'david.alcantara@trabalho.ce.gov.br';
+    const photo = custom && saved ? saved : (isDavid ? '../assets/david-profile.png' : '');
     const avatar = document.getElementById('portalSidebarAvatar');
-    if(avatar){ avatar.innerHTML = `<img src="${photo}" alt="Foto de ${name}">`; }
+    if(avatar){
+      avatar.innerHTML = photo
+        ? `<img src="${photo}" alt="Foto de ${name}">`
+        : `<span>${String(name).split(' ').filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase() || 'U'}</span>`;
+    }
     const nm = document.getElementById('portalSidebarName');
     const rl = document.getElementById('portalSidebarRole');
     if(nm) nm.textContent = name;

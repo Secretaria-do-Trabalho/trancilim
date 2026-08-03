@@ -1,4 +1,4 @@
-# TRANCELIM - v142
+# TRANCELIM - v145
 
 ## Atualização principal
 - login integrado ao Supabase Auth;
@@ -22,3 +22,14 @@ Depois abra com Ctrl+F5.
 - Corrigido cadastro provisório de Paula Carvalho.
 - Login liberado para paula.carvalho@trabalho.ce.gov.br.
 - Acesso mantido somente ao Sistema de Gestão Patrimonial, com permissão total.
+
+## v144
+- Corrigida a foto de perfil: a foto padrão de David não é mais exibida para outros usuários.
+- Usuários sem foto passam a ver somente suas iniciais.
+
+
+## v145
+- Integrada a versão mais recente enviada do Sistema de Gestão Patrimonial (v127 do módulo).
+- Mantidos o login central do TRANCELIM, as permissões do portal e o acesso sem novo login.
+- Mantida a regra de foto individual: David usa sua foto; usuários sem foto veem somente as iniciais.
+- Sistema de Prestação de Contas CG e portal mantidos sem alteração funcional.

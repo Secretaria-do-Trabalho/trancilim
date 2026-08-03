@@ -216,7 +216,7 @@
     .user-area{display:flex;align-items:center;gap:12px}
     .user-identity{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:14px;cursor:pointer;transition:background .16s ease,transform .16s ease}
     .user-identity:hover{background:#f3f8fa;transform:translateY(-1px)}
-    .portal-avatar{width:48px;height:48px;border-radius:16px;object-fit:cover;border:3px solid rgba(8,120,62,.12);background:#e6eff2;box-shadow:0 10px 20px rgba(11,47,74,.08)}
+    .portal-avatar{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;overflow:hidden;border:3px solid rgba(8,120,62,.12);background:#e6eff2;color:var(--azul);font-size:14px;font-weight:900;box-shadow:0 10px 20px rgba(11,47,74,.08);flex:none}.portal-avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .user-meta{text-align:right}
     .user-name{display:block;color:var(--azul);font-size:12px;font-weight:850}
     .user-access{display:block;margin-top:3px;color:var(--muted);font-size:9px}
@@ -524,7 +524,7 @@
           <span class="notification-badge" id="notificationBadge">0</span>
         </button>
         <div class="user-identity" id="userProfileTrigger">
-          <img class="portal-avatar" id="portalAvatar" src="./assets/david-profile.png" alt="Foto do usuário">
+          <div class="portal-avatar" id="portalAvatar" aria-label="Avatar do usuário">U</div>
           <div class="user-meta">
             <span class="user-name" id="currentUser"></span>
             <span class="user-access" id="currentAccess"></span>
@@ -682,11 +682,25 @@
     }
     function sharedPhotoKey(email) { return `trancilim_profile_photo_${normalize(email || 'local')}`; }
     function sharedPhotoFlagKey(email) { return `trancilim_profile_photo_custom_${normalize(email || 'local')}`; }
+    function isDavidProfile(email) {
+      return normalize(email) === normalize('david.alcantara@trabalho.ce.gov.br');
+    }
     function resolveProfilePhoto(profile) {
       const email = profile?.email || 'local';
       const cached = localStorage.getItem(sharedPhotoKey(email));
       const custom = localStorage.getItem(sharedPhotoFlagKey(email)) === '1';
-      return custom && cached ? cached : './assets/david-profile.png';
+      if (custom && cached) return cached;
+      return isDavidProfile(email) ? './assets/david-profile.png' : '';
+    }
+    function renderPortalAvatar(session) {
+      if (!portalAvatar) return;
+      const name = session?.name || 'Usuário';
+      if (session?.photo) {
+        portalAvatar.innerHTML = `<img src="${session.photo}" alt="Foto de ${escapeHtml(name)}">`;
+      } else {
+        portalAvatar.textContent = profileInitials(name);
+      }
+      portalAvatar.setAttribute('aria-label', session?.photo ? `Foto de ${name}` : `Iniciais de ${name}`);
     }
     function modulesFromProfile(profile) {
       if (Array.isArray(profile?.modulos) && profile.modulos.length) return profile.modulos;
@@ -736,8 +750,7 @@
       portalScreen.classList.add('active');
       currentUser.textContent = session.name || 'Usuário';
       currentAccess.textContent = session.role || 'Perfil de acesso';
-      portalAvatar.src = session.photo || './assets/david-profile.png';
-      portalAvatar.alt = `Foto de ${session.name || 'Usuário'}`;
+      renderPortalAvatar(session);
       portalGreeting.textContent = `Olá, ${session.firstName || 'usuário'}. Selecione o sistema`;
       let allowedCount = 0;
       document.querySelectorAll('[data-module]').forEach(card => {
@@ -937,7 +950,7 @@
       if (!currentPortalSession) return;
       localStorage.removeItem(sharedPhotoKey(currentPortalSession.email));
       localStorage.removeItem(sharedPhotoFlagKey(currentPortalSession.email));
-      currentPortalSession.photo = './assets/david-profile.png';
+      currentPortalSession.photo = resolveProfilePhoto(currentPortalSession);
       showPortal(currentPortalSession);
       fillPortalProfile(currentPortalSession);
     });
