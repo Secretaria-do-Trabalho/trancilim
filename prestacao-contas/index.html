@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v43</title>
+<title>Sistema de Prestação de Contas CG — v44</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -52,6 +52,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 .profile-badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;background:#e6f1ea;color:#64806f;font-size:12px;font-weight:800}
 .profile-light-btn{border:1px solid #dce6ea;background:#eef4f6;color:#0b5e91;padding:8px 12px;border-radius:12px;font-weight:800;cursor:pointer}
 @media(max-width:780px){.profile-grid,.profile-users-grid{grid-template-columns:1fr}.profile-top-card{align-items:flex-start;flex-direction:column}}
+
 
     :root{
       --bg:#eef4f5;
@@ -99,7 +100,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       width:42px;height:42px;min-width:42px;min-height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;
       background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35)
     }
-    .avatar img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .user-card strong{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .user-card small{font-size:11px;color:rgba(255,255,255,.85)}
     .nav{display:flex;flex-direction:column;gap:6px}
@@ -485,6 +486,230 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     .tag.pending{
       background:#fff2df;
       color:#9a5a00;
+    }
+
+    .responsible-import-editor-list{
+      display:grid;
+      gap:16px;
+      margin-top:14px;
+    }
+
+    .responsible-import-editor{
+      border:1px solid #cfe0e5;
+      border-radius:17px;
+      background:#fff;
+      overflow:hidden;
+      box-shadow:0 8px 22px rgba(14,48,67,.06);
+    }
+
+    .responsible-import-editor-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:15px 17px;
+      background:#f4faf7;
+      border-bottom:1px solid #d9e7e3;
+    }
+
+    .responsible-import-editor-head strong{
+      display:block;
+      color:#0b2f4a;
+      font-size:15px;
+      margin-bottom:4px;
+    }
+
+    .responsible-import-editor-head small{
+      color:#687d89;
+      font-size:10px;
+    }
+
+    .responsible-import-editor-head .actions{
+      margin:0;
+      flex:0 0 auto;
+    }
+
+    .responsible-import-editor-body{
+      padding:16px;
+    }
+
+    .responsible-import-form-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .responsible-import-form-grid .span-2{
+      grid-column:span 2;
+    }
+
+    .responsible-import-form-grid .span-4{
+      grid-column:1/-1;
+    }
+
+    .responsible-import-form-grid label,
+    .responsible-import-subsection label{
+      display:block;
+      margin-bottom:6px;
+      font-size:10px;
+      font-weight:900;
+      color:#25465c;
+    }
+
+    .responsible-import-form-grid input,
+    .responsible-import-form-grid select,
+    .responsible-import-form-grid textarea,
+    .responsible-import-subsection input,
+    .responsible-import-subsection select,
+    .responsible-import-subsection textarea{
+      width:100%;
+      min-height:40px;
+      border:1px solid #cbdce3;
+      border-radius:10px;
+      padding:9px 10px;
+      background:#fff;
+      color:#15344a;
+      outline:none;
+    }
+
+    .responsible-import-form-grid textarea,
+    .responsible-import-subsection textarea{
+      min-height:70px;
+      resize:vertical;
+    }
+
+    .responsible-import-form-grid input:focus,
+    .responsible-import-form-grid select:focus,
+    .responsible-import-form-grid textarea:focus,
+    .responsible-import-subsection input:focus,
+    .responsible-import-subsection select:focus,
+    .responsible-import-subsection textarea:focus{
+      border-color:#48b8ae;
+      box-shadow:0 0 0 3px rgba(72,184,174,.11);
+    }
+
+    .responsible-import-subsection{
+      margin-top:14px;
+      padding:14px;
+      border:1px solid #d8e5e9;
+      border-radius:13px;
+      background:#f9fbfc;
+    }
+
+    .responsible-import-subsection-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:11px;
+    }
+
+    .responsible-import-subsection-title strong{
+      color:#0b2f4a;
+      font-size:13px;
+    }
+
+    .responsible-import-period-row{
+      display:grid;
+      grid-template-columns:1fr 1fr auto;
+      gap:10px;
+      align-items:end;
+      padding:10px;
+      border:1px solid #dce7eb;
+      border-radius:11px;
+      background:#fff;
+      margin-bottom:9px;
+    }
+
+    .responsible-import-act-row{
+      display:grid;
+      grid-template-columns:1.1fr 1fr .6fr .85fr .85fr 1.15fr;
+      gap:9px;
+      padding:11px;
+      border:1px solid #dce7eb;
+      border-radius:11px;
+      background:#fff;
+      margin-bottom:10px;
+    }
+
+    .responsible-import-act-row .act-span-2{
+      grid-column:span 2;
+    }
+
+    .responsible-import-act-row .act-span-all{
+      grid-column:1/-1;
+    }
+
+    .responsible-import-act-file{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      flex-wrap:wrap;
+      grid-column:1/-1;
+    }
+
+    .responsible-import-act-file input{
+      flex:1 1 280px;
+    }
+
+    .responsible-import-act-file small{
+      color:#687d89;
+      font-size:10px;
+    }
+
+    .responsible-import-person-issues{
+      margin-top:13px;
+      padding:11px 13px;
+      border-radius:11px;
+      background:#fff5e8;
+      border:1px solid #f1d7ad;
+      color:#955700;
+      font-size:10px;
+      line-height:1.5;
+    }
+
+    .responsible-import-person-complete{
+      margin-top:13px;
+      padding:11px 13px;
+      border-radius:11px;
+      background:#edf9f1;
+      border:1px solid #cde9d6;
+      color:#167443;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .responsible-import-empty{
+      padding:12px;
+      border:1px dashed #cadbe2;
+      border-radius:10px;
+      color:#718591;
+      text-align:center;
+      background:#fff;
+      font-size:11px;
+    }
+
+    .responsible-import-small-button{
+      min-height:34px;
+      padding:7px 10px;
+      font-size:10px;
+      border-radius:9px;
+    }
+
+    @media(max-width:1100px){
+      .responsible-import-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .responsible-import-form-grid .span-4{grid-column:1/-1}
+      .responsible-import-act-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+
+    @media(max-width:680px){
+      .responsible-import-form-grid{grid-template-columns:1fr}
+      .responsible-import-form-grid .span-2,
+      .responsible-import-form-grid .span-4{grid-column:auto}
+      .responsible-import-period-row{grid-template-columns:1fr}
+      .responsible-import-act-row{grid-template-columns:1fr}
+      .responsible-import-act-row .act-span-2,
+      .responsible-import-act-row .act-span-all{grid-column:auto}
     }
     @media(max-width:1250px){
       .acts-add{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -4219,7 +4444,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="modal-head">
 <div>
 <strong>Importar documentos do Rol de Responsáveis</strong>
-<div class="small">O sistema lê os PDFs, preenche os campos identificados e mantém como pendência tudo que não estiver no documento.</div>
+<div class="small">O sistema lê os PDFs e cria uma prévia totalmente editável. Corrija ou complete os campos, períodos e atos antes de confirmar.</div>
 </div>
 <button class="close" onclick="closeResponsibleImportModal()">×</button>
 </div>
@@ -4250,23 +4475,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div><small>Campos preenchidos</small><strong id="rrImportFilledCount">0</strong></div>
 <div><small>Pendências previstas</small><strong id="rrImportPendingCount">0</strong></div>
 </div>
-<div class="table-wrap">
-<table style="min-width:1450px">
-<thead>
-<tr>
-<th>Arquivo</th>
-<th>Nome</th>
-<th>CPF</th>
-<th>Categoria</th>
-<th>Representação</th>
-<th>Cargo/Função</th>
-<th>Período(s)</th>
-<th>Campos pendentes</th>
-</tr>
-</thead>
-<tbody id="rrImportPreviewBody"></tbody>
-</table>
-</div>
+<div class="responsible-import-editor-list" id="rrImportPreviewBody"></div>
 </div>
 </div>
 <div class="modal-foot">
@@ -6096,7 +6305,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       if(!act.actDate)issues.push(`${prefix} sem data do ato`);
       if(!act.publicationDate)issues.push(`${prefix} sem data da publicação`);
       if(!act.publicationType)issues.push(`${prefix} sem tipo da publicação`);
-      if(!act.documentId)issues.push(`${prefix} sem publicação anexada`);
+      if(!act.documentId&&!act._file)issues.push(`${prefix} sem publicação anexada`);
     });
 
     return [...new Set(issues)];
@@ -6429,39 +6638,456 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       : `<div class="notice error">Nenhum responsável foi identificado. O arquivo pode estar digitalizado como imagem ou possuir outro formato.</div>`;
   }
 
+
+  const responsibleImportCategories=[
+    'Diretoria',
+    'Conselho de Administração – Art. 3º da Lei 12.781/1997',
+    'Conselho Fiscal – Art. 5º da Lei 12.781/97',
+    'Responsável pelo Setor Financeiro',
+    'Contador',
+    'Membros da Comissão de Avaliação'
+  ];
+
+  const responsibleImportRepresentations=[
+    'Representante do Poder Executivo',
+    'Representante da sociedade civil',
+    'Representante eleito dentre membros ou associados',
+    'Representante eleito pelos membros do Conselho',
+    'Membro indicado ou eleito, conforme estatuto',
+    'Representante da Secretaria',
+    'Representante da SEFAZ',
+    'Representante da SEPLAG',
+    'Representante da CGE',
+    'Representante dos empregados da OS',
+    'Membro indicado pelas entidades da Sociedade Civil',
+    'Não se aplica'
+  ];
+
+  const responsibleImportActTypes=[
+    'Eleição','Nomeação','Designação','Recondução',
+    'Substituição','Exoneração','Dispensa'
+  ];
+
+  const responsibleImportPublicationTypes=[
+    'Diário Oficial do Estado',
+    'Diário Oficial da União',
+    'Diário Oficial do Município',
+    'Outro meio oficial'
+  ];
+
+  function responsibleImportOptions(values,selected,placeholder='Selecione'){
+    return `<option value="">${safe(placeholder)}</option>`+
+      values.map(value=>`<option value="${safe(value)}" ${value===selected?'selected':''}>${safe(value)}</option>`).join('');
+  }
+
+  function responsibleImportPeriodOptions(item,selected){
+    const periods=item.periods||[];
+    return `<option value="">Selecione o período</option>`+
+      periods.map((period,index)=>
+        `<option value="${safe(period.id)}" ${period.id===selected?'selected':''}>`+
+        `${index+1}º período — ${safe(isoToBr(period.de)||'sem início')} a ${safe(isoToBr(period.ate)||'sem final')}`+
+        `</option>`
+      ).join('');
+  }
+
+  window.updateResponsibleImportField=function(index,field,value,input=null){
+    const item=responsibleImportPreview[index];
+    if(!item)return;
+
+    if(field==='cpf'){
+      value=formatCpf(value);
+      if(input)input.value=value;
+    }
+    if(field==='telefone'){
+      value=formatPhone(value);
+      if(input)input.value=value;
+    }
+
+    item[field]=value;
+    refreshResponsibleImportMetricsAndIssues(index);
+  }
+
+  window.updateResponsibleImportPeriod=function(personIndex,periodIndex,field,value){
+    const item=responsibleImportPreview[personIndex];
+    const period=item?.periods?.[periodIndex];
+    if(!period)return;
+    period[field]=value;
+    refreshResponsibleImportMetricsAndIssues(personIndex);
+    refreshResponsibleImportActPeriodOptions(personIndex);
+  }
+
+  window.addResponsibleImportPeriod=function(personIndex){
+    const item=responsibleImportPreview[personIndex];
+    if(!item)return;
+    item.periods=item.periods||[];
+    item.periods.push({id:id(),de:'',ate:''});
+    renderResponsibleImportPreview();
+  }
+
+  window.removeResponsibleImportPeriod=function(personIndex,periodIndex){
+    const item=responsibleImportPreview[personIndex];
+    const period=item?.periods?.[periodIndex];
+    if(!item||!period)return;
+    if(!confirm('Excluir este período da prévia?'))return;
+
+    item.periods.splice(periodIndex,1);
+    (item.acts||[]).forEach(act=>{
+      if(act.periodId===period.id)act.periodId='';
+    });
+    renderResponsibleImportPreview();
+  }
+
+  window.addResponsibleImportAct=function(personIndex){
+    const item=responsibleImportPreview[personIndex];
+    if(!item)return;
+    item.acts=item.acts||[];
+    item.acts.push({
+      id:id(),
+      periodId:item.periods?.[0]?.id||'',
+      type:'',
+      page:'',
+      actDate:'',
+      publicationDate:'',
+      publicationType:'',
+      fileName:'',
+      documentId:'',
+      description:'',
+      _file:null
+    });
+    renderResponsibleImportPreview();
+  }
+
+  window.removeResponsibleImportAct=function(personIndex,actIndex){
+    const item=responsibleImportPreview[personIndex];
+    if(!item?.acts?.[actIndex])return;
+    if(!confirm('Excluir este ato da prévia?'))return;
+    item.acts.splice(actIndex,1);
+    renderResponsibleImportPreview();
+  }
+
+  window.updateResponsibleImportAct=function(personIndex,actIndex,field,value){
+    const act=responsibleImportPreview[personIndex]?.acts?.[actIndex];
+    if(!act)return;
+    act[field]=value;
+    refreshResponsibleImportMetricsAndIssues(personIndex);
+  }
+
+  window.updateResponsibleImportActFile=function(personIndex,actIndex,input){
+    const act=responsibleImportPreview[personIndex]?.acts?.[actIndex];
+    if(!act)return;
+    const file=input.files?.[0]||null;
+    act._file=file;
+    if(file)act.fileName=file.name;
+    refreshResponsibleImportMetricsAndIssues(personIndex);
+  }
+
+  window.removeResponsibleImportPerson=function(index){
+    if(!responsibleImportPreview[index])return;
+    if(!confirm('Retirar esta pessoa da importação?'))return;
+    responsibleImportPreview.splice(index,1);
+    renderResponsibleImportPreview();
+  }
+
+  function refreshResponsibleImportActPeriodOptions(personIndex){
+    const item=responsibleImportPreview[personIndex];
+    if(!item)return;
+    document.querySelectorAll(`[data-rr-person="${personIndex}"][data-rr-act-period]`).forEach(select=>{
+      const actIndex=Number(select.dataset.rrActPeriod);
+      const act=item.acts?.[actIndex];
+      if(!act)return;
+      select.innerHTML=responsibleImportPeriodOptions(item,act.periodId);
+    });
+  }
+
+  function refreshResponsibleImportMetricsAndIssues(personIndex=null){
+    const pendingTotal=responsibleImportPreview.reduce(
+      (sum,item)=>sum+responsibleIssueList(item).length,0
+    );
+    const filledTotal=responsibleImportPreview.reduce(
+      (sum,item)=>sum+responsibleFieldCount(item),0
+    );
+
+    const fileCount=document.getElementById('rrImportFileCount');
+    const personCount=document.getElementById('rrImportPersonCount');
+    const filledCount=document.getElementById('rrImportFilledCount');
+    const pendingCount=document.getElementById('rrImportPendingCount');
+
+    if(fileCount)fileCount.textContent=responsibleImportFiles.length;
+    if(personCount)personCount.textContent=responsibleImportPreview.length;
+    if(filledCount)filledCount.textContent=filledTotal;
+    if(pendingCount)pendingCount.textContent=pendingTotal;
+
+    if(personIndex===null)return;
+    const item=responsibleImportPreview[personIndex];
+    const status=document.getElementById(`rrImportPersonIssues_${personIndex}`);
+    if(!item||!status)return;
+
+    const issues=responsibleIssueList(item);
+    status.className=issues.length
+      ? 'responsible-import-person-issues'
+      : 'responsible-import-person-complete';
+    status.innerHTML=issues.length
+      ? `<strong>${issues.length} pendência(s) prevista(s):</strong><br>${issues.map(safe).join('<br>')}`
+      : 'Cadastro completo para esta pessoa.';
+  }
+
+  async function saveResponsibleImportedActFiles(item,contract){
+    for(const act of item.acts||[]){
+      if(!act._file)continue;
+
+      const file=act._file;
+      const documentId=id();
+      let hasFile=false;
+      try{
+        hasFile=await saveFileBlob(documentId,file);
+      }catch(error){
+        console.error(error);
+      }
+
+      state.documents.push({
+        id:documentId,
+        folder:'atos_responsaveis',
+        categoria:'responsavel',
+        tipo:'publicacao_ato_responsavel',
+        name:file.name,
+        mime:file.type||'application/pdf',
+        contractId:contract.id,
+        ug:contract.ug,
+        sacc:contract.sacc,
+        contrato:contract.contrato,
+        projeto:contract.projeto,
+        competencia:act.publicationDate?.slice(0,7)||act.actDate?.slice(0,7)||'',
+        hasFile,
+        createdAt:new Date().toISOString()
+      });
+
+      act.documentId=documentId;
+      act.fileName=file.name;
+      act._file=undefined;
+    }
+  }
+
   function renderResponsibleImportPreview(){
     const area=document.getElementById('rrImportPreviewArea');
     const button=document.getElementById('confirmResponsibleImportButton');
     const body=document.getElementById('rrImportPreviewBody');
     if(!area||!button||!body)return;
 
-    const pendingTotal=responsibleImportPreview.reduce((sum,item)=>sum+responsibleIssueList(item).length,0);
-    const filledTotal=responsibleImportPreview.reduce((sum,item)=>sum+responsibleFieldCount(item),0);
+    refreshResponsibleImportMetricsAndIssues();
 
-    document.getElementById('rrImportFileCount').textContent=responsibleImportFiles.length;
-    document.getElementById('rrImportPersonCount').textContent=responsibleImportPreview.length;
-    document.getElementById('rrImportFilledCount').textContent=filledTotal;
-    document.getElementById('rrImportPendingCount').textContent=pendingTotal;
-
-    body.innerHTML=responsibleImportPreview.map(item=>{
+    body.innerHTML=responsibleImportPreview.map((item,personIndex)=>{
       const issues=responsibleIssueList(item);
-      const periods=(item.periods||[]).map(period=>
-        `${isoToBr(period.de)||'—'} a ${isoToBr(period.ate)||'—'}`
-      ).join('<br>')||'—';
-      return `<tr>
-        <td>${safe(item.sourceFileName)}</td>
-        <td><strong>${safe(item.nome||'NÃO IDENTIFICADO')}</strong></td>
-        <td>${safe(item.cpf||'—')}</td>
-        <td>${safe(item.categoria||'—')}</td>
-        <td>${safe(item.representacao||'—')}</td>
-        <td>${safe(item.cargo||'—')}</td>
-        <td>${periods}</td>
-        <td>
-          ${issues.length
-            ? `<div class="responsible-import-issues">${issues.map(safe).join('<br>')}</div>`
-            : '<span class="responsible-import-ok">Cadastro completo</span>'}
-        </td>
-      </tr>`;
+      const periods=item.periods||[];
+      const acts=item.acts||[];
+
+      const periodsHtml=periods.length
+        ? periods.map((period,periodIndex)=>`
+          <div class="responsible-import-period-row">
+            <div>
+              <label>Data inicial</label>
+              <input type="date" value="${safe(period.de||'')}"
+                onchange="updateResponsibleImportPeriod(${personIndex},${periodIndex},'de',this.value)">
+            </div>
+            <div>
+              <label>Data final</label>
+              <input type="date" value="${safe(period.ate||'')}"
+                onchange="updateResponsibleImportPeriod(${personIndex},${periodIndex},'ate',this.value)">
+            </div>
+            <button class="btn btn-outline responsible-import-small-button"
+              onclick="removeResponsibleImportPeriod(${personIndex},${periodIndex})">Excluir período</button>
+          </div>
+        `).join('')
+        : '<div class="responsible-import-empty">Nenhum período informado. Clique em “Adicionar período”.</div>';
+
+      const actsHtml=acts.length
+        ? acts.map((act,actIndex)=>`
+          <div class="responsible-import-act-row">
+            <div>
+              <label>Período vinculado</label>
+              <select data-rr-person="${personIndex}" data-rr-act-period="${actIndex}"
+                onchange="updateResponsibleImportAct(${personIndex},${actIndex},'periodId',this.value)">
+                ${responsibleImportPeriodOptions(item,act.periodId)}
+              </select>
+            </div>
+            <div>
+              <label>Tipo do ato</label>
+              <select onchange="updateResponsibleImportAct(${personIndex},${actIndex},'type',this.value)">
+                ${responsibleImportOptions(responsibleImportActTypes,act.type,'Selecione o tipo')}
+              </select>
+            </div>
+            <div>
+              <label>Página do Diário</label>
+              <input value="${safe(act.page||'')}" placeholder="Ex.: 15"
+                oninput="updateResponsibleImportAct(${personIndex},${actIndex},'page',this.value)">
+            </div>
+            <div>
+              <label>Data do ato</label>
+              <input type="date" value="${safe(act.actDate||'')}"
+                onchange="updateResponsibleImportAct(${personIndex},${actIndex},'actDate',this.value)">
+            </div>
+            <div>
+              <label>Data da publicação</label>
+              <input type="date" value="${safe(act.publicationDate||'')}"
+                onchange="updateResponsibleImportAct(${personIndex},${actIndex},'publicationDate',this.value)">
+            </div>
+            <div>
+              <label>Tipo da publicação</label>
+              <select onchange="updateResponsibleImportAct(${personIndex},${actIndex},'publicationType',this.value)">
+                ${responsibleImportOptions(
+                  responsibleImportPublicationTypes,
+                  act.publicationType,
+                  'Selecione'
+                )}
+              </select>
+            </div>
+            <div class="act-span-all">
+              <label>Descrição do ato</label>
+              <textarea placeholder="Descrição ou referência do ato"
+                oninput="updateResponsibleImportAct(${personIndex},${actIndex},'description',this.value)">${safe(act.description||'')}</textarea>
+            </div>
+            <div class="responsible-import-act-file">
+              <div style="flex:1 1 360px">
+                <label>Publicação do ato</label>
+                <input type="file" accept="application/pdf,.pdf,image/*"
+                  onchange="updateResponsibleImportActFile(${personIndex},${actIndex},this)">
+              </div>
+              <small>
+                ${act.fileName
+                  ? `Arquivo selecionado: <strong>${safe(act.fileName)}</strong>`
+                  : 'Nenhuma publicação anexada.'}
+              </small>
+              <button class="btn btn-outline responsible-import-small-button"
+                onclick="removeResponsibleImportAct(${personIndex},${actIndex})">Excluir ato</button>
+            </div>
+          </div>
+        `).join('')
+        : '<div class="responsible-import-empty">Nenhum ato informado. Clique em “Adicionar ato”.</div>';
+
+      return `
+        <article class="responsible-import-editor">
+          <div class="responsible-import-editor-head">
+            <div>
+              <strong>${safe(item.nome||`Responsável ${personIndex+1}`)}</strong>
+              <small>Documento de origem: ${safe(item.sourceFileName||'—')}</small>
+            </div>
+            <div class="actions">
+              <button class="btn btn-outline responsible-import-small-button"
+                onclick="removeResponsibleImportPerson(${personIndex})">Retirar da importação</button>
+            </div>
+          </div>
+
+          <div class="responsible-import-editor-body">
+            <div class="responsible-import-form-grid">
+              <div class="span-2">
+                <label>Nome *</label>
+                <input value="${safe(item.nome||'')}" placeholder="Nome completo"
+                  oninput="updateResponsibleImportField(${personIndex},'nome',this.value,this)">
+              </div>
+
+              <div>
+                <label>CPF *</label>
+                <input value="${safe(item.cpf||'')}" maxlength="14" placeholder="000.000.000-00"
+                  oninput="updateResponsibleImportField(${personIndex},'cpf',this.value,this)">
+              </div>
+
+              <div>
+                <label>Telefone *</label>
+                <input value="${safe(item.telefone||'')}" maxlength="15" placeholder="(85) 99999-9999"
+                  oninput="updateResponsibleImportField(${personIndex},'telefone',this.value,this)">
+              </div>
+
+              <div>
+                <label>E-mail funcional *</label>
+                <input type="email" value="${safe(item.emailFuncional||'')}" placeholder="E-mail funcional"
+                  oninput="updateResponsibleImportField(${personIndex},'emailFuncional',this.value,this)">
+              </div>
+
+              <div>
+                <label>E-mail pessoal *</label>
+                <input type="email" value="${safe(item.emailPessoal||'')}" placeholder="E-mail pessoal"
+                  oninput="updateResponsibleImportField(${personIndex},'emailPessoal',this.value,this)">
+              </div>
+
+              <div>
+                <label>Cargo/Função exercida *</label>
+                <input value="${safe(item.cargo||'')}" placeholder="Cargo ou função"
+                  oninput="updateResponsibleImportField(${personIndex},'cargo',this.value,this)">
+              </div>
+
+              <div>
+                <label>Data de nascimento *</label>
+                <input type="date" value="${safe(item.nascimento||'')}"
+                  onchange="updateResponsibleImportField(${personIndex},'nascimento',this.value,this)">
+              </div>
+
+              <div class="span-2">
+                <label>Endereço funcional *</label>
+                <input value="${safe(item.enderecoFuncional||'')}" placeholder="Endereço funcional"
+                  oninput="updateResponsibleImportField(${personIndex},'enderecoFuncional',this.value,this)">
+              </div>
+
+              <div class="span-2">
+                <label>Endereço residencial *</label>
+                <input value="${safe(item.enderecoResidencial||'')}" placeholder="Endereço residencial"
+                  oninput="updateResponsibleImportField(${personIndex},'enderecoResidencial',this.value,this)">
+              </div>
+
+              <div class="span-2">
+                <label>Categoria *</label>
+                <select onchange="updateResponsibleImportField(${personIndex},'categoria',this.value,this)">
+                  ${responsibleImportOptions(
+                    responsibleImportCategories,
+                    item.categoria,
+                    'Selecione a categoria'
+                  )}
+                </select>
+              </div>
+
+              <div class="span-2">
+                <label>Representação / condição *</label>
+                <select onchange="updateResponsibleImportField(${personIndex},'representacao',this.value,this)">
+                  ${responsibleImportOptions(
+                    responsibleImportRepresentations,
+                    item.representacao,
+                    'Selecione'
+                  )}
+                </select>
+              </div>
+
+              <div class="span-4">
+                <label>Observação</label>
+                <textarea placeholder="Informações complementares"
+                  oninput="updateResponsibleImportField(${personIndex},'observacao',this.value,this)">${safe(item.observacao||'')}</textarea>
+              </div>
+            </div>
+
+            <section class="responsible-import-subsection">
+              <div class="responsible-import-subsection-title">
+                <strong>Períodos de efetiva gestão</strong>
+                <button class="btn btn-primary responsible-import-small-button"
+                  onclick="addResponsibleImportPeriod(${personIndex})">＋ Adicionar período</button>
+              </div>
+              ${periodsHtml}
+            </section>
+
+            <section class="responsible-import-subsection">
+              <div class="responsible-import-subsection-title">
+                <strong>Atos de nomeação, eleição, designação ou equivalente</strong>
+                <button class="btn btn-primary responsible-import-small-button"
+                  onclick="addResponsibleImportAct(${personIndex})">＋ Adicionar ato</button>
+              </div>
+              ${actsHtml}
+            </section>
+
+            <div id="rrImportPersonIssues_${personIndex}"
+              class="${issues.length?'responsible-import-person-issues':'responsible-import-person-complete'}">
+              ${issues.length
+                ? `<strong>${issues.length} pendência(s) prevista(s):</strong><br>${issues.map(safe).join('<br>')}`
+                : 'Cadastro completo para esta pessoa.'}
+            </div>
+          </div>
+        </article>
+      `;
     }).join('');
 
     area.classList.toggle('hidden',!responsibleImportPreview.length);
@@ -6511,7 +7137,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     let created=0;
     let updated=0;
 
-    responsibleImportPreview.forEach(incoming=>{
+    for(const incoming of responsibleImportPreview){
+      await saveResponsibleImportedActFiles(incoming,contract);
+
       const existing=state.responsibles.find(item=>
         item.contractId===contract.id&&
         responsibleNormalizeName(item.nome)===responsibleNormalizeName(incoming.nome)&&
@@ -6526,8 +7154,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         [
           'cpf','nome','emailFuncional','emailPessoal','telefone','cargo','nascimento',
           'enderecoFuncional','enderecoResidencial','categoria','representacao'
-        ].forEach(field=>existing[field]=responsibleFillMissing(existing,incoming,field));
-        if(!existing.observacao)existing.observacao=incoming.observacao||'';
+        ].forEach(field=>{
+          if(incoming[field]!==undefined)existing[field]=incoming[field]||'';
+        });
+        existing.observacao=incoming.observacao||existing.observacao||'';
         existing.sourceDocumentIds=[...new Set([...(existing.sourceDocumentIds||[]),sourceDocumentId].filter(Boolean))];
         existing.updatedAt=new Date().toISOString();
         updated++;
@@ -6543,7 +7173,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         });
         created++;
       }
-    });
+    }
 
     const pendingCount=state.responsibles
       .filter(item=>item.contractId===contract.id)
@@ -11156,13 +11786,19 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const type=document.getElementById('accountabilityFilterType')?.value||'';
     const status=document.getElementById('accountabilityFilterStatus')?.value||'';
     const search=normalizeForChecklist(document.getElementById('accountabilitySearch')?.value||'');
+    const topYear=document.getElementById('topAno')?.value||'';
+    const topMonth=document.getElementById('topMes')?.value||'';
+    const topCompetence=topYear&&topMonth?`${topYear}-${topMonth}`:'';
+
     const rows=accountabilityAllItems().filter(item=>{
       const contract=contractById(item.contractId);
       const haystack=normalizeForChecklist(
         `${item.label||''} ${item.nup||''} ${item.observation||''} ${contract?.sacc||''} ${contract?.contrato||''}`
       );
+      const itemCompetence=accountabilityMonthKey(item.periodEnd||item.periodStart||item.dueDate);
       return (!contractId||item.contractId===contractId)&&
         (!year||[item.periodStart,item.periodEnd,item.dueDate].some(value=>value?.startsWith(year)))&&
+        (!topCompetence||itemCompetence===topCompetence)&&
         (!type||item.type===type)&&
         accountabilityItemMatchesStatus(item,status)&&
         (!search||haystack.includes(search));
@@ -13045,6 +13681,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const comp=`${ano}-${mes}`;
     if(fc && [...fc.options].some(o=>o.value===comp)) fc.value=comp;
 
+    const accountabilityYear=document.getElementById('accountabilityFilterYear');
+    if(accountabilityYear&&[...accountabilityYear.options].some(option=>option.value===ano)){
+      accountabilityYear.value=ano;
+    }
+
     renderPageOnly(getActivePageName());
   }
   document.getElementById('topAno')?.addEventListener('change',syncTopPeriod);
@@ -13249,8 +13890,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       contract.situacao==='ativo'&&(!contract.fim||contract.fim>=today)
     );
 
-    // O filtro de competência seleciona os indicadores do mês, mas as prestações
-    // vencidas permanecem acumuladas até que a data de apresentação seja informada.
+    // O período selecionado organiza os indicadores do mês, mas as prestações
+    // vencidas continuam acumuladas até que a data de apresentação seja informada.
     const accountabilityScope=accountabilityAllItems().filter(item=>
       dashboardFieldsMatch(item,filters)
     );
@@ -14337,7 +14978,7 @@ Total bruto: ${money(a.proventos)}`)}
     const changed=monitorContractStatuses();
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
-<script data-trancelim-integration-v152>
+<script data-trancelim-integration-v154>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   const DEFAULT_PHOTO='../assets/david-profile.png';
@@ -14517,6 +15158,5 @@ Total bruto: ${money(a.proventos)}`)}
   });
 })();
 </script>
-
 </body>
 </html>

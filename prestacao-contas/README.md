@@ -1,23 +1,39 @@
-# Sistema de Prestação de Contas CG — v43
+# Sistema de Prestação de Contas CG — v44
 
-## Ajustes no acompanhamento da prestação de contas
+## Prévia editável do Rol de Responsáveis
 
-- Retirado do cabeçalho o botão **Abrir Relação de Pessoal**.
-- Mantido o botão **Relatórios**.
-- A alteração do exercício e do mês no cabeçalho atualiza imediatamente:
-  - a quantidade de prestações previstas;
-  - aguardando apresentação;
-  - em atraso;
-  - aguardando análise;
-  - analisadas;
-  - comissão pendente;
-  - as linhas exibidas na tabela.
-- A competência é considerada pelo mês final do período da prestação:
-  - mensal: o próprio mês;
-  - trimestral: o último mês do trimestre;
-  - final: o mês de encerramento.
-- A tabela foi compactada, reduzindo espaços vazios e aumentando um pouco a fonte.
-- A coluna **Contrato** mostra somente:
-  - SACC/SCC;
-  - número do Contrato de Gestão.
-- A coordenadoria finalística não aparece mais nessa coluna.
+A importação dos documentos do Rol agora gera um formulário completo e
+editável para cada pessoa identificada.
+
+Antes de confirmar a importação, o usuário pode corrigir ou preencher:
+
+- nome;
+- CPF;
+- telefone;
+- e-mail funcional;
+- e-mail pessoal;
+- cargo ou função;
+- data de nascimento;
+- endereço funcional;
+- endereço residencial;
+- categoria;
+- representação ou condição;
+- observações.
+
+Também é possível:
+
+- adicionar, editar ou excluir períodos de efetiva gestão;
+- adicionar, editar ou excluir atos;
+- vincular cada ato a um período;
+- informar tipo, página, data do ato, data e tipo da publicação;
+- anexar a publicação do ato em PDF ou imagem;
+- retirar uma pessoa da importação.
+
+Os indicadores de campos preenchidos e pendências são atualizados enquanto os
+dados são editados.
+
+Após a confirmação:
+
+- o PDF original do Rol permanece salvo;
+- as publicações anexadas aos atos também são guardadas;
+- somente os campos ainda vazios seguem para a aba Pendências.
