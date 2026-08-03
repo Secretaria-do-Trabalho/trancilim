@@ -25,9 +25,9 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 
-body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif !important}
-.btn,.btn-primary,.btn-secondary,.btn-danger,.nav button,.profile-light-btn,.profile-approved-actions button,.profile-action-row label,.profile-action-row button{font-family:Inter, Segoe UI, Arial, sans-serif !important;border-radius:12px !important;font-weight:800 !important}
-.side-brand,.topbar-brand{cursor:pointer}
+body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !important}
+.btn,.btn-primary,.btn-secondary,.btn-danger,.nav button,.profile-light-btn,.profile-approved-actions button,.profile-action-row label,.profile-action-row button{font-family:Inter,Segoe UI,Arial,sans-serif !important;border-radius:12px !important;font-weight:800 !important}
+.side-brand,.institution{cursor:pointer}
 
     :root{
       --bg:#eef4f5;
@@ -195,6 +195,7 @@ body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif
     .report-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .footer-note{font-size:12px;color:var(--muted);margin-top:12px}
     .hidden{display:none!important}
+
     .portal-profile-card{cursor:pointer;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
     .portal-profile-card:hover{transform:translateY(-1px);background:rgba(255,255,255,.16);box-shadow:0 12px 28px rgba(0,0,0,.12)}
     .profile-top-card{display:flex;align-items:center;gap:18px;padding:18px;border-radius:24px;background:#eef5f8;margin-bottom:18px}
@@ -1545,12 +1546,11 @@ body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif
     @media(max-width:720px){.module-summary-grid{grid-template-columns:1fr 1fr}.integrated-form,.allocation-grid,.allocation-row{grid-template-columns:1fr}.integrated-form .span-2,.integrated-form .span-3,.integrated-form .span-4{grid-column:auto}.financial-line,.execution-row{grid-template-columns:1fr}}
 
   
-    /* v30 — modo leve */
+    /* paginação das tabelas */
     .table-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:11px;padding:9px 11px;border:1px solid #d6e1e5;border-radius:11px;background:#f7fafb;color:#5f7584;font-size:10px}
     .table-pagination .pagination-actions{display:flex;align-items:center;gap:7px}
     .table-pagination button{min-width:78px;padding:7px 10px;border:1px solid #cbd9df;border-radius:9px;background:#fff;color:#0b5279;font-weight:800;cursor:pointer}
     .table-pagination button:disabled{opacity:.45;cursor:not-allowed}
-    .performance-note{display:inline-flex;margin-left:6px;padding:4px 7px;border-radius:999px;background:#e8f6ee;color:#177347;font-size:7px;font-weight:900;text-transform:uppercase;vertical-align:middle}
   
     /* ======================================================
        v31 — módulos agrupados
@@ -2287,14 +2287,14 @@ body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif
 <div class="brand-mark">CG</div>
 <div>
 <h1>Sistema de Prestação<br/>de Contas CG</h1>
-<p>COAFI • Contratos de Gestão <span class="performance-note">modo leve</span></p>
+<p>COAFI • Contratos de Gestão</p>
 </div>
 </div>
 <div class="user-card portal-profile-card" id="portalProfileCard" title="Abrir perfil">
 <div class="avatar" id="portalSidebarAvatar">U</div>
 <div style="min-width:0">
-<strong id="portalSidebarName">David Pereira Alcântara</strong>
-<small id="portalSidebarRole">Administrador • total</small>
+<strong id="portalSidebarName">Usuário</strong>
+<small id="portalSidebarRole">Perfil de acesso</small>
 </div>
 </div>
 <nav class="nav">
@@ -5118,11 +5118,13 @@ body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif
     }
 
     const duplicate=editingContractBankAccounts.some(item=>
+      normalizeBankValue(item.bank)===bank&&
       bankDigits(item.agency)===bankDigits(agency)&&
-      bankDigits(item.account)===bankDigits(account)
+      bankDigits(item.account)===bankDigits(account)&&
+      item.type===type
     );
     if(duplicate){
-      alert('Esta agência e conta já foram adicionadas ao contrato.');
+      alert('Esta conta já foi adicionada ao contrato com o mesmo tipo.');
       return;
     }
 
@@ -13189,58 +13191,70 @@ Total bruto: ${money(a.proventos)}`)}
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
 
-<script>
+<script data-trancelim-integration-v146>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   const DEFAULT_PHOTO='../assets/david-profile.png';
+
   function readSession(){
-    try{ const data=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null'); return data&&Array.isArray(data.modules)?data:null; }catch(e){ return null; }
+    try{
+      const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+      return session && Array.isArray(session.modules) ? session : null;
+    }catch(error){ return null; }
   }
-  function normalize(v){ return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+
+  function normalize(value){
+    return String(value||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  }
+
   function photoKey(email){ return `trancilim_profile_photo_${normalize(email||'local')}`; }
   function photoFlagKey(email){ return `trancilim_profile_photo_custom_${normalize(email||'local')}`; }
-  function isDavidProfile(email){
-    return normalize(email) === normalize('david.alcantara@trabalho.ce.gov.br');
-  }
+  function isDavid(email){ return normalize(email)==='david.alcantara@trabalho.ce.gov.br'; }
+
   function getPortalUser(){
     const session=readSession();
-    const email=session?.email || '';
+    const email=session?.email||'';
     const saved=localStorage.getItem(photoKey(email));
-    const custom=localStorage.getItem(photoFlagKey(email)) === '1' || session?.customPhoto === true;
+    const custom=localStorage.getItem(photoFlagKey(email))==='1'||session?.customPhoto===true;
     return {
-      name: session?.name || 'Usuário',
-      firstName: session?.firstName || String(session?.name || 'Usuário').split(' ')[0],
-      email: email || '-',
-      setor: session?.setor || '-',
-      perfil: session?.perfil || 'Usuário',
-      permissao: session?.permissao || 'visualizar',
-      status: session?.status || 'aprovado',
-      role: session?.role || 'Usuário',
-      photo: custom && saved ? saved : (isDavidProfile(email) ? DEFAULT_PHOTO : ''),
-      modules: session?.modules || ['prestacao-contas']
+      name:session?.name||'Usuário',
+      firstName:session?.firstName||String(session?.name||'Usuário').split(' ')[0],
+      email:email||'-',
+      setor:session?.setor||'-',
+      perfil:session?.perfil||'Usuário',
+      permissao:session?.permissao||'visualizar',
+      status:session?.status||'aprovado',
+      role:session?.role||'Usuário',
+      photo:custom&&saved?saved:(isDavid(email)?DEFAULT_PHOTO:''),
+      modules:session?.modules||['prestacao-contas']
     };
   }
-  function savePortalPhoto(src){
+
+  function initials(user){
+    return String(user.firstName||user.name||'U').split(' ').filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase()||'U';
+  }
+
+  function avatarMarkup(user){
+    return user.photo ? `<img src="${user.photo}" alt="Foto de ${user.name}">` : `<span>${initials(user)}</span>`;
+  }
+
+  function savePhoto(src){
     const session=readSession();
-    const email=session?.email || 'david.alcantara@trabalho.ce.gov.br';
+    const email=session?.email||'';
     if(src){
       localStorage.setItem(photoKey(email),src);
       localStorage.setItem(photoFlagKey(email),'1');
-    } else {
+    }else{
       localStorage.removeItem(photoKey(email));
       localStorage.removeItem(photoFlagKey(email));
     }
     if(session){
-      session.photo = src || '';
-      session.customPhoto = Boolean(src);
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      session.photo=src||'';
+      session.customPhoto=Boolean(src);
+      sessionStorage.setItem(SESSION_KEY,JSON.stringify(session));
     }
   }
-  function avatarMarkup(user,big=false){
-    if(user.photo){ return `<img src="${user.photo}" alt="Foto de ${user.name}">`; }
-    const initials=String(user.firstName||user.name||'U').split(' ').map(part=>part[0]).slice(0,2).join('').toUpperCase();
-    return `<span>${initials}</span>`;
-  }
+
   function renderSidebarProfile(){
     const user=getPortalUser();
     const avatar=document.getElementById('portalSidebarAvatar');
@@ -13249,9 +13263,8 @@ Total bruto: ${money(a.proventos)}`)}
     if(avatar) avatar.innerHTML=avatarMarkup(user);
     if(name) name.textContent=user.name;
     if(role) role.textContent=`${user.perfil} • ${user.permissao}`;
-    const heading=document.querySelector('.topbar-copy h2');
-    if(heading && !heading.dataset.personalized){ heading.dataset.personalized='1'; }
   }
+
   function ensureProfileModal(){
     if(document.getElementById('portalProfileModal')) return;
     const modal=document.createElement('div');
@@ -13299,14 +13312,10 @@ Total bruto: ${money(a.proventos)}`)}
                 <div class="profile-approved-card">
                   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
                     <div>
-                      <strong id="portalApprovedUserTitle">Administrador<br>COAFI</strong>
+                      <strong id="portalApprovedUserTitle"></strong>
                       <div class="profile-approved-meta" id="portalApprovedUserMeta"></div>
                     </div>
                     <span class="profile-badge">Aprovado</span>
-                  </div>
-                  <div class="profile-approved-actions">
-                    <button class="profile-light-btn" type="button">Editar</button>
-                    <button class="profile-light-btn" type="button">Excluir</button>
                   </div>
                 </div>
               </div>
@@ -13315,78 +13324,51 @@ Total bruto: ${money(a.proventos)}`)}
         </div>
       </div>`;
     document.body.appendChild(modal);
-    modal.addEventListener('click', (event)=>{ if(event.target===modal) closeProfileModal(); });
-    document.getElementById('portalProfileClose').addEventListener('click', closeProfileModal);
-    document.getElementById('portalProfileRemovePhoto').addEventListener('click', ()=>{ savePortalPhoto(''); renderSidebarProfile(); fillProfileModal(); });
-    document.getElementById('portalProfileLogout').addEventListener('click', ()=>{ sessionStorage.removeItem(SESSION_KEY); window.location.href='../index.html'; });
-    document.getElementById('portalProfilePhotoInput').addEventListener('change', (event)=>{
+    modal.addEventListener('click',event=>{ if(event.target===modal) closeProfileModal(); });
+    document.getElementById('portalProfileClose')?.addEventListener('click',closeProfileModal);
+    document.getElementById('portalProfileRemovePhoto')?.addEventListener('click',()=>{ savePhoto(''); renderSidebarProfile(); fillProfileModal(); });
+    document.getElementById('portalProfileLogout')?.addEventListener('click',()=>{ sessionStorage.removeItem(SESSION_KEY); window.location.href='../index.html'; });
+    document.getElementById('portalProfilePhotoInput')?.addEventListener('change',event=>{
       const file=event.target.files?.[0];
       if(!file) return;
       const reader=new FileReader();
-      reader.onload=()=>{ savePortalPhoto(reader.result); renderSidebarProfile(); fillProfileModal(); };
+      reader.onload=()=>{ savePhoto(reader.result); renderSidebarProfile(); fillProfileModal(); };
       reader.readAsDataURL(file);
       event.target.value='';
     });
   }
+
   function fillProfileModal(){
     const user=getPortalUser();
-    const set=(id,value)=>{ const el=document.getElementById(id); if(el) el.textContent=value; };
+    const set=(id,value)=>{ const element=document.getElementById(id); if(element) element.textContent=value; };
     const avatar=document.getElementById('portalProfileAvatarBig');
-    if(avatar) avatar.innerHTML=avatarMarkup(user,true);
-    set('portalProfileNameTitle', user.name);
-    set('portalProfileEmailTitle', user.email);
-    set('portalProfileName', user.name);
-    set('portalProfileEmail', user.email);
-    set('portalProfileSetor', user.setor);
-    set('portalProfilePerfil', user.perfil);
-    set('portalProfilePermissao', user.permissao);
-    set('portalProfileStatus', user.status);
-    set('portalApprovedUserMeta', `${user.setor} • ${user.setor} • ${user.perfil} • Acesso ${user.permissao}`);
+    if(avatar) avatar.innerHTML=avatarMarkup(user);
+    set('portalProfileNameTitle',user.name);
+    set('portalProfileEmailTitle',user.email);
+    set('portalProfileName',user.name);
+    set('portalProfileEmail',user.email);
+    set('portalProfileSetor',user.setor);
+    set('portalProfilePerfil',user.perfil);
+    set('portalProfilePermissao',user.permissao);
+    set('portalProfileStatus',user.status);
+    set('portalApprovedUserTitle',user.name);
+    set('portalApprovedUserMeta',`${user.setor} • ${user.perfil} • Acesso ${user.permissao}`);
   }
-  function openProfileModal(){ ensureProfileModal(); fillProfileModal(); document.getElementById('portalProfileModal').classList.add('open'); }
+
+  function openProfileModal(){
+    ensureProfileModal();
+    fillProfileModal();
+    document.getElementById('portalProfileModal')?.classList.add('open');
+  }
+
   function closeProfileModal(){ document.getElementById('portalProfileModal')?.classList.remove('open'); }
-  document.addEventListener('DOMContentLoaded', ()=>{
+
+  document.addEventListener('DOMContentLoaded',()=>{
     renderSidebarProfile();
-    const card=document.getElementById('portalProfileCard');
-    if(card) card.addEventListener('click', openProfileModal);
+    document.getElementById('portalProfileCard')?.addEventListener('click',openProfileModal);
+    document.querySelector('.side-brand')?.addEventListener('click',()=>{ window.location.href='../index.html'; });
+    document.querySelector('.institution')?.addEventListener('click',()=>{ window.location.href='../index.html'; });
   });
-})();
-</script>
-
-
-<script>
-(function(){
-  const SESSION_KEY='trancilim_portal_session_v2';
-  function readPortalSession(){
-    try{ const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null'); return session && Array.isArray(session.modules) ? session : null; }catch(error){ return null; }
-  }
-  function bindHomeLink(){
-    document.querySelector('.side-brand')?.addEventListener('click', function(){ window.location.href='../index.html'; });
-    document.querySelector('.topbar-brand')?.addEventListener('click', function(){ window.location.href='../index.html'; });
-  }
-  function syncPrestacaoProfile(){
-    const session = readPortalSession();
-    if(!session) return;
-    const name = session.name || 'David Pereira Alcântara';
-    const role = `${session.perfil || 'Administrador'} • ${session.permissao || 'total'}`;
-    const email = session.email || 'david.alcantara@trabalho.ce.gov.br';
-    const normalized = String(email).trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-    const custom = localStorage.getItem(`trancilim_profile_photo_custom_${normalized}`) === '1' || session.customPhoto === true;
-    const saved = localStorage.getItem(`trancilim_profile_photo_${normalized}`);
-    const isDavid = normalized === 'david.alcantara@trabalho.ce.gov.br';
-    const photo = custom && saved ? saved : (isDavid ? '../assets/david-profile.png' : '');
-    const avatar = document.getElementById('portalSidebarAvatar');
-    if(avatar){
-      avatar.innerHTML = photo
-        ? `<img src="${photo}" alt="Foto de ${name}">`
-        : `<span>${String(name).split(' ').filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase() || 'U'}</span>`;
-    }
-    const nm = document.getElementById('portalSidebarName');
-    const rl = document.getElementById('portalSidebarRole');
-    if(nm) nm.textContent = name;
-    if(rl) rl.textContent = role;
-  }
-  document.addEventListener('DOMContentLoaded', function(){ bindHomeLink(); setTimeout(syncPrestacaoProfile, 120); });
 })();
 </script>
 
