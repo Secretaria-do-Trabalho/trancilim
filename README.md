@@ -1,4 +1,4 @@
-# TRANCELIM - v148
+# TRANCELIM - v149
 
 ## Atualização principal
 - login integrado ao Supabase Auth;
@@ -34,7 +34,7 @@ Depois abra com Ctrl+F5.
 - Mantida a regra de foto individual: David usa sua foto; usuários sem foto veem somente as iniciais.
 - Sistema de Prestação de Contas CG e portal mantidos sem alteração funcional.
 
-## v148
+## v149
 - Integrada a versão v39 do Sistema de Prestação de Contas CG.
 - Permitido cadastrar a mesma conta bancária com tipos diferentes, mantendo bloqueio apenas para duplicidade completa de banco, agência, conta e tipo.
 - Removido o selo “MODO LEVE” do módulo.
