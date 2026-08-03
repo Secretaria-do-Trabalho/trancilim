@@ -15,10 +15,30 @@
   }
 })();
 </script>
+
+<script data-trancilim-portal-preload>
+(function(){
+  const SESSION_KEY = 'trancilim_portal_session_v2';
+  try {
+    const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+    if (session && Array.isArray(session.modules) && session.modules.includes('patrimonio')) {
+      document.documentElement.classList.add('portal-autologin-patrimonio');
+    }
+  } catch (error) {}
+})();
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" href="../assets/favicon-trancilim.png"/>
 <title>Sistema de Gestão Patrimonial - SGP</title>
 <style>
+
+html.portal-autologin-patrimonio #login{display:none !important;visibility:hidden !important}
+html.portal-autologin-patrimonio #app{display:flex !important;visibility:visible !important}
+html.portal-autologin-patrimonio body{background:#eef8f6 !important}
+body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif !important}
+button,.primary,.secondary,.delete-btn,.refresh-btn,.btn,.nav button,.actions-row button,label.secondary{font-family:Inter, Segoe UI, Arial, sans-serif !important;border-radius:12px !important;font-weight:800 !important}
+.header-title-logo{cursor:pointer}
 :root{
   --verde:#18a83a;
   --verde-escuro:#087a32;
@@ -37,7 +57,7 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Segoe UI, Arial, sans-serif;
+  font-family:Inter, Segoe UI, Arial, sans-serif;
   background:var(--fundo);
   color:var(--texto);
 }
@@ -7046,7 +7066,13 @@ button.delete-btn:hover{
 
 </style>
     </head>
-    <body>${conteudo}</body>
+    <body>${conteudo}
+
+
+
+
+
+</body>
     </html>
   `);
   janela.document.close();
@@ -7938,7 +7964,10 @@ function gerarRelatorioSEFAZ(){
 
 </style>
       </head>
-      <body>${montarRelatorioSEFAZ()}</body>
+      <body>${montarRelatorioSEFAZ()}
+
+
+</body>
     </html>
   `);
   janela.document.close();
@@ -8246,7 +8275,10 @@ function gerarRelatorioSEFAZ(){
 
 </style>
       </head>
-      <body>${montarRelatorioSEFAZ()}</body>
+      <body>${montarRelatorioSEFAZ()}
+
+
+</body>
     </html>
   `);
   janela.document.close();
@@ -8464,7 +8496,10 @@ function abrirJanelaRelatorio(titulo, corpo){
     return;
   }
   janela.document.open();
-  janela.document.write("<!doctype html><html><head><meta charset='utf-8'><title>"+titulo+"</title>"+relatorioPrintStyle()+"</head><body>"+corpo+"</body></html>");
+  janela.document.write("<!doctype html><html><head><meta charset='utf-8'><title>"+titulo+"</title>"+relatorioPrintStyle()+"</head><body>"+corpo+"
+
+
+</body></html>");
   janela.document.close();
   setTimeout(()=>{ try{ janela.print(); }catch(e){} },400);
 }
@@ -9862,7 +9897,10 @@ function depAcumuladaTotalAteMesAnterior(){
           <button class="primary" onclick="window.print()">Salvar/Imprimir PDF</button>
           <button onclick="window.close()">Fechar</button>
         </div>
-      </body>
+      
+
+
+</body>
       </html>`);
     janela.document.close();
   };
@@ -14566,5 +14604,225 @@ function depAcumuladaTotalAteMesAnterior(){
 })();
 
 </script>
+
+
+
+
+<script>
+(function(){
+  const SESSION_KEY='trancilim_portal_session_v2';
+  const DEFAULT_PHOTO='../assets/david-profile.png';
+  function normalize(value){
+    return String(value || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  }
+  function readPortalSession(){
+    try{
+      const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+      return session && Array.isArray(session.modules) ? session : null;
+    }catch(error){ return null; }
+  }
+  function sharedPhotoKey(email){ return `trancilim_profile_photo_${normalize(email||'local')}`; }
+  function sharedPhotoFlagKey(email){ return `trancilim_profile_photo_custom_${normalize(email||'local')}`; }
+  function updateSessionPhoto(src){
+    const session=readPortalSession();
+    if(!session) return;
+    session.photo = src || '';
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  }
+  const originalFotoPerfilAtual = window.fotoPerfilAtual;
+  window.fotoPerfilAtual = function(){
+    const session=readPortalSession();
+    const email=(window.usuarioAtual?.email || session?.email || 'david.alcantara@trabalho.ce.gov.br');
+    const shared=localStorage.getItem(sharedPhotoKey(email));
+    if(shared) return shared;
+    if(typeof window.chaveFotoPerfil === 'function'){
+      const legacy=localStorage.getItem(window.chaveFotoPerfil());
+      if(legacy){
+        localStorage.setItem(sharedPhotoKey(email), legacy);
+        return legacy;
+      }
+    }
+    return session?.photo || DEFAULT_PHOTO || (originalFotoPerfilAtual ? originalFotoPerfilAtual() : '');
+  };
+  window.alterarFotoPerfil = function(event){
+    const file = event.target.files?.[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const session=readPortalSession();
+      const email=(window.usuarioAtual?.email || session?.email || 'david.alcantara@trabalho.ce.gov.br');
+      if(typeof window.chaveFotoPerfil === 'function') localStorage.setItem(window.chaveFotoPerfil(), reader.result);
+      localStorage.setItem(sharedPhotoKey(email), reader.result);
+      updateSessionPhoto(reader.result);
+      if(typeof atualizarResumoPerfil==='function') atualizarResumoPerfil();
+      if(typeof abrirPerfil==='function') abrirPerfil();
+    };
+    reader.readAsDataURL(file);
+  };
+  window.removerFotoPerfil = function(){
+    const session=readPortalSession();
+    const email=(window.usuarioAtual?.email || session?.email || 'david.alcantara@trabalho.ce.gov.br');
+    if(typeof window.chaveFotoPerfil === 'function') localStorage.removeItem(window.chaveFotoPerfil());
+    localStorage.removeItem(sharedPhotoKey(email));
+    updateSessionPhoto('');
+    if(typeof atualizarResumoPerfil==='function') atualizarResumoPerfil();
+    if(typeof abrirPerfil==='function') abrirPerfil();
+  };
+  function applyPortalSessionAutoLogin(){
+    const session=readPortalSession();
+    if(!session || !session.modules.includes('patrimonio')) return;
+    const email = session.email || 'david.alcantara@trabalho.ce.gov.br';
+    if(session.photo){ localStorage.setItem(sharedPhotoKey(email), session.photo); }
+    window.usuarioAtual = {
+      nome: session.name || 'David Pereira Alcântara',
+      email,
+      setor: session.setor || 'COAFI',
+      perfil: session.perfil || 'Administrador',
+      permissao: session.permissao || 'total',
+      status: session.status || 'aprovado'
+    };
+    const usuarioLogado = document.getElementById('usuarioLogado');
+    if(usuarioLogado){
+      usuarioLogado.textContent = window.usuarioAtual.perfil === 'Administrador'
+        ? 'Administrador'
+        : `${window.usuarioAtual.nome} • ${window.usuarioAtual.permissao === 'visualizar' ? 'Visualização' : 'Acesso total'}`;
+    }
+    document.getElementById('login')?.classList.add('hidden');
+    document.getElementById('app')?.classList.remove('hidden');
+    try{ if(typeof setStatusBanco==='function') setStatusBanco('Banco: sessão integrada do portal', 'ok'); }catch(e){}
+    try{ if(typeof renderTudo==='function') renderTudo(); }catch(e){}
+    try{ if(typeof aplicarPermissoes==='function') aplicarPermissoes(); }catch(e){}
+    try{ if(typeof atualizarResumoPerfil==='function') atualizarResumoPerfil(); }catch(e){}
+    document.body.classList.remove('sgp-boot');
+  }
+  setTimeout(applyPortalSessionAutoLogin, 250);
+})();
+</script>
+
+<script>
+(function(){
+  const SESSION_KEY='trancilim_portal_session_v2';
+  const DEFAULT_PHOTO='../assets/david-profile.png';
+  function normalize(value){
+    return String(value || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  }
+  function readPortalSession(){
+    try{
+      const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+      return session && Array.isArray(session.modules) ? session : null;
+    }catch(error){return null;}
+  }
+  function sharedPhotoKey(email){ return `trancilim_profile_photo_${normalize(email||'local')}`; }
+  function sharedPhotoFlagKey(email){ return `trancilim_profile_photo_custom_${normalize(email||'local')}`; }
+  function getPortalProfileUser(){
+    const session = readPortalSession();
+    const current = window.usuarioAtual || {};
+    const email = current.email || session?.email || 'david.alcantara@trabalho.ce.gov.br';
+    const cached = localStorage.getItem(sharedPhotoKey(email));
+    const custom = localStorage.getItem(sharedPhotoFlagKey(email)) === '1' || session?.customPhoto === true;
+    const photo = custom && cached ? cached : DEFAULT_PHOTO;
+    return {
+      nome: current.nome || session?.name || 'David Pereira Alcântara',
+      email,
+      setor: current.setor || session?.setor || 'COAFI',
+      perfil: current.perfil || session?.perfil || 'Administrador',
+      permissao: current.permissao || session?.permissao || 'total',
+      status: current.status || session?.status || 'aprovado',
+      photo
+    };
+  }
+  function setAvatarContent(el, user){
+    if(!el) return;
+    if(user.photo){
+      el.classList.remove('only-initials');
+      el.innerHTML = `<img src="${user.photo}" alt="Foto de ${user.nome}">`;
+    } else {
+      el.classList.add('only-initials');
+      el.textContent = String(user.nome || 'Usuário').split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase() || 'U';
+    }
+  }
+  function renderPatrimonioProfile(){
+    const user = getPortalProfileUser();
+    window.usuarioAtual = Object.assign({}, window.usuarioAtual || {}, user);
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+    setAvatarContent(document.getElementById('profileAvatarTop'), user);
+    setAvatarContent(document.getElementById('profileAvatarBig'), user);
+    setText('profileNameTop', user.nome);
+    setText('profileRoleTop', `${user.perfil} • ${user.permissao}`);
+    setText('perfilNomeTitulo', user.nome);
+    setText('perfilEmailTitulo', user.email);
+    setText('perfilNome', user.nome);
+    setText('perfilEmail', user.email);
+    setText('perfilSetor', user.setor);
+    setText('perfilPerfil', user.perfil);
+    setText('perfilPermissao', user.permissao);
+    setText('perfilStatus', user.status);
+    const usuarioLogado = document.getElementById('usuarioLogado');
+    if(usuarioLogado){
+      usuarioLogado.textContent = user.perfil === 'Administrador' ? 'Administrador' : `${user.nome} • ${user.permissao === 'visualizar' ? 'Visualização' : 'Acesso total'}`;
+    }
+    return user;
+  }
+  window.atualizarResumoPerfil = renderPatrimonioProfile;
+  window.abrirPerfil = function(){
+    renderPatrimonioProfile();
+    document.getElementById('modalPerfil')?.classList.remove('hidden');
+  };
+  window.fecharPerfil = function(){
+    document.getElementById('modalPerfil')?.classList.add('hidden');
+  };
+  window.alterarFotoPerfil = function(event){
+    const file = event.target.files?.[0];
+    const session = readPortalSession();
+    const email = (window.usuarioAtual?.email || session?.email || 'david.alcantara@trabalho.ce.gov.br');
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      localStorage.setItem(sharedPhotoKey(email), reader.result);
+      localStorage.setItem(sharedPhotoFlagKey(email), '1');
+      if(session){ session.photo = reader.result; session.customPhoto = true; sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); }
+      renderPatrimonioProfile();
+      window.abrirPerfil();
+    };
+    reader.readAsDataURL(file);
+    event.target.value='';
+  };
+  window.removerFotoPerfil = function(){
+    const session = readPortalSession();
+    const email = (window.usuarioAtual?.email || session?.email || 'david.alcantara@trabalho.ce.gov.br');
+    localStorage.removeItem(sharedPhotoKey(email));
+    localStorage.removeItem(sharedPhotoFlagKey(email));
+    if(session){ session.photo = ''; session.customPhoto = false; sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); }
+    renderPatrimonioProfile();
+    window.abrirPerfil();
+  };
+  function forcePortalAutologin(){
+    const session = readPortalSession();
+    if(!session || !session.modules.includes('patrimonio')) return;
+    document.documentElement.classList.add('portal-autologin-patrimonio');
+    window.usuarioAtual = {
+      nome: session.name || 'David Pereira Alcântara',
+      email: session.email || 'david.alcantara@trabalho.ce.gov.br',
+      setor: session.setor || 'COAFI',
+      perfil: session.perfil || 'Administrador',
+      permissao: session.permissao || 'total',
+      status: session.status || 'aprovado'
+    };
+    document.getElementById('login')?.classList.add('hidden');
+    document.getElementById('app')?.classList.remove('hidden');
+    document.body.classList.remove('sgp-boot');
+    renderPatrimonioProfile();
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelector('.header-title-logo')?.addEventListener('click', function(){ window.location.href='../index.html'; });
+    forcePortalAutologin();
+    setTimeout(renderPatrimonioProfile, 120);
+  });
+})();
+</script>
+
 </body>
 </html>

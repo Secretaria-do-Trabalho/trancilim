@@ -1,14 +1,11 @@
-# TRANCILIM — Ajuste 01 do login
+# TRANCILIM - v136
 
-Alterações realizadas somente na tela de login:
+Ajuste exclusivo na tela de login:
+- removida a linha “TRANCILIM — Sistema Integrado de Controle e Gestão” abaixo da logo;
+- mantidos a logo, o fundo, o card de login, as posições, as cores e os demais textos;
+- funcionamento do login preservado;
+- nenhum módulo interno foi alterado;
+- permanece sem botão de visualizar senha.
 
-- verde nas faixas superior e inferior;
-- azul de referência `#4EBCC5` na faixa central;
-- fonte original preservada;
-- logo transparente enviada pelo usuário, sem placa branca;
-- texto institucional atualizado e deslocado discretamente para baixo;
-- botão “Solicitar cadastro” com o mesmo visual do botão “Entrar”;
-- retirada da mensagem de versão de demonstração;
-- formulário de solicitação de cadastro com status inicial PENDENTE.
-
-Os dois sistemas internos foram mantidos sem alterações.
+Suba todos os arquivos mantendo as pastas `assets`, `patrimonio` e `prestacao-contas`.
+Depois abra com Ctrl+F5.

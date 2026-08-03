@@ -18,12 +18,16 @@
 </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%2308783e%22/%3E%0A%3Cpath%20d%3D%22M0%200h64v10H0z%22%20fill%3D%22%23ff6f1e%22/%3E%0A%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22800%22%20fill%3D%22white%22%3ECG%3C/text%3E%0A%3C/svg%3E" rel="icon"/>
+<link href="../assets/favicon-trancilim.png" rel="icon"/>
 <title>Sistema de Prestação de Contas CG — Publicação v2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
+
+body,button,input,select,textarea{font-family:Inter, Segoe UI, Arial, sans-serif !important}
+.btn,.btn-primary,.btn-secondary,.btn-danger,.nav button,.profile-light-btn,.profile-approved-actions button,.profile-action-row label,.profile-action-row button{font-family:Inter, Segoe UI, Arial, sans-serif !important;border-radius:12px !important;font-weight:800 !important}
+.side-brand,.topbar-brand{cursor:pointer}
 
     :root{
       --bg:#eef4f5;
@@ -68,9 +72,10 @@
       background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);margin-bottom:15px
     }
     .avatar{
-      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
-      background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35)
+      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+      background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35);flex:none
     }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .user-card strong{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .user-card small{font-size:11px;color:rgba(255,255,255,.85)}
     .nav{display:flex;flex-direction:column;gap:6px}
@@ -190,6 +195,30 @@
     .report-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .footer-note{font-size:12px;color:var(--muted);margin-top:12px}
     .hidden{display:none!important}
+    .portal-profile-card{cursor:pointer;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
+    .portal-profile-card:hover{transform:translateY(-1px);background:rgba(255,255,255,.16);box-shadow:0 12px 28px rgba(0,0,0,.12)}
+    .profile-top-card{display:flex;align-items:center;gap:18px;padding:18px;border-radius:24px;background:#eef5f8;margin-bottom:18px}
+    .profile-big-avatar{width:84px;height:84px;border-radius:50%;overflow:hidden;border:5px solid #1f9f60;box-shadow:0 10px 24px rgba(0,0,0,.08);background:#fff;display:grid;place-items:center;color:#08783e;font-weight:900;font-size:22px;flex:none}
+    .profile-big-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .profile-top-card h2{margin:0;color:#0b2f4a;font-size:18px}
+    .profile-top-card p{margin:5px 0 0;color:#6c8290;font-size:13px;font-weight:700}
+    .profile-action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-top:4px}
+    .profile-field label{display:block;color:#6d8190;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+    .profile-field strong{display:block;color:#0b2f4a;font-size:13px}
+    .profile-users-section{margin-top:22px;padding-top:18px;border-top:1px solid #d8e3e7}
+    .profile-users-section h3{margin:0 0 14px;color:#0b2f4a;font-size:17px}
+    .profile-users-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .profile-users-panel{border:1px solid #d8e4e8;border-radius:18px;background:#fff;min-height:170px;padding:16px}
+    .profile-users-panel h4{margin:0 0 12px;color:#0b2f4a;font-size:14px}
+    .profile-empty-note{color:#6d8190;font-size:12px}
+    .profile-approved-card{border:1px solid #d9e4e8;border-radius:18px;background:#f6fafb;padding:14px}
+    .profile-approved-card strong{display:block;color:#0b2f4a;font-size:15px;line-height:1.25}
+    .profile-approved-meta{margin-top:8px;color:#6f8390;font-size:12px;line-height:1.45}
+    .profile-approved-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .profile-badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;background:#e6f1ea;color:#64806f;font-size:12px;font-weight:800}
+    .profile-light-btn{border:1px solid #dce6ea;background:#eef4f6;color:#0b5e91;padding:8px 12px;border-radius:12px;font-weight:800;cursor:pointer}
+    @media(max-width:780px){.profile-grid,.profile-users-grid{grid-template-columns:1fr}.profile-top-card{align-items:flex-start;flex-direction:column}}
     @media(max-width:1180px){
       .app-shell{grid-template-columns:245px minmax(0,1fr)}
       .institution .org{white-space:normal}
@@ -2261,11 +2290,11 @@
 <p>COAFI • Contratos de Gestão <span class="performance-note">modo leve</span></p>
 </div>
 </div>
-<div class="user-card">
-<div class="avatar">DA</div>
+<div class="user-card portal-profile-card" id="portalProfileCard" title="Abrir perfil">
+<div class="avatar" id="portalSidebarAvatar"><img src="../assets/david-profile.png" alt="Foto do perfil"></div>
 <div style="min-width:0">
-<strong>David Alcântara</strong>
-<small>Administrador • total</small>
+<strong id="portalSidebarName">David Pereira Alcântara</strong>
+<small id="portalSidebarRole">Administrador • total</small>
 </div>
 </div>
 <nav class="nav">
@@ -13159,5 +13188,199 @@ Total bruto: ${money(a.proventos)}`)}
     const changed=monitorContractStatuses();
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
+
+<script>
+(function(){
+  const SESSION_KEY='trancilim_portal_session_v2';
+  const DEFAULT_PHOTO='../assets/david-profile.png';
+  function readSession(){
+    try{ const data=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null'); return data&&Array.isArray(data.modules)?data:null; }catch(e){ return null; }
+  }
+  function normalize(v){ return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+  function photoKey(email){ return `trancilim_profile_photo_${normalize(email||'local')}`; }
+  function photoFlagKey(email){ return `trancilim_profile_photo_custom_${normalize(email||'local')}`; }
+  function getPortalUser(){
+    const session=readSession();
+    const email=session?.email || 'david.alcantara@trabalho.ce.gov.br';
+    const saved=localStorage.getItem(photoKey(email));
+    const custom=localStorage.getItem(photoFlagKey(email)) === '1' || session?.customPhoto === true;
+    return {
+      name: session?.name || 'David Pereira Alcântara',
+      firstName: session?.firstName || String(session?.name || 'David').split(' ')[0],
+      email,
+      setor: session?.setor || 'COAFI',
+      perfil: session?.perfil || 'Administrador',
+      permissao: session?.permissao || 'total',
+      status: session?.status || 'aprovado',
+      role: session?.role || 'Administrador • total',
+      photo: custom && saved ? saved : DEFAULT_PHOTO,
+      modules: session?.modules || ['prestacao-contas']
+    };
+  }
+  function savePortalPhoto(src){
+    const session=readSession();
+    const email=session?.email || 'david.alcantara@trabalho.ce.gov.br';
+    if(src){
+      localStorage.setItem(photoKey(email),src);
+      localStorage.setItem(photoFlagKey(email),'1');
+    } else {
+      localStorage.removeItem(photoKey(email));
+      localStorage.removeItem(photoFlagKey(email));
+    }
+    if(session){
+      session.photo = src || '';
+      session.customPhoto = Boolean(src);
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    }
+  }
+  function avatarMarkup(user,big=false){
+    if(user.photo){ return `<img src="${user.photo}" alt="Foto de ${user.name}">`; }
+    const initials=String(user.firstName||user.name||'U').split(' ').map(part=>part[0]).slice(0,2).join('').toUpperCase();
+    return `<span>${initials}</span>`;
+  }
+  function renderSidebarProfile(){
+    const user=getPortalUser();
+    const avatar=document.getElementById('portalSidebarAvatar');
+    const name=document.getElementById('portalSidebarName');
+    const role=document.getElementById('portalSidebarRole');
+    if(avatar) avatar.innerHTML=avatarMarkup(user);
+    if(name) name.textContent=user.name;
+    if(role) role.textContent=`${user.perfil} • ${user.permissao}`;
+    const heading=document.querySelector('.topbar-copy h2');
+    if(heading && !heading.dataset.personalized){ heading.dataset.personalized='1'; }
+  }
+  function ensureProfileModal(){
+    if(document.getElementById('portalProfileModal')) return;
+    const modal=document.createElement('div');
+    modal.className='modal';
+    modal.id='portalProfileModal';
+    modal.innerHTML=`
+      <div class="modal-box" style="width:min(980px,100%)">
+        <div class="modal-head">
+          <div><h3 style="margin:0;color:#0b2f4a;font-size:28px">Meu perfil</h3></div>
+          <button class="btn btn-secondary" type="button" id="portalProfileClose">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="profile-top-card">
+            <div class="profile-big-avatar" id="portalProfileAvatarBig"></div>
+            <div style="min-width:0;flex:1">
+              <h2 id="portalProfileNameTitle"></h2>
+              <p id="portalProfileEmailTitle"></p>
+              <div class="profile-action-row">
+                <label class="btn btn-primary" style="cursor:pointer">Alterar foto<input type="file" id="portalProfilePhotoInput" accept="image/*" style="display:none"></label>
+                <button class="btn btn-danger" type="button" id="portalProfileRemovePhoto">Remover foto</button>
+                <button class="btn btn-secondary" type="button" id="portalProfileLogout">Sair</button>
+              </div>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <div class="profile-field"><label>Nome</label><strong id="portalProfileName"></strong></div>
+            <div class="profile-field"><label>E-mail</label><strong id="portalProfileEmail"></strong></div>
+            <div class="profile-field"><label>Setor</label><strong id="portalProfileSetor"></strong></div>
+            <div class="profile-field"><label>Perfil</label><strong id="portalProfilePerfil"></strong></div>
+            <div class="profile-field"><label>Permissão</label><strong id="portalProfilePermissao"></strong></div>
+            <div class="profile-field"><label>Status</label><strong id="portalProfileStatus"></strong></div>
+          </div>
+          <div class="profile-users-section">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px">
+              <h3>Usuários e Aprovações</h3>
+              <button class="btn btn-primary" type="button">Novo usuário</button>
+            </div>
+            <div class="profile-users-grid">
+              <div class="profile-users-panel">
+                <h4>Solicitações pendentes</h4>
+                <div class="profile-empty-note">Nenhuma solicitação pendente.</div>
+              </div>
+              <div class="profile-users-panel">
+                <h4>Usuários aprovados</h4>
+                <div class="profile-approved-card">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                    <div>
+                      <strong id="portalApprovedUserTitle">Administrador<br>COAFI</strong>
+                      <div class="profile-approved-meta" id="portalApprovedUserMeta"></div>
+                    </div>
+                    <span class="profile-badge">Aprovado</span>
+                  </div>
+                  <div class="profile-approved-actions">
+                    <button class="profile-light-btn" type="button">Editar</button>
+                    <button class="profile-light-btn" type="button">Excluir</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (event)=>{ if(event.target===modal) closeProfileModal(); });
+    document.getElementById('portalProfileClose').addEventListener('click', closeProfileModal);
+    document.getElementById('portalProfileRemovePhoto').addEventListener('click', ()=>{ savePortalPhoto(''); renderSidebarProfile(); fillProfileModal(); });
+    document.getElementById('portalProfileLogout').addEventListener('click', ()=>{ sessionStorage.removeItem(SESSION_KEY); window.location.href='../index.html'; });
+    document.getElementById('portalProfilePhotoInput').addEventListener('change', (event)=>{
+      const file=event.target.files?.[0];
+      if(!file) return;
+      const reader=new FileReader();
+      reader.onload=()=>{ savePortalPhoto(reader.result); renderSidebarProfile(); fillProfileModal(); };
+      reader.readAsDataURL(file);
+      event.target.value='';
+    });
+  }
+  function fillProfileModal(){
+    const user=getPortalUser();
+    const set=(id,value)=>{ const el=document.getElementById(id); if(el) el.textContent=value; };
+    const avatar=document.getElementById('portalProfileAvatarBig');
+    if(avatar) avatar.innerHTML=avatarMarkup(user,true);
+    set('portalProfileNameTitle', user.name);
+    set('portalProfileEmailTitle', user.email);
+    set('portalProfileName', user.name);
+    set('portalProfileEmail', user.email);
+    set('portalProfileSetor', user.setor);
+    set('portalProfilePerfil', user.perfil);
+    set('portalProfilePermissao', user.permissao);
+    set('portalProfileStatus', user.status);
+    set('portalApprovedUserMeta', `${user.setor} • ${user.setor} • ${user.perfil} • Acesso ${user.permissao}`);
+  }
+  function openProfileModal(){ ensureProfileModal(); fillProfileModal(); document.getElementById('portalProfileModal').classList.add('open'); }
+  function closeProfileModal(){ document.getElementById('portalProfileModal')?.classList.remove('open'); }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    renderSidebarProfile();
+    const card=document.getElementById('portalProfileCard');
+    if(card) card.addEventListener('click', openProfileModal);
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  const SESSION_KEY='trancilim_portal_session_v2';
+  function readPortalSession(){
+    try{ const session=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null'); return session && Array.isArray(session.modules) ? session : null; }catch(error){ return null; }
+  }
+  function bindHomeLink(){
+    document.querySelector('.side-brand')?.addEventListener('click', function(){ window.location.href='../index.html'; });
+    document.querySelector('.topbar-brand')?.addEventListener('click', function(){ window.location.href='../index.html'; });
+  }
+  function syncPrestacaoProfile(){
+    const session = readPortalSession();
+    if(!session) return;
+    const name = session.name || 'David Pereira Alcântara';
+    const role = `${session.perfil || 'Administrador'} • ${session.permissao || 'total'}`;
+    const email = session.email || 'david.alcantara@trabalho.ce.gov.br';
+    const normalized = String(email).trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    const custom = localStorage.getItem(`trancilim_profile_photo_custom_${normalized}`) === '1' || session.customPhoto === true;
+    const saved = localStorage.getItem(`trancilim_profile_photo_${normalized}`);
+    const photo = custom && saved ? saved : '../assets/david-profile.png';
+    const avatar = document.getElementById('portalSidebarAvatar');
+    if(avatar){ avatar.innerHTML = `<img src="${photo}" alt="Foto de ${name}">`; }
+    const nm = document.getElementById('portalSidebarName');
+    const rl = document.getElementById('portalSidebarRole');
+    if(nm) nm.textContent = name;
+    if(rl) rl.textContent = role;
+  }
+  document.addEventListener('DOMContentLoaded', function(){ bindHomeLink(); setTimeout(syncPrestacaoProfile, 120); });
+})();
+</script>
+
 </body>
 </html>
