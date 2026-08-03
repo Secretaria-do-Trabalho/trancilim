@@ -1,27 +1,39 @@
-# TRANCILIM — Portal com login compacto
+# TRANCILIM — Portal de acesso por módulos
 
-## Alterações
+## Alterações desta versão
 
-- primeira tela agora é o login;
-- logomarca oficial da Secretaria do Trabalho;
-- portal menor e mais direto;
-- retirada da apresentação longa;
-- após entrar, o usuário escolhe entre:
-  - Gestão Patrimonial;
-  - Prestação de Contas CG;
-- botão para sair do portal.
+- tela de login redesenhada no formato institucional, inspirada na organização visual do Guardião;
+- inclusão da logomarca oficial do TRANCILIM;
+- manutenção da marca do Governo do Ceará / Secretaria do Trabalho;
+- inclusão do contato do administrador:
+  - telefone: (85) 9918-7030;
+  - e-mail: david.alcantara@trabalho.ce.gov.br;
+- portal pós-login mostra somente os módulos autorizados para cada usuário;
+- proteção provisória dos endereços dos módulos para impedir abertura direta sem autorização no portal;
+- botão para sair e encerrar a sessão do portal.
 
-## Atenção sobre o login
+## Perfis configurados para demonstração
 
-O login desta versão é apenas visual e provisório. Ele usa `sessionStorage` e
-não oferece autenticação segura.
+### David Alcântara
 
-Não utilize senha institucional real nesta etapa.
+Pode entrar usando `david`, `david.alcantara@trabalho.ce.gov.br` ou `8599187030`.
+Aparecem os módulos:
 
-O próximo passo é conectar o formulário ao Supabase Auth.
+- Gestão Patrimonial;
+- Prestação de Contas CG.
 
-## Banco de dados
+### Paula Ivane
 
-Os sistemas ainda não estão gravando as informações no Supabase. Eles
-continuam usando armazenamento local do navegador (`localStorage` e
-`IndexedDB`).
+Pode entrar usando `paula`, `paula ivane` ou `paula.ivane`.
+Aparece somente:
+
+- Gestão Patrimonial.
+
+Nesta versão, qualquer senha preenchida permite o teste do perfil cadastrado.
+
+## Atenção sobre segurança
+
+O controle de acesso desta publicação ainda é demonstrativo e usa `sessionStorage`.
+Ele organiza a interface e bloqueia a navegação comum, mas não substitui autenticação e autorização seguras no servidor.
+
+A versão definitiva deve conectar o portal ao Supabase Auth e consultar no banco os módulos permitidos para o usuário autenticado. As políticas RLS também devem proteger os dados de cada módulo.

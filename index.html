@@ -3,424 +3,376 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRANCILIM — Portal de Sistemas</title>
-  <meta name="description" content="Portal integrado da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.">
+  <title>TRANCILIM — Acesso ao Sistema</title>
+  <meta name="description" content="Portal integrado de controle e gestão da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.">
   <style>
     :root{
-      --verde:#087f3f;
-      --verde-escuro:#076434;
-      --verde-claro:#e9f7ef;
-      --azul:#0b2f4a;
+      --verde:#078442;
+      --verde-2:#14a956;
+      --verde-escuro:#056834;
+      --verde-claro:#eaf8ef;
+      --azul:#153747;
       --azul-medio:#176d98;
       --azul-claro:#eaf3f8;
-      --laranja:#f47721;
-      --texto:#18364a;
-      --muted:#6e8390;
-      --borda:#d2e0e5;
-      --fundo:#f2f7f8;
+      --ciano:#50bdca;
+      --turquesa:#48b8a9;
+      --laranja:#f25b35;
+      --laranja-2:#ff9b2f;
+      --texto:#173747;
+      --muted:#687f8c;
+      --borda:#d2dde1;
+      --fundo:#eef1f2;
       --branco:#fff;
       --erro:#b42318;
-      --sombra:0 20px 55px rgba(21,64,83,.13);
+      --sombra:0 18px 48px rgba(23,55,71,.16);
     }
 
     *{box-sizing:border-box}
-
-    html,body{
-      margin:0;
-      min-height:100%;
-      font-family:Inter,Segoe UI,Arial,sans-serif;
-      color:var(--texto);
-      background:
-        linear-gradient(135deg,rgba(8,127,63,.09),transparent 34%),
-        linear-gradient(315deg,rgba(244,119,33,.08),transparent 30%),
-        var(--fundo);
-    }
-
+    html,body{margin:0;min-height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--texto);background:var(--fundo)}
     button,input{font:inherit}
+    button,a{-webkit-tap-highlight-color:transparent}
 
-    .top-line{
-      height:7px;
-      background:linear-gradient(
-        90deg,
-        var(--laranja) 0 18%,
-        #58bfd0 18% 42%,
-        var(--verde) 42% 72%,
-        #48b5aa 72% 100%
-      );
-    }
-
-    .screen{
-      min-height:calc(100vh - 7px);
-      display:none;
-    }
-
+    .screen{min-height:100vh;display:none}
     .screen.active{display:flex}
 
-    /* LOGIN */
-    #loginScreen{
+    /* LOGIN — inspirado na organização visual do Guardião */
+    #loginScreen{background:#edf0f1;overflow:hidden}
+
+    .login-visual{
+      position:relative;
+      width:52%;
+      min-height:100vh;
+      display:flex;
       align-items:center;
       justify-content:center;
-      padding:28px;
+      padding:80px 10% 80px 7%;
+      overflow:hidden;
+      background:linear-gradient(145deg,#34b957 0%,#20a852 48%,#118444 100%);
+      clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
     }
+
+    .login-visual::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg,var(--laranja) 0 34px,transparent 34px),
+        linear-gradient(180deg,var(--turquesa) 0 15%,transparent 15% 75%,var(--ciano) 75% 100%);
+      opacity:.96;
+      pointer-events:none;
+    }
+
+    .login-visual::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:34px;
+      height:25%;
+      background:var(--laranja-2);
+      pointer-events:none;
+    }
+
+    .brand-box{
+      position:relative;
+      z-index:1;
+      width:min(590px,100%);
+      text-align:center;
+      color:#fff;
+    }
+
+    .brand-logo-plate{
+      width:100%;
+      padding:24px 28px;
+      border-radius:22px;
+      background:rgba(255,255,255,.97);
+      box-shadow:0 22px 48px rgba(0,70,37,.22);
+    }
+
+    .brand-logo{display:block;width:100%;height:auto}
+
+    .brand-intro{
+      max-width:470px;
+      margin:30px auto 0;
+      font-size:14px;
+      line-height:1.55;
+      font-weight:650;
+      text-shadow:0 1px 1px rgba(0,0,0,.12);
+    }
+
+    .brand-intro strong{display:block;margin-bottom:8px;font-size:17px}
+
+    .login-access{
+      flex:1;
+      min-width:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:38px 5vw;
+    }
+
+    .institution-logo{
+      display:block;
+      width:205px;
+      max-height:112px;
+      object-fit:contain;
+      margin:0 auto 22px;
+    }
+
+    .login-stack{width:min(370px,100%)}
 
     .login-card{
-      width:min(390px,100%);
-      padding:30px;
-      border:1px solid var(--borda);
-      border-radius:24px;
-      background:rgba(255,255,255,.96);
-      box-shadow:var(--sombra);
+      width:100%;
+      padding:25px 24px 22px;
+      border:1px solid #d2d7da;
+      border-radius:3px;
+      background:#fff;
+      box-shadow:0 9px 24px rgba(30,45,54,.2);
     }
 
-    .login-logo{
-      display:block;
-      width:150px;
-      max-height:95px;
-      object-fit:contain;
-      margin:0 auto 16px;
-    }
-
-    .login-card h1{
-      margin:0;
-      color:var(--azul);
-      font-size:26px;
-      text-align:center;
-      letter-spacing:.02em;
-    }
-
-    .login-card .subtitle{
-      margin:6px 0 24px;
-      color:var(--muted);
-      font-size:12px;
-      text-align:center;
-    }
+    .login-card h1{margin:0;color:var(--azul);font-size:21px;text-align:center}
+    .login-card .subtitle{margin:6px 0 20px;color:var(--muted);font-size:11px;line-height:1.4;text-align:center}
 
     .field{margin-bottom:14px}
-
-    .field label{
-      display:block;
-      margin-bottom:6px;
-      color:#536c7a;
-      font-size:11px;
-      font-weight:800;
-    }
-
+    .field label{display:block;margin-bottom:6px;color:#465f6d;font-size:11px;font-weight:700}
+    .input-wrap{position:relative}
     .field input{
-      width:100%;
-      height:45px;
-      border:1px solid #cbd9df;
-      border-radius:11px;
-      padding:0 13px;
-      background:#fff;
-      color:var(--texto);
-      outline:none;
+      width:100%;height:44px;border:1px solid #b9cbd4;border-left:4px solid var(--verde);
+      border-radius:4px;padding:0 42px 0 11px;background:#eef5ff;color:var(--texto);outline:none
     }
+    .field input:focus{border-color:#6aa987;border-left-color:var(--laranja);box-shadow:0 0 0 3px rgba(8,132,66,.09)}
+    .input-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#6c8290;pointer-events:none}
 
-    .field input:focus{
-      border-color:#55a87c;
-      box-shadow:0 0 0 3px rgba(8,127,63,.09);
-    }
-
+    .login-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
     .login-button{
-      width:100%;
-      min-height:47px;
-      margin-top:4px;
-      border:0;
-      border-radius:12px;
-      background:linear-gradient(135deg,var(--verde),#13a55b);
-      color:#fff;
-      font-weight:900;
-      cursor:pointer;
+      min-height:43px;border:0;border-radius:4px;background:linear-gradient(135deg,var(--verde),#07964c);
+      color:#fff;font-weight:850;cursor:pointer;transition:filter .15s ease,transform .15s ease
     }
+    .login-button:hover{filter:brightness(1.04)}
+    .login-button:active{transform:translateY(1px)}
+    .login-error{min-height:17px;margin-top:10px;color:var(--erro);font-size:11px;line-height:1.35;text-align:center}
 
-    .login-error{
-      min-height:18px;
-      margin-top:10px;
-      color:var(--erro);
-      font-size:11px;
-      text-align:center;
+    .provisional-note{margin:12px 0 0;color:#8a999f;font-size:9px;line-height:1.4;text-align:center}
+
+    .support-card{
+      display:flex;align-items:center;gap:13px;width:100%;margin-top:12px;padding:14px 16px;
+      border:1px solid #d2d7da;border-radius:3px;background:#fff;box-shadow:0 4px 13px rgba(30,45,54,.15)
     }
+    .support-icon{display:grid;place-items:center;flex:0 0 43px;width:43px;height:43px;border:1px solid #c8d2d6;border-radius:12px;color:var(--verde)}
+    .support-icon svg{width:24px;height:24px}
+    .support-card strong{display:block;margin-bottom:4px;font-size:11px;color:#203e4d}
+    .support-card a,.support-card span{display:block;color:#304f5e;font-size:10px;line-height:1.5;text-decoration:none;word-break:break-word}
+    .support-card a:hover{text-decoration:underline}
+    .login-footer{margin-top:15px;color:#8b989d;font-size:9px;text-align:center}
 
-    .provisional-note{
-      margin:15px 0 0;
-      padding-top:13px;
-      border-top:1px solid #e2eaed;
-      color:#8798a1;
-      font-size:9px;
-      line-height:1.4;
-      text-align:center;
-    }
+    /* PORTAL APÓS O LOGIN */
+    #portalScreen{flex-direction:column;background:linear-gradient(135deg,rgba(8,132,66,.07),transparent 34%),linear-gradient(315deg,rgba(242,91,53,.06),transparent 28%),#f2f7f8}
 
-    /* PORTAL */
-    #portalScreen{
-      flex-direction:column;
-    }
+    .portal-top-line{height:7px;background:linear-gradient(90deg,var(--laranja) 0 11%,var(--ciano) 11% 34%,var(--verde) 34% 69%,var(--turquesa) 69% 100%)}
+    .portal-header{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:92px;padding:13px 5vw;border-bottom:1px solid var(--borda);background:rgba(255,255,255,.96);box-shadow:0 5px 18px rgba(18,57,79,.05)}
+    .portal-brand{display:flex;align-items:center;gap:16px;min-width:0}
+    .portal-logo{width:260px;max-width:42vw;height:62px;object-fit:contain}
+    .portal-brand-text{padding-left:16px;border-left:1px solid #d7e2e6}
+    .portal-brand-text strong{display:block;color:var(--azul);font-size:13px}
+    .portal-brand-text span{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+    .user-area{display:flex;align-items:center;gap:12px}
+    .user-meta{text-align:right}
+    .user-name{display:block;color:var(--azul);font-size:12px;font-weight:850}
+    .user-access{display:block;margin-top:3px;color:var(--muted);font-size:9px}
+    .logout-button{min-height:37px;border:1px solid #c9d8de;border-radius:9px;padding:0 14px;background:#fff;color:#496575;font-size:11px;font-weight:800;cursor:pointer}
 
-    .portal-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      min-height:82px;
-      padding:14px 5vw;
-      border-bottom:1px solid var(--borda);
-      background:rgba(255,255,255,.94);
-      backdrop-filter:blur(12px);
-    }
+    .portal-main{width:min(930px,92vw);margin:0 auto;padding:50px 0 38px}
+    .portal-title{margin-bottom:25px;text-align:center}
+    .portal-title h2{margin:0;color:var(--azul);font-size:28px}
+    .portal-title p{margin:7px 0 0;color:var(--muted);font-size:12px}
+    .systems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+    .systems.single{grid-template-columns:minmax(0,460px);justify-content:center}
+    .system-card{display:none;flex-direction:column;min-height:248px;padding:24px;border:1px solid var(--borda);border-radius:19px;background:#fff;box-shadow:0 14px 34px rgba(25,68,86,.08);transition:transform .16s ease,box-shadow .16s ease}
+    .system-card.allowed{display:flex}
+    .system-card:hover{transform:translateY(-4px);box-shadow:0 20px 42px rgba(25,68,86,.13)}
+    .system-icon{display:grid;place-items:center;width:52px;height:52px;margin-bottom:16px;border-radius:15px;font-size:24px;font-weight:900}
+    .patrimonio .system-icon{color:var(--verde);background:var(--verde-claro)}
+    .prestacao .system-icon{color:var(--azul-medio);background:var(--azul-claro)}
+    .system-card small{color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+    .system-card h3{margin:8px 0 9px;color:var(--azul);font-size:20px;line-height:1.2}
+    .system-card p{margin:0 0 19px;color:#627986;font-size:11px;line-height:1.5}
+    .access{display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:auto;border-radius:10px;color:#fff;text-decoration:none;font-size:12px;font-weight:900}
+    .patrimonio .access{background:linear-gradient(135deg,var(--verde),#12a059)}
+    .prestacao .access{background:linear-gradient(135deg,#0b5279,#2387b1)}
+    .no-access{display:none;padding:26px;border:1px solid #f0c9c5;border-radius:16px;background:#fff5f4;color:#8e2f27;text-align:center;font-size:12px}
+    .no-access.active{display:block}
+    footer{margin-top:auto;padding:20px;color:#83949d;font-size:10px;text-align:center}
 
-    .portal-brand{
-      display:flex;
-      align-items:center;
-      gap:13px;
-    }
-
-    .portal-logo{
-      width:108px;
-      height:58px;
-      object-fit:contain;
-    }
-
-    .portal-brand h1{
-      margin:0;
-      color:var(--azul);
-      font-size:21px;
-    }
-
-    .portal-brand p{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:10px;
-    }
-
-    .user-area{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .user-name{
-      color:#5d7482;
-      font-size:11px;
-      font-weight:800;
-    }
-
-    .logout-button{
-      min-height:36px;
-      border:1px solid #cbd9df;
-      border-radius:10px;
-      padding:0 13px;
-      background:#fff;
-      color:#496575;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    .portal-main{
-      width:min(860px,92vw);
-      margin:0 auto;
-      padding:48px 0;
-    }
-
-    .portal-title{
-      margin-bottom:24px;
-      text-align:center;
-    }
-
-    .portal-title h2{
-      margin:0;
-      color:var(--azul);
-      font-size:27px;
-    }
-
-    .portal-title p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .systems{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:18px;
-    }
-
-    .system-card{
-      display:flex;
-      flex-direction:column;
-      min-height:235px;
-      padding:22px;
-      border:1px solid var(--borda);
-      border-radius:20px;
-      background:#fff;
-      box-shadow:0 14px 34px rgba(25,68,86,.08);
-      transition:transform .16s ease,box-shadow .16s ease;
-    }
-
-    .system-card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 20px 42px rgba(25,68,86,.13);
-    }
-
-    .system-icon{
-      display:grid;
-      place-items:center;
-      width:48px;
-      height:48px;
-      margin-bottom:15px;
-      border-radius:15px;
-      font-size:22px;
-      font-weight:900;
-    }
-
-    .patrimonio .system-icon{
-      color:var(--verde);
-      background:var(--verde-claro);
-    }
-
-    .prestacao .system-icon{
-      color:var(--azul-medio);
-      background:var(--azul-claro);
-    }
-
-    .system-card small{
-      color:var(--muted);
-      font-size:9px;
-      font-weight:900;
-      text-transform:uppercase;
-    }
-
-    .system-card h3{
-      margin:7px 0 8px;
-      color:var(--azul);
-      font-size:19px;
-      line-height:1.2;
-    }
-
-    .system-card p{
-      margin:0 0 18px;
-      color:#627986;
-      font-size:11px;
-      line-height:1.45;
-    }
-
-    .access{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:43px;
-      margin-top:auto;
-      border-radius:11px;
-      color:#fff;
-      text-decoration:none;
-      font-size:12px;
-      font-weight:900;
-    }
-
-    .patrimonio .access{
-      background:linear-gradient(135deg,var(--verde),#12a059);
-    }
-
-    .prestacao .access{
-      background:linear-gradient(135deg,#0b5279,#2387b1);
-    }
-
-    footer{
-      margin-top:auto;
-      padding:20px;
-      color:#83949d;
-      font-size:10px;
-      text-align:center;
+    @media(max-width:900px){
+      #loginScreen.active{flex-direction:column}
+      .login-visual{width:100%;min-height:42vh;padding:52px 12vw;clip-path:none}
+      .login-visual::before{background:linear-gradient(90deg,var(--laranja) 0 18px,transparent 18px),linear-gradient(180deg,var(--turquesa) 0 18%,transparent 18% 82%,var(--ciano) 82% 100%)}
+      .login-visual::after{width:18px;height:18%;}
+      .brand-logo-plate{padding:18px 21px;border-radius:17px}
+      .brand-intro{margin-top:18px;font-size:12px}
+      .login-access{min-height:auto;padding:34px 22px 44px}
     }
 
     @media(max-width:680px){
-      .portal-header{
-        align-items:flex-start;
-        flex-direction:column;
-      }
-
-      .systems{grid-template-columns:1fr}
-      .portal-main{padding-top:34px}
+      .brand-intro{display:none}
+      .login-visual{min-height:auto;padding:38px 45px}
+      .portal-header{align-items:flex-start;flex-direction:column;padding:16px 20px}
+      .portal-logo{width:240px;max-width:100%;height:57px}
+      .portal-brand-text{display:none}
       .user-area{width:100%;justify-content:space-between}
+      .user-meta{text-align:left}
+      .systems,.systems.single{grid-template-columns:1fr}
+      .portal-main{padding-top:34px}
     }
   </style>
 </head>
 <body>
-  <div class="top-line"></div>
-
   <section class="screen active" id="loginScreen">
-    <form class="login-card" id="loginForm">
-      <img class="login-logo" src="./assets/logo-ceara-set.png" alt="Governo do Estado do Ceará — Secretaria do Trabalho">
-
-      <h1>TRANCILIM</h1>
-      <p class="subtitle">Portal de sistemas integrados da COAFI</p>
-
-      <div class="field">
-        <label for="loginEmail">Usuário</label>
-        <input id="loginEmail" autocomplete="username" placeholder="Digite seu usuário" required>
+    <aside class="login-visual" aria-label="Apresentação do TRANCILIM">
+      <div class="brand-box">
+        <div class="brand-logo-plate">
+          <img class="brand-logo" src="./assets/logo-trancilim.png" alt="TRANCILIM — Sistema Integrado de Controle e Gestão">
+        </div>
+        <div class="brand-intro">
+          <strong>Acesso integrado aos sistemas da COAFI</strong>
+          Cada usuário visualiza somente os módulos autorizados para o seu perfil.
+          Solicitações de cadastro, alteração de acesso ou recuperação de senha devem ser encaminhadas ao administrador do sistema.
+        </div>
       </div>
+    </aside>
 
-      <div class="field">
-        <label for="loginPassword">Senha</label>
-        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+    <main class="login-access">
+      <div class="login-stack">
+        <img class="institution-logo" src="./assets/logo-ceara-set.png" alt="Governo do Estado do Ceará — Secretaria do Trabalho">
+
+        <form class="login-card" id="loginForm">
+          <h1>Acesso ao TRANCILIM</h1>
+          <p class="subtitle">Entre com o usuário cadastrado para acessar os módulos liberados no seu perfil.</p>
+
+          <div class="field">
+            <label for="loginEmail">Usuário ou e-mail</label>
+            <div class="input-wrap">
+              <input id="loginEmail" autocomplete="username" placeholder="Digite seu usuário" required>
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c.8-4 3.4-6 7.5-6s6.7 2 7.5 6"></path></svg>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="loginPassword">Senha</label>
+            <div class="input-wrap">
+              <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            </div>
+          </div>
+
+          <div class="login-actions">
+            <button class="login-button" type="submit">Entrar</button>
+          </div>
+          <div class="login-error" id="loginError" role="alert"></div>
+          <p class="provisional-note">Versão de demonstração: a validação definitiva será vinculada ao Supabase Auth.</p>
+        </form>
+
+        <div class="support-card">
+          <div class="support-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.6-4.8A8 8 0 1 1 21 15Z"></path><path d="M8 11h.01M12 11h.01M16 11h.01"></path></svg>
+          </div>
+          <div>
+            <strong>Administrador do sistema</strong>
+            <span>(85) 9918-7030</span>
+            <a href="mailto:david.alcantara@trabalho.ce.gov.br">david.alcantara@trabalho.ce.gov.br</a>
+          </div>
+        </div>
+
+        <div class="login-footer">Governo do Estado do Ceará • Secretaria do Trabalho • COAFI</div>
       </div>
-
-      <button class="login-button" type="submit">Entrar</button>
-      <div class="login-error" id="loginError"></div>
-
-      <p class="provisional-note">
-        Acesso provisório da publicação inicial. A autenticação segura será conectada ao Supabase.
-      </p>
-    </form>
+    </main>
   </section>
 
   <section class="screen" id="portalScreen">
+    <div class="portal-top-line"></div>
     <header class="portal-header">
       <div class="portal-brand">
-        <img class="portal-logo" src="./assets/logo-ceara-set.png" alt="Secretaria do Trabalho">
-        <div>
-          <h1>TRANCILIM</h1>
-          <p>Portal de sistemas integrados • COAFI</p>
+        <img class="portal-logo" src="./assets/logo-trancilim.png" alt="TRANCILIM">
+        <div class="portal-brand-text">
+          <strong>Portal de sistemas integrados</strong>
+          <span>Coordenadoria Administrativo-Financeira</span>
         </div>
       </div>
 
       <div class="user-area">
-        <span class="user-name" id="currentUser"></span>
+        <div class="user-meta">
+          <span class="user-name" id="currentUser"></span>
+          <span class="user-access" id="currentAccess"></span>
+        </div>
         <button class="logout-button" type="button" id="logoutButton">Sair</button>
       </div>
     </header>
 
     <main class="portal-main">
       <div class="portal-title">
-        <h2>Selecione o sistema</h2>
-        <p>Escolha o módulo que deseja acessar.</p>
+        <h2 id="portalGreeting">Selecione o sistema</h2>
+        <p>Serão exibidos somente os módulos autorizados para o seu usuário.</p>
       </div>
 
-      <section class="systems">
-        <article class="system-card patrimonio">
+      <section class="systems" id="systemsGrid">
+        <article class="system-card patrimonio" data-module="patrimonio">
           <div class="system-icon">▣</div>
           <small>Patrimônio</small>
           <h3>Gestão Patrimonial</h3>
-          <p>Bens móveis, depreciação, almoxarifado, movimentações e relatórios.</p>
+          <p>Bens móveis, depreciação, almoxarifado, movimentações e relatórios patrimoniais.</p>
           <a class="access" href="./patrimonio/index.html">Acessar sistema</a>
         </article>
 
-        <article class="system-card prestacao">
+        <article class="system-card prestacao" data-module="prestacao-contas">
           <div class="system-icon">✓</div>
           <small>Contratos de Gestão</small>
           <h3>Prestação de Contas CG</h3>
-          <p>Contratos, pagamentos, extratos, pessoal, prazos e documentos.</p>
+          <p>Contratos, pagamentos, extratos, pessoal, prazos, documentos e relatório anual.</p>
           <a class="access" href="./prestacao-contas/index.html">Acessar sistema</a>
         </article>
       </section>
+
+      <div class="no-access" id="noAccess">Seu perfil ainda não possui módulo liberado. Entre em contato com o administrador do sistema.</div>
     </main>
 
-    <footer>
-      Governo do Estado do Ceará • Secretaria do Trabalho • Coordenadoria Administrativo-Financeira
-    </footer>
+    <footer>Governo do Estado do Ceará • Secretaria do Trabalho • Coordenadoria Administrativo-Financeira</footer>
   </section>
 
   <script>
-    const SESSION_KEY = 'trancilim_portal_login_provisorio';
+    const SESSION_KEY = 'trancilim_portal_session_v2';
+
+    /*
+     * PERFIS PROVISÓRIOS DO PORTAL
+     * Nesta fase, os usuários são definidos aqui apenas para demonstrar a lógica.
+     * Na versão definitiva, nome e módulos devem vir do Supabase após o login.
+     */
+    const ACCESS_PROFILES = [
+      {
+        id: 'david-alcantara',
+        name: 'David Alcântara',
+        role: 'Administrador do portal',
+        admin: true,
+        aliases: [
+          'david',
+          'david alcantara',
+          'david alcântara',
+          'david.alcantara',
+          'david.alcantara@trabalho.ce.gov.br',
+          '8599187030'
+        ],
+        modules: ['patrimonio', 'prestacao-contas']
+      },
+      {
+        id: 'paula-ivane',
+        name: 'Paula Ivane',
+        role: 'Usuária do Patrimônio',
+        admin: false,
+        aliases: ['paula', 'paula ivane', 'paula.ivane', 'paula_ivane'],
+        modules: ['patrimonio']
+      }
+    ];
 
     const loginScreen = document.getElementById('loginScreen');
     const portalScreen = document.getElementById('portalScreen');
@@ -429,48 +381,115 @@
     const loginPassword = document.getElementById('loginPassword');
     const loginError = document.getElementById('loginError');
     const currentUser = document.getElementById('currentUser');
+    const currentAccess = document.getElementById('currentAccess');
+    const portalGreeting = document.getElementById('portalGreeting');
+    const systemsGrid = document.getElementById('systemsGrid');
+    const noAccess = document.getElementById('noAccess');
     const logoutButton = document.getElementById('logoutButton');
 
-    function showPortal(user) {
-      loginScreen.classList.remove('active');
-      portalScreen.classList.add('active');
-      currentUser.textContent = user || 'Usuário';
+    function normalize(value) {
+      return String(value || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ');
     }
 
-    function showLogin() {
+    function findProfile(login) {
+      const normalizedLogin = normalize(login);
+      return ACCESS_PROFILES.find(profile =>
+        profile.aliases.some(alias => normalize(alias) === normalizedLogin)
+      ) || null;
+    }
+
+    function saveSession(profile, typedLogin) {
+      const session = {
+        id: profile.id,
+        name: profile.name,
+        role: profile.role,
+        admin: profile.admin,
+        login: typedLogin,
+        modules: [...profile.modules],
+        loggedAt: new Date().toISOString()
+      };
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      return session;
+    }
+
+    function readSession() {
+      try {
+        const value = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+        if (!value || !Array.isArray(value.modules)) return null;
+        return value;
+      } catch (error) {
+        sessionStorage.removeItem(SESSION_KEY);
+        return null;
+      }
+    }
+
+    function showPortal(session) {
+      loginScreen.classList.remove('active');
+      portalScreen.classList.add('active');
+
+      currentUser.textContent = session.name || 'Usuário';
+      currentAccess.textContent = session.role || 'Perfil de acesso';
+      portalGreeting.textContent = `Olá, ${String(session.name || 'usuário').split(' ')[0]}. Selecione o sistema`;
+
+      let allowedCount = 0;
+      document.querySelectorAll('[data-module]').forEach(card => {
+        const allowed = session.modules.includes(card.dataset.module);
+        card.classList.toggle('allowed', allowed);
+        if (allowed) allowedCount += 1;
+      });
+
+      systemsGrid.classList.toggle('single', allowedCount === 1);
+      noAccess.classList.toggle('active', allowedCount === 0);
+    }
+
+    function showLogin(message = '') {
       portalScreen.classList.remove('active');
       loginScreen.classList.add('active');
       loginPassword.value = '';
-      loginError.textContent = '';
+      loginError.textContent = message;
+      setTimeout(() => loginEmail.focus(), 50);
     }
 
     loginForm.addEventListener('submit', function(event) {
       event.preventDefault();
+      loginError.textContent = '';
 
-      const user = loginEmail.value.trim();
+      const typedLogin = loginEmail.value.trim();
       const password = loginPassword.value.trim();
 
-      if (!user || !password) {
-        loginError.textContent = 'Preencha usuário e senha.';
+      if (!typedLogin || !password) {
+        loginError.textContent = 'Preencha o usuário e a senha.';
         return;
       }
 
-      /*
-       * Acesso visual provisório.
-       * Será substituído pelo Supabase Auth na etapa do banco de dados.
-       */
-      sessionStorage.setItem(SESSION_KEY, user);
-      showPortal(user);
+      const profile = findProfile(typedLogin);
+      if (!profile) {
+        loginError.textContent = 'Usuário ainda não cadastrado no portal. Entre em contato com o administrador.';
+        return;
+      }
+
+      /* A senha ainda é apenas visual nesta versão de demonstração. */
+      const session = saveSession(profile, typedLogin);
+      showPortal(session);
     });
 
     logoutButton.addEventListener('click', function() {
       sessionStorage.removeItem(SESSION_KEY);
+      loginEmail.value = '';
       showLogin();
     });
 
-    const savedUser = sessionStorage.getItem(SESSION_KEY);
-    if (savedUser) {
-      showPortal(savedUser);
+    const query = new URLSearchParams(window.location.search);
+    const savedSession = readSession();
+    if (savedSession) {
+      showPortal(savedSession);
+    } else if (query.get('acesso') === 'negado') {
+      showLogin('Seu usuário não possui autorização para acessar esse módulo.');
     }
   </script>
 </body>
