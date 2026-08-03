@@ -96,9 +96,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);margin-bottom:15px
     }
     .avatar{
-      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+      width:42px;height:42px;min-width:42px;min-height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;
       background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35)
     }
+    .avatar img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
     .user-card strong{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .user-card small{font-size:11px;color:rgba(255,255,255,.85)}
     .nav{display:flex;flex-direction:column;gap:6px}
@@ -11155,19 +11156,13 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const type=document.getElementById('accountabilityFilterType')?.value||'';
     const status=document.getElementById('accountabilityFilterStatus')?.value||'';
     const search=normalizeForChecklist(document.getElementById('accountabilitySearch')?.value||'');
-    const topYear=document.getElementById('topAno')?.value||'';
-    const topMonth=document.getElementById('topMes')?.value||'';
-    const topCompetence=topYear&&topMonth?`${topYear}-${topMonth}`:'';
-
     const rows=accountabilityAllItems().filter(item=>{
       const contract=contractById(item.contractId);
       const haystack=normalizeForChecklist(
         `${item.label||''} ${item.nup||''} ${item.observation||''} ${contract?.sacc||''} ${contract?.contrato||''}`
       );
-      const itemCompetence=accountabilityMonthKey(item.periodEnd||item.periodStart||item.dueDate);
       return (!contractId||item.contractId===contractId)&&
         (!year||[item.periodStart,item.periodEnd,item.dueDate].some(value=>value?.startsWith(year)))&&
-        (!topCompetence||itemCompetence===topCompetence)&&
         (!type||item.type===type)&&
         accountabilityItemMatchesStatus(item,status)&&
         (!search||haystack.includes(search));
@@ -13050,11 +13045,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const comp=`${ano}-${mes}`;
     if(fc && [...fc.options].some(o=>o.value===comp)) fc.value=comp;
 
-    const accountabilityYear=document.getElementById('accountabilityFilterYear');
-    if(accountabilityYear&&[...accountabilityYear.options].some(option=>option.value===ano)){
-      accountabilityYear.value=ano;
-    }
-
     renderPageOnly(getActivePageName());
   }
   document.getElementById('topAno')?.addEventListener('change',syncTopPeriod);
@@ -13210,6 +13200,27 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     },filters);
   }
 
+  function dashboardReferenceDate(filters){
+    if(filters.comp){
+      const [year,month]=filters.comp.split('-').map(Number);
+      return accountabilityIso(new Date(year,month,0,12,0,0));
+    }
+    if(filters.ano)return `${filters.ano}-12-31`;
+    return todayIsoLocal();
+  }
+
+  function dashboardAccountabilityDeliveryStatus(item,referenceDate){
+    if(item.submittedDate){
+      const days=accountabilityDaysBetween(item.dueDate,item.submittedDate);
+      if(days<=0)return {key:'APRESENTADA',label:'APRESENTADA NO PRAZO',className:'ok'};
+      return {key:'APRESENTADA',label:`APRESENTADA COM ${days} DIA(S) DE ATRASO`,className:'warn'};
+    }
+    if(item.dueDate&&item.dueDate<=referenceDate){
+      return {key:'ATRASADA',label:'EM ATRASO',className:'error'};
+    }
+    return {key:'AGUARDANDO',label:'AGUARDANDO APRESENTAÇÃO',className:'info'};
+  }
+
   function dashboardIssueMatches(issue,filters){
     if(!filters.sacc&&!filters.contrato&&!filters.projeto&&!filters.ano&&!filters.comp)return true;
 
@@ -13231,25 +13242,33 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   function renderDashboard(){
     const filters=currentFilters();
     const today=todayIsoLocal();
+    const referenceDate=dashboardReferenceDate(filters);
 
     const contracts=state.contracts.filter(contract=>dashboardContractMatch(contract,filters));
     const activeContracts=contracts.filter(contract=>
       contract.situacao==='ativo'&&(!contract.fim||contract.fim>=today)
     );
 
-    const accountabilityItems=accountabilityAllItems().filter(item=>
-      dashboardFieldsMatch(item,filters)&&dashboardTemporalMatch(item,filters)
+    // O filtro de competência seleciona os indicadores do mês, mas as prestações
+    // vencidas permanecem acumuladas até que a data de apresentação seja informada.
+    const accountabilityScope=accountabilityAllItems().filter(item=>
+      dashboardFieldsMatch(item,filters)
+    );
+    const accountabilityItems=accountabilityScope.filter(item=>
+      dashboardTemporalMatch(item,filters)
     );
     const accountabilityDelivery=accountabilityItems.map(item=>({
       item,
-      status:accountabilityDeliveryStatus(item)
+      status:dashboardAccountabilityDeliveryStatus(item,referenceDate)
     }));
     const accountabilityAnalysis=accountabilityItems.map(item=>({
       item,
       status:accountabilityAnalysisStatus(item)
     }));
 
-    const pcOverdue=accountabilityDelivery.filter(entry=>entry.status.key==='ATRASADA').length;
+    const pcOverdue=accountabilityScope.filter(item=>
+      !item.submittedDate&&item.dueDate&&item.dueDate<=referenceDate
+    ).length;
     const pcSubmitted=accountabilityDelivery.filter(entry=>entry.status.key==='APRESENTADA').length;
     const pcWaitingPresentation=accountabilityDelivery.filter(entry=>entry.status.key==='AGUARDANDO').length;
     const pcWaitingAnalysis=accountabilityAnalysis.filter(entry=>
