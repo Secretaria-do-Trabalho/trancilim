@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script data-trancilim-module-guard>
+(function(){
+  const SESSION_KEY = 'trancilim_portal_session_v2';
+  try {
+    const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
+    const allowed = session && Array.isArray(session.modules) && session.modules.includes('patrimonio');
+    if (!allowed) {
+      window.location.replace('../index.html?acesso=negado');
+    }
+  } catch (error) {
+    window.location.replace('../index.html?acesso=negado');
+  }
+})();
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sistema de Gestão Patrimonial - SGP</title>
