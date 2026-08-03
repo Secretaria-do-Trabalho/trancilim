@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — Publicação v2</title>
+<title>Sistema de Prestação de Contas CG — v40</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -195,7 +195,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     .report-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .footer-note{font-size:12px;color:var(--muted);margin-top:12px}
     .hidden{display:none!important}
-
     .portal-profile-card{cursor:pointer;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
     .portal-profile-card:hover{transform:translateY(-1px);background:rgba(255,255,255,.16);box-shadow:0 12px 28px rgba(0,0,0,.12)}
     .profile-top-card{display:flex;align-items:center;gap:18px;padding:18px;border-radius:24px;background:#eef5f8;margin-bottom:18px}
@@ -1677,6 +1676,41 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     }
 
     .accountability-contract-info strong{color:#0b2f4a}
+    .accountability-dates-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:13px;
+      margin-top:14px;
+      padding:14px;
+      border:1px solid #cfe1dc;
+      border-radius:14px;
+      background:#f7fbf9;
+    }
+    .accountability-dates-grid .date-group-title{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:-2px;
+    }
+    .accountability-dates-grid .date-group-title strong{
+      color:#0b2f4a;
+      font-size:14px;
+    }
+    .accountability-dates-grid .date-group-title span{
+      color:#687d89;
+      font-size:11px;
+    }
+    .accountability-dates-grid input{
+      background:#fff;
+    }
+    @media(max-width:900px){
+      .accountability-dates-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:560px){
+      .accountability-dates-grid{grid-template-columns:1fr}
+    }
 
     .accountability-status{
       display:inline-flex;
@@ -2291,10 +2325,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div>
 </div>
 <div class="user-card portal-profile-card" id="portalProfileCard" title="Abrir perfil">
-<div class="avatar" id="portalSidebarAvatar">U</div>
+<div class="avatar" id="portalSidebarAvatar"><span>U</span></div>
 <div style="min-width:0">
 <strong id="portalSidebarName">Usuário</strong>
-<small id="portalSidebarRole">Perfil de acesso</small>
+<small id="portalSidebarRole">Perfil</small>
 </div>
 </div>
 <nav class="nav">
@@ -4512,13 +4546,38 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="accountability-contract-info" id="accountabilityPlanContractInfo">
 <div><small>Organização Social</small><strong>Selecione um SACC/SCC</strong></div>
 <div><small>Projeto</small><strong>—</strong></div>
-<div><small>Início do contrato</small><strong>—</strong></div>
-<div><small>Final do contrato</small><strong>—</strong></div>
+<div><small>Unidade Gestora</small><strong>—</strong></div>
+<div><small>Situação</small><strong>—</strong></div>
 </div>
+
+<div class="accountability-dates-grid">
+  <div class="date-group-title">
+    <strong>Datas para geração do cronograma</strong>
+    <span>As datas são puxadas do contrato e podem ser ajustadas antes de gerar.</span>
+  </div>
+  <div>
+    <label>Início do contrato *</label>
+    <input id="apContractStartDate" type="date"/>
+  </div>
+  <div>
+    <label>Final do contrato *</label>
+    <input id="apContractEndDate" type="date"/>
+  </div>
+  <div>
+    <label>Início da prestação de contas *</label>
+    <input id="apAccountabilityStartDate" type="date"/>
+  </div>
+  <div>
+    <label>Final da prestação de contas *</label>
+    <input id="apAccountabilityEndDate" type="date"/>
+  </div>
+</div>
+
 <div class="notice info" style="margin-top:13px">
+        O cronograma será criado entre a data inicial e a data final da prestação de contas.
         A prestação mensal será calculada até o 10º dia útil do mês subsequente, considerando inicialmente segunda a sexta-feira.
-        O prazo poderá ser ajustado manualmente para feriados locais. A trimestral vencerá 30 dias após o encerramento do trimestre
-        e a final, 90 dias após o término do contrato.
+        A trimestral vencerá 30 dias após o encerramento do trimestre e a final, 90 dias após o encerramento da prestação de contas.
+        Os prazos poderão ser ajustados manualmente para feriados locais.
       </div>
 </div>
 <div class="modal-foot">
@@ -9818,7 +9877,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     };
   }
 
-  function generateAccountabilityScheduleForContract(contractId,silent=false){
+  function generateAccountabilityScheduleForContract(contractId,silent=false,customPeriod=null){
     const contract=contractById(contractId);
     if(!contract||!contract.inicio||!contract.fim){
       if(!silent)alert('O contrato precisa ter data inicial e data final da vigência.');
@@ -9826,17 +9885,29 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     }
 
     const existing=accountabilityPlanForContract(contractId);
+    const scheduleStart=customPeriod?.startDate||existing?.startDate||contract.inicio;
+    const scheduleEnd=customPeriod?.endDate||existing?.endDate||contract.fim;
+
+    if(!scheduleStart||!scheduleEnd){
+      if(!silent)alert('Informe a data inicial e a data final da prestação de contas.');
+      return null;
+    }
+    if(scheduleStart>scheduleEnd){
+      if(!silent)alert('A data inicial da prestação de contas não pode ser posterior à data final.');
+      return null;
+    }
+
     const oldItems=new Map((existing?.items||[]).map(item=>[item.key,item]));
     const generated=[];
 
-    const startMonth=accountabilityMonthKey(contract.inicio);
-    const endMonth=accountabilityMonthKey(contract.fim);
+    const startMonth=accountabilityMonthKey(scheduleStart);
+    const endMonth=accountabilityMonthKey(scheduleEnd);
 
     let monthlySequence=1;
     for(let monthKey=startMonth;monthKey<=endMonth;monthKey=accountabilityAddMonths(monthKey,1)){
       const nextMonth=accountabilityAddMonths(monthKey,1);
-      const periodStart=monthKey===startMonth?contract.inicio:`${monthKey}-01`;
-      const periodEnd=monthKey===endMonth?contract.fim:accountabilityMonthEnd(monthKey);
+      const periodStart=monthKey===startMonth?scheduleStart:`${monthKey}-01`;
+      const periodEnd=monthKey===endMonth?scheduleEnd:accountabilityMonthEnd(monthKey);
       const base=accountabilityBaseItem(
         `MENSAL:${monthKey}`,
         'MENSAL',
@@ -9854,8 +9925,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     for(let quarterStart=startMonth;quarterStart<=endMonth;quarterStart=accountabilityAddMonths(quarterStart,3)){
       const proposedEnd=accountabilityAddMonths(quarterStart,2);
       const quarterEnd=proposedEnd>endMonth?endMonth:proposedEnd;
-      const periodStart=quarterStart===startMonth?contract.inicio:`${quarterStart}-01`;
-      const periodEnd=quarterEnd===endMonth?contract.fim:accountabilityMonthEnd(quarterEnd);
+      const periodStart=quarterStart===startMonth?scheduleStart:`${quarterStart}-01`;
+      const periodEnd=quarterEnd===endMonth?scheduleEnd:accountabilityMonthEnd(quarterEnd);
       const base=accountabilityBaseItem(
         `TRIMESTRAL:${quarterStart}:${quarterEnd}`,
         'TRIMESTRAL',
@@ -9873,15 +9944,15 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       'FINAL',
       'FINAL',
       'PRESTAÇÃO DE CONTAS FINAL',
-      contract.inicio,
-      contract.fim,
-      accountabilityAddDays(contract.fim,90)
+      scheduleStart,
+      scheduleEnd,
+      accountabilityAddDays(scheduleEnd,90)
     );
     const oldFinal=oldItems.get('FINAL');
     generated.push(oldFinal?{
       ...finalBase,...oldFinal,
       label:finalBase.label,type:'FINAL',
-      periodStart:contract.inicio,periodEnd:contract.fim,dueDate:finalBase.dueDate
+      periodStart:scheduleStart,periodEnd:scheduleEnd,dueDate:finalBase.dueDate
     }:finalBase);
 
     generated.sort((a,b)=>
@@ -9892,8 +9963,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const plan={
       id:existing?.id||id(),
       contractId,
-      startDate:contract.inicio,
-      endDate:contract.fim,
+      startDate:scheduleStart,
+      endDate:scheduleEnd,
       items:generated,
       createdAt:existing?.createdAt||new Date().toISOString(),
       updatedAt:new Date().toISOString()
@@ -10014,6 +10085,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     document.getElementById('apContractId').value='';
     document.getElementById('apContractNumber').value='';
     document.getElementById('apCoordenadoria').value='';
+    document.getElementById('apContractStartDate').value='';
+    document.getElementById('apContractEndDate').value='';
+    document.getElementById('apAccountabilityStartDate').value='';
+    document.getElementById('apAccountabilityEndDate').value='';
     accountabilityPlanSaccChanged();
     document.getElementById('accountabilityPlanModal').classList.add('open');
   }
@@ -10025,22 +10100,30 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   window.accountabilityPlanSaccChanged=function(){
     const value=document.getElementById('apSaccInput')?.value.trim()||'';
     const contract=state.contracts.find(item=>item.sacc===value)||null;
+    const existingPlan=contract?accountabilityPlanForContract(contract.id):null;
+
     document.getElementById('apContractId').value=contract?.id||'';
     document.getElementById('apContractNumber').value=contract?.contrato||'';
     document.getElementById('apCoordenadoria').value=contract?.coordenadoria||'';
+    document.getElementById('apContractStartDate').value=contract?.inicio||'';
+    document.getElementById('apContractEndDate').value=contract?.fim||'';
+    document.getElementById('apAccountabilityStartDate').value=
+      existingPlan?.startDate||contract?.inicio||'';
+    document.getElementById('apAccountabilityEndDate').value=
+      existingPlan?.endDate||contract?.fim||'';
 
     const box=document.getElementById('accountabilityPlanContractInfo');
     if(!box)return;
     box.innerHTML=contract?`
       <div><small>Organização Social</small><strong>${safe(contract.os||'—')}</strong></div>
       <div><small>Projeto</small><strong>${safe(contract.projeto||'—')}</strong></div>
-      <div><small>Início do contrato</small><strong>${safe(isoToBr(contract.inicio)||'—')}</strong></div>
-      <div><small>Final do contrato</small><strong>${safe(isoToBr(contract.fim)||'—')}</strong></div>
+      <div><small>Unidade Gestora</small><strong>${safe(contract.ug||'—')}</strong></div>
+      <div><small>Situação</small><strong>${safe((contract.situacao||'—').toUpperCase())}</strong></div>
     `:`
       <div><small>Organização Social</small><strong>Selecione um SACC/SCC</strong></div>
       <div><small>Projeto</small><strong>—</strong></div>
-      <div><small>Início do contrato</small><strong>—</strong></div>
-      <div><small>Final do contrato</small><strong>—</strong></div>`;
+      <div><small>Unidade Gestora</small><strong>—</strong></div>
+      <div><small>Situação</small><strong>—</strong></div>`;
   }
 
   window.generateAccountabilitySchedule=function(){
@@ -10049,12 +10132,48 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       alert('Selecione um SACC/SCC cadastrado.');
       return;
     }
-    const plan=generateAccountabilityScheduleForContract(contractId,false);
+
+    const contract=contractById(contractId);
+    const contractStart=document.getElementById('apContractStartDate')?.value||'';
+    const contractEnd=document.getElementById('apContractEndDate')?.value||'';
+    const accountabilityStart=document.getElementById('apAccountabilityStartDate')?.value||'';
+    const accountabilityEnd=document.getElementById('apAccountabilityEndDate')?.value||'';
+
+    if(!contractStart||!contractEnd){
+      alert('Informe a data inicial e a data final do contrato.');
+      return;
+    }
+    if(contractStart>contractEnd){
+      alert('A data inicial do contrato não pode ser posterior à data final.');
+      return;
+    }
+    if(!accountabilityStart||!accountabilityEnd){
+      alert('Informe a data inicial e a data final da prestação de contas.');
+      return;
+    }
+    if(accountabilityStart>accountabilityEnd){
+      alert('A data inicial da prestação de contas não pode ser posterior à data final.');
+      return;
+    }
+
+    contract.inicio=contractStart;
+    contract.fim=contractEnd;
+    contract.updatedAt=new Date().toISOString();
+
+    const plan=generateAccountabilityScheduleForContract(
+      contractId,
+      false,
+      {startDate:accountabilityStart,endDate:accountabilityEnd}
+    );
     if(!plan)return;
+
     saveState({render:false});
     closeAccountabilityPlanModal();
     renderAccountabilityTracking();
-    alert(`Cronograma criado com ${plan.items.length} prestação(ões) de contas.`);
+    alert(
+      `Cronograma criado com ${plan.items.length} prestação(ões) de contas, `+
+      `no período de ${isoToBr(accountabilityStart)} a ${isoToBr(accountabilityEnd)}.`
+    );
   }
 
   window.accountabilitySearchChanged=function(){
@@ -13191,7 +13310,7 @@ Total bruto: ${money(a.proventos)}`)}
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
 
-<script data-trancelim-integration-v146>
+<script data-trancelim-integration-v148>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   const DEFAULT_PHOTO='../assets/david-profile.png';
