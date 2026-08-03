@@ -1,39 +1,48 @@
-# Sistema de Prestação de Contas CG — v44
+# Sistema de Prestação de Contas CG — v45
 
-## Prévia editável do Rol de Responsáveis
+## Novos relatórios reconhecidos
 
-A importação dos documentos do Rol agora gera um formulário completo e
-editável para cada pessoa identificada.
+O importador do **Rol de Responsáveis pela Organização Social** agora reconhece:
 
-Antes de confirmar a importação, o usuário pode corrigir ou preencher:
+### Conselho de Administração - 2024
+
+O sistema lê o relatório cadastral e identifica:
 
 - nome;
 - CPF;
-- telefone;
 - e-mail funcional;
-- e-mail pessoal;
-- cargo ou função;
-- data de nascimento;
+- e-mail pessoal, quando informado;
+- telefone;
 - endereço funcional;
 - endereço residencial;
-- categoria;
-- representação ou condição;
-- observações.
+- data de nascimento;
+- instituição ou condição representada;
+- data do Termo de Posse;
+- período do mandato.
 
-Também é possível:
+A data do Termo de Posse é criada como ato do tipo **Termo de Posse**.
+Página, publicação e documento do ato continuam pendentes quando não constarem
+no relatório.
 
-- adicionar, editar ou excluir períodos de efetiva gestão;
-- adicionar, editar ou excluir atos;
-- vincular cada ato a um período;
-- informar tipo, página, data do ato, data e tipo da publicação;
-- anexar a publicação do ato em PDF ou imagem;
-- retirar uma pessoa da importação.
+### Cadastro dos Membros - Conselho Fiscal
 
-Os indicadores de campos preenchidos e pendências são atualizados enquanto os
-dados são editados.
+O sistema lê as tabelas por instituição e identifica os conselheiros titulares
+e suplentes, preenchendo:
 
-Após a confirmação:
+- nome;
+- CPF;
+- nascimento;
+- endereço comercial;
+- setor/cargo;
+- telefone ou celular;
+- e-mail comercial;
+- endereço residencial;
+- e-mail particular;
+- instituição representada;
+- condição de titular ou suplente.
 
-- o PDF original do Rol permanece salvo;
-- as publicações anexadas aos atos também são guardadas;
-- somente os campos ainda vazios seguem para a aba Pendências.
+Os registros escritos como **SEM INDICAÇÃO** não são criados.
+
+Como o relatório do Conselho Fiscal não apresenta mandato nem ato de
+designação/publicação, esses itens permanecem como pendência para preenchimento
+na prévia editável.

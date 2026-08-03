@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v44</title>
+<title>Sistema de Prestação de Contas CG — v45</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -3472,6 +3472,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <option value="Diretoria">Diretoria</option>
 <option value="Conselho de Administração – Art. 3º da Lei 12.781/1997">Conselho de Administração – Art. 3º da Lei 12.781/1997</option>
 <option value="Conselho Fiscal – Art. 5º da Lei 12.781/97">Conselho Fiscal – Art. 5º da Lei 12.781/97</option>
+<option value="Secretaria Executiva do Conselho de Administração">Secretaria Executiva do Conselho de Administração</option>
 <option value="Responsável pelo Setor Financeiro">Responsável pelo Setor Financeiro</option>
 <option value="Contador">Contador</option>
 <option value="Membros da Comissão de Avaliação">Membros da Comissão de Avaliação</option>
@@ -3538,6 +3539,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <select id="rrActType">
 <option value="">Selecione o tipo do ato</option>
 <option value="Eleição">Eleição</option>
+<option value="Termo de Posse">Termo de Posse</option>
 <option value="Nomeação">Nomeação</option>
 <option value="Designação">Designação</option>
 <option value="Recondução">Recondução</option>
@@ -3621,6 +3623,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <option value="Diretoria">Diretoria</option>
 <option value="Conselho de Administração – Art. 3º da Lei 12.781/1997">Conselho de Administração</option>
 <option value="Conselho Fiscal – Art. 5º da Lei 12.781/97">Conselho Fiscal</option>
+<option value="Secretaria Executiva do Conselho de Administração">Secretaria Executiva do Conselho de Administração</option>
 <option value="Responsável pelo Setor Financeiro">Responsável pelo Setor Financeiro</option>
 <option value="Contador">Contador</option>
 <option value="Membros da Comissão de Avaliação">Comissão de Avaliação</option>
@@ -6224,8 +6227,23 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
   function responsibleParseDate(value){
-    const match=String(value||'').match(/(\d{2})[./](\d{2})[./](\d{4})/);
-    return match?`${match[3]}-${match[2]}-${match[1]}`:'';
+    const match=String(value||'').match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2}|\d{4})/);
+    if(!match)return '';
+
+    let year=Number(match[3]);
+    if(match[3].length===2)year=year>=50?1900+year:2000+year;
+
+    const month=Number(match[2]);
+    const day=Number(match[1]);
+    const date=new Date(year,month-1,day);
+
+    if(
+      date.getFullYear()!==year||
+      date.getMonth()!==month-1||
+      date.getDate()!==day
+    )return '';
+
+    return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   }
 
   function responsibleExtractEmails(text){
@@ -6463,12 +6481,427 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     return records;
   }
 
+
+  function responsibleCleanSourceValue(value){
+    const clean=String(value||'')
+      .replace(/\s+/g,' ')
+      .replace(/^[\s:;,-]+|[\s:;,-]+$/g,'')
+      .trim();
+
+    if(!clean)return '';
+    if(/^(?:x{2,}|\*{2,}|sem indicação|não informado|não se aplica|n\/a)$/i.test(clean)){
+      return '';
+    }
+    return clean;
+  }
+
+  function responsibleSourceEmail(value){
+    const clean=responsibleCleanSourceValue(value);
+    if(!clean)return '';
+    const candidate=(clean.match(/[^\s,;]+@[^\s,;]+/i)||[])[0]||clean.split(/\s+/)[0]||'';
+    return responsibleCleanSourceValue(candidate).toLowerCase();
+  }
+
+  function responsibleSourcePhone(value){
+    const clean=responsibleCleanSourceValue(value);
+    if(!clean)return '';
+    return responsibleExtractPhone(clean);
+  }
+
+  function responsibleStripAdministrationHeader(text){
+    return String(text||'').replace(
+      /SECRETARIA EXECUTIVA DO CONSELHO DE ADMINISTRAÇÃO DO IDT[\s\S]{0,400}?Portal:\s*www\.idt\.org\.br/gi,
+      '\n'
+    );
+  }
+
+  const responsibleAdministrationFieldLabels=[
+    'Nome completo',
+    'N(?:º|°|o)?\\s*CPF',
+    'E-mail funcional',
+    'E-mail pessoal',
+    'Endereço completo funcional',
+    'Endereço residencial',
+    'Telefone funcional',
+    'Telefone pessoal',
+    'Data do Termo de Posse',
+    'Período do mandato',
+    'Data de nascimento'
+  ];
+
+  function responsibleExtractAdministrationField(text,labelPattern){
+    const allLabels=responsibleAdministrationFieldLabels.join('|');
+    const regex=new RegExp(
+      `(?:^|\\n)\\s*(?:\\d+\\.\\s*)?(?:${labelPattern})\\s*:\\s*`+
+      `([\\s\\S]*?)(?=\\n\\s*(?:\\d+\\.\\s*)?(?:${allLabels})\\s*:|$)`,
+      'i'
+    );
+    const match=String(text||'').match(regex);
+    return responsibleCleanSourceValue(match?.[1]||'');
+  }
+
+  function responsibleLastHeading(text,definitions){
+    let selected=null;
+
+    definitions.forEach(definition=>{
+      const flags=definition.pattern.flags.includes('g')
+        ? definition.pattern.flags
+        : definition.pattern.flags+'g';
+      const regex=new RegExp(definition.pattern.source,flags);
+      for(const match of String(text||'').matchAll(regex)){
+        if(!selected||match.index>selected.index){
+          selected={...definition,index:match.index};
+        }
+      }
+    });
+
+    return selected;
+  }
+
+  function responsibleParseAdministration2024Document(lines,fileName){
+    const original=(lines||[]).join('\n');
+    const text=responsibleStripAdministrationHeader(original)
+      .replace(/\r/g,'')
+      .replace(/\u00a0/g,' ');
+
+    const headings=[
+      {
+        label:'Secretaria do Trabalho (SET)',
+        pattern:/SECRETARIA DO TRABALHO\s*\(SET\)/im,
+        representacao:'Representante da Secretaria',
+        cargo:'Representante da Secretaria do Trabalho (SET)'
+      },
+      {
+        label:'Secretaria de Educação (SEDUC)',
+        pattern:/SECRETARIA DE EDUCAÇÃO\s*\(SEDUC\)/im,
+        representacao:'Representante da Secretaria',
+        cargo:'Representante da Secretaria de Educação (SEDUC)'
+      },
+      {
+        label:'Federação das Indústrias do Estado do Ceará (FIEC)',
+        pattern:/FEDERAÇÃO DAS INDUSTRIAS DO ESTADO DO CEARÁ\s*\(FIEC\)/im,
+        representacao:'Membro indicado pelas entidades da Sociedade Civil',
+        cargo:'Representante da FIEC'
+      },
+      {
+        label:'Departamento Intersindical de Estatística e Estudos Socioeconômicos (DIEESE)',
+        pattern:/DEPARTAMENTO INTERSINDICAL DE ESTATÍSTICA E ESTUDOS\s+SOCIOECONÔMICOS\s*[–-]\s*DIEESE/im,
+        representacao:'Membro indicado pelas entidades da Sociedade Civil',
+        cargo:'Representante do DIEESE'
+      },
+      {
+        label:'Representante Notório Saber',
+        pattern:/REPRESENTANTE NOTÓRIO SABER/im,
+        representacao:'Membro indicado ou eleito, conforme estatuto',
+        cargo:'Representante Notório Saber'
+      },
+      {
+        label:'Representante dos Associados (IDT)',
+        pattern:/REPRESENTANTE DOS ASSOCIADOS\s*\(IDT\)/im,
+        representacao:'Representante eleito dentre membros ou associados',
+        cargo:'Representante dos Associados do IDT'
+      },
+      {
+        label:'Representante dos Empregados (IDT)',
+        pattern:/REPRESENTANTE DOS EMPREGADOS\s*\(IDT\)/im,
+        representacao:'Representante dos empregados da OS',
+        cargo:'Representante dos Empregados do IDT'
+      },
+      {
+        label:'Secretaria Executiva',
+        pattern:/(?:^|\n)\s*SECRETARIA EXECUTIVA\s*(?=\n|$)/im,
+        representacao:'Não se aplica',
+        cargo:'Secretário Executivo do Conselho de Administração',
+        categoria:'Secretaria Executiva do Conselho de Administração'
+      }
+    ];
+
+    const matches=[
+      ...text.matchAll(/(?:^|\n)\s*1\.\s*Nome completo:\s*([^\n]+)/gim)
+    ];
+    const records=[];
+
+    matches.forEach((match,index)=>{
+      const start=match.index;
+      const end=matches[index+1]?.index||text.length;
+      const block=text.slice(start,end);
+      const heading=responsibleLastHeading(text.slice(0,start),headings)||{
+        label:'Conselho de Administração',
+        representacao:'Membro indicado ou eleito, conforme estatuto',
+        cargo:'Conselheiro'
+      };
+
+      let nome=responsibleCleanSourceValue(match[1]);
+      const roleInName=(nome.match(/\(([^)]+)\)\s*$/)||[])[1]||'';
+      nome=nome.replace(/\s*\([^)]+\)\s*$/,'').trim();
+
+      const cpf=responsibleExtractAdministrationField(block,'N(?:º|°|o)?\\s*CPF');
+      const emailFuncional=responsibleSourceEmail(
+        responsibleExtractAdministrationField(block,'E-mail funcional')
+      );
+      const emailPessoal=responsibleSourceEmail(
+        responsibleExtractAdministrationField(block,'E-mail pessoal')
+      );
+      const enderecoFuncional=responsibleExtractAdministrationField(
+        block,'Endereço completo funcional'
+      );
+      const enderecoResidencial=responsibleExtractAdministrationField(
+        block,'Endereço residencial'
+      );
+      const telefoneFuncional=responsibleExtractAdministrationField(
+        block,'Telefone funcional'
+      );
+      const telefonePessoal=responsibleExtractAdministrationField(
+        block,'Telefone pessoal'
+      );
+      const posseRaw=responsibleExtractAdministrationField(
+        block,'Data do Termo de Posse'
+      );
+      const periodRaw=responsibleExtractAdministrationField(
+        block,'Período do mandato'
+      );
+      const nascimentoRaw=responsibleExtractAdministrationField(
+        block,'Data de nascimento'
+      );
+
+      const posseDate=responsibleParseDate(posseRaw);
+      const periodDates=(
+        periodRaw.match(/\d{1,2}[./-]\d{1,2}[./-](?:\d{2}|\d{4})/g)||[]
+      ).map(responsibleParseDate).filter(Boolean);
+
+      const periods=[];
+      if(periodDates.length){
+        periods.push({
+          de:periodDates[0],
+          ate:periodDates[1]||''
+        });
+      }else if(posseDate){
+        periods.push({
+          de:posseDate,
+          ate:''
+        });
+      }
+
+      const cargo=roleInName||heading.cargo||'Conselheiro';
+      const categoria=heading.categoria||
+        'Conselho de Administração – Art. 3º da Lei 12.781/1997';
+
+      const acts=posseDate?[{
+        periodIndex:0,
+        type:'Termo de Posse',
+        page:'',
+        actDate:posseDate,
+        publicationDate:'',
+        publicationType:'',
+        documentId:'',
+        description:`Termo de Posse — ${heading.label}`
+      }]:[];
+
+      const notes=[
+        `Importado do documento ${fileName}`,
+        `Representação identificada: ${heading.label}`,
+        telefoneFuncional?`Telefone funcional informado no documento: ${telefoneFuncional}`:'',
+        periodRaw?`Período descrito no documento: ${periodRaw}`:''
+      ].filter(Boolean);
+
+      records.push({
+        nome:responsibleNormalizeName(nome),
+        cpf:formatCpf(cpf),
+        emailFuncional,
+        emailPessoal,
+        telefone:responsibleSourcePhone(telefonePessoal)||
+          responsibleSourcePhone(telefoneFuncional),
+        cargo,
+        nascimento:responsibleParseDate(nascimentoRaw),
+        enderecoFuncional,
+        enderecoResidencial,
+        categoria,
+        representacao:heading.representacao||
+          'Membro indicado ou eleito, conforme estatuto',
+        observacao:notes.join(' • '),
+        periods,
+        acts
+      });
+    });
+
+    return records.filter(record=>record.nome);
+  }
+
+  const responsibleFiscalInstitutions=[
+    {
+      label:'Conselho Regional de Contabilidade – CRC',
+      pattern:/CONSELHO REGIONAL DE CONTABILIDADE\s*[–-]\s*CRC/i,
+      representacao:'Representante da sociedade civil'
+    },
+    {
+      label:'Secretaria do Trabalho – SET',
+      pattern:/SECRETARIA DO TRABALHO\s*[–-]\s*SET/i,
+      representacao:'Representante da Secretaria'
+    },
+    {
+      label:'Secretaria de Planejamento e Gestão – SEPLAG',
+      pattern:/SECRETARIA DE PLANEJAMENTO E GESTÃO\s*[–-]\s*SEPLAG/i,
+      representacao:'Representante da SEPLAG'
+    },
+    {
+      label:'Secretaria da Fazenda – SEFAZ',
+      pattern:/SECRETARIA DA FAZENDA\s*[–-]\s*SEFAZ/i,
+      representacao:'Representante da SEFAZ'
+    },
+    {
+      label:'Procuradoria Geral do Estado – PGE',
+      pattern:/PROCURADORIA GERAL DO ESTADO\s*[–-]\s*PGE/i,
+      representacao:'Representante do Poder Executivo'
+    },
+    {
+      label:'Instituto de Desenvolvimento do Trabalho – IDT',
+      pattern:/INSTITUTO DE DESENVOLVIMENTO DO TRABALHO\s*[–-]\s*IDT/i,
+      representacao:'Membro indicado ou eleito, conforme estatuto'
+    },
+    {
+      label:'Controladoria e Ouvidoria Geral – CGE',
+      pattern:/CONTROLADORIA E OUVIDORIA GERAL/i,
+      representacao:'Representante da CGE'
+    }
+  ];
+
+  function responsibleFiscalInstitution(line){
+    return responsibleFiscalInstitutions.find(item=>item.pattern.test(line))||null;
+  }
+
+  function responsibleFiscalField(line){
+    const definitions=[
+      ['cpf',/^CPF(?:\s+|$)(.*)$/i],
+      ['nascimento',/^Data de Na(?:s)?cimento(?:\s+|$)(.*)$/i],
+      ['enderecoFuncional',/^Endereço comercial(?:\s+|$)(.*)$/i],
+      ['setor',/^Setor(?:\s+|$)(.*)$/i],
+      ['telefoneComercial',/^Fone comercial(?:\s+|$)(.*)$/i],
+      ['celular',/^Celular(?:\s+|$)(.*)$/i],
+      ['emailFuncional',/^e-mail comercial(?:\s+|$)(.*)$/i],
+      ['enderecoResidencial',/^Endereço Residencial(?:\s+|$)(.*)$/i],
+      ['telefoneResidencial',/^Fone Residencial(?:\s+|$)(.*)$/i],
+      ['emailPessoal',/^e-mail particular(?:\s+|$)(.*)$/i]
+    ];
+
+    for(const [field,pattern] of definitions){
+      const match=String(line||'').match(pattern);
+      if(match)return {field,value:responsibleCleanSourceValue(match[1]||'')};
+    }
+    return null;
+  }
+
+  function responsibleParseFiscalDocument(lines,fileName){
+    const cleanLines=(lines||[])
+      .map(line=>String(line||'').replace(/\s+/g,' ').trim())
+      .filter(Boolean);
+
+    const records=[];
+    let institution=null;
+    let condition='';
+
+    for(let index=0;index<cleanLines.length;index++){
+      const line=cleanLines[index];
+      const foundInstitution=responsibleFiscalInstitution(line);
+      if(foundInstitution){
+        institution=foundInstitution;
+        continue;
+      }
+
+      if(/^(Titular|Suplente)$/i.test(line)){
+        condition=line.replace(/^./,character=>character.toUpperCase());
+        continue;
+      }
+
+      const personMatch=line.match(
+        /^Conselheiro(?:\s+(Titular|Suplente))?\s+(.+)$/i
+      );
+      if(!personMatch)continue;
+
+      const localCondition=personMatch[1]||condition||'';
+      const nome=responsibleCleanSourceValue(personMatch[2]||'');
+      if(!nome||/^SEM INDICAÇÃO$/i.test(nome))continue;
+
+      const fields={};
+      let cursor=index+1;
+
+      for(;cursor<cleanLines.length;cursor++){
+        const nextLine=cleanLines[cursor];
+
+        if(
+          responsibleFiscalInstitution(nextLine)||
+          /^(Titular|Suplente)$/i.test(nextLine)||
+          /^Conselheiro(?:\s|$)/i.test(nextLine)
+        )break;
+
+        const parsed=responsibleFiscalField(nextLine);
+        if(parsed)fields[parsed.field]=parsed.value;
+      }
+
+      index=cursor-1;
+
+      const phone=
+        responsibleSourcePhone(fields.celular)||
+        responsibleSourcePhone(fields.telefoneResidencial)||
+        responsibleSourcePhone(fields.telefoneComercial);
+
+      const notes=[
+        `Importado do documento ${fileName}`,
+        institution?`Instituição: ${institution.label}`:'',
+        localCondition?`Condição: ${localCondition}`:'',
+        fields.telefoneComercial
+          ? `Telefone comercial informado: ${fields.telefoneComercial}`
+          : ''
+      ].filter(Boolean);
+
+      records.push({
+        nome:responsibleNormalizeName(nome),
+        cpf:formatCpf(fields.cpf||''),
+        emailFuncional:responsibleSourceEmail(fields.emailFuncional||''),
+        emailPessoal:responsibleSourceEmail(fields.emailPessoal||''),
+        telefone:phone,
+        cargo:[
+          'Conselheiro',
+          responsibleCleanSourceValue(localCondition),
+          institution?.label||''
+        ].filter(Boolean).join(' — '),
+        nascimento:responsibleParseDate(fields.nascimento||''),
+        enderecoFuncional:responsibleCleanSourceValue(
+          fields.enderecoFuncional||''
+        ),
+        enderecoResidencial:responsibleCleanSourceValue(
+          fields.enderecoResidencial||''
+        ),
+        categoria:'Conselho Fiscal – Art. 5º da Lei 12.781/97',
+        representacao:institution?.representacao||
+          'Membro indicado ou eleito, conforme estatuto',
+        observacao:notes.join(' • '),
+        periods:[],
+        acts:[]
+      });
+    }
+
+    return records;
+  }
+
   function responsibleParseDocument(lines,fileName){
     const text=(lines||[]).join('\n');
+
+    if(/CADASTRO DOS MEMBROS DO CONSELHO FISCAL DO IDT/i.test(text)){
+      return responsibleParseFiscalDocument(lines,fileName);
+    }
+
+    if(
+      /CONSELHO DE ADMINISTRAÇÃO DO IDT/i.test(text)&&
+      /DADOS CADASTRAIS DOS CONSELHEIROS/i.test(text)
+    ){
+      return responsibleParseAdministration2024Document(lines,fileName);
+    }
+
     if(/MEMBROS DO CONSELHO DE ADMINISTRAÇÃO/i.test(text)||
        /SOCIEDADE CIVIL\s*\/\s*(DIEESE|FIEC)/i.test(text)){
       return responsibleParseCouncilDocument(text,fileName);
     }
+
     return responsibleParseNamedDocument(text,fileName);
   }
 
@@ -6633,7 +7066,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     status.innerHTML=responsibleImportPreview.length
       ? `<div class="notice ${errors.length?'warn':'ok'}">
           ${responsibleImportPreview.length} responsável(is) identificado(s).
-          ${errors.length?` Atenção: ${safe(errors.join(' • '))}`:' Os campos ausentes serão registrados como pendência.'}
+          ${errors.length?` Atenção: ${safe(errors.join(' • '))}`:' Revise os dados na prévia editável. Os campos ausentes serão registrados como pendência.'}
         </div>`
       : `<div class="notice error">Nenhum responsável foi identificado. O arquivo pode estar digitalizado como imagem ou possuir outro formato.</div>`;
   }
@@ -6643,6 +7076,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     'Diretoria',
     'Conselho de Administração – Art. 3º da Lei 12.781/1997',
     'Conselho Fiscal – Art. 5º da Lei 12.781/97',
+    'Secretaria Executiva do Conselho de Administração',
     'Responsável pelo Setor Financeiro',
     'Contador',
     'Membros da Comissão de Avaliação'
@@ -6664,7 +7098,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   ];
 
   const responsibleImportActTypes=[
-    'Eleição','Nomeação','Designação','Recondução',
+    'Eleição','Termo de Posse','Nomeação','Designação','Recondução',
     'Substituição','Exoneração','Dispensa'
   ];
 
@@ -14978,7 +15412,7 @@ Total bruto: ${money(a.proventos)}`)}
     const changed=monitorContractStatuses();
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
-<script data-trancelim-integration-v154>
+<script data-trancelim-integration-v155>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   const DEFAULT_PHOTO='../assets/david-profile.png';
