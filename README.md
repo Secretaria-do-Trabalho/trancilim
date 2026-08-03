@@ -1,4 +1,4 @@
-# TRANCELIM - v161
+# TRANCELIM - v162
 
 ## Atualização principal
 - login integrado ao Supabase Auth;
@@ -55,12 +55,12 @@ Depois abra com Ctrl+F5.
 - Acompanhamento da Prestação de Contas independente dos filtros gerais do dashboard; usa somente os filtros internos da própria aba.
 
 
-## v160
+## v162
 - limpeza automática única dos dados das abas Pagamentos e Extratos;
 - preservados contratos, responsáveis, pessoal, prestações de contas e demais módulos.
 
 
-## v161
+## v162
 - corrigida a importação do Relatório Mensal de Pagamentos em PDF, mantendo número do processo, PESSOAL e CUSTEIO;
 - o extrato bancário deixou de criar pagamentos artificiais;
 - corrigida a leitura de documentos bancários longos colados ao valor;

@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v161</title>
+<title>Sistema de Prestação de Contas CG — v162</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1776,7 +1776,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     .bank-application-item{
       display:grid;
-      grid-template-columns:90px 1.15fr 130px 120px 1.2fr 170px;
+      grid-template-columns:90px 1.25fr 110px 135px 135px 105px 175px;
       gap:10px;
       align-items:center;
       padding:10px 12px;
@@ -2825,18 +2825,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div>
 <div class="top-actions">
 <button class="top-action primary" onclick="refreshAll()">Atualizar Painel</button>
-<select aria-label="Exercício" id="topAno">
-<option value="2025">2025</option>
-<option value="2026">2026</option>
-</select>
-<select aria-label="Mês" id="topMes">
-<option value="01">Janeiro</option><option value="02">Fevereiro</option>
-<option value="03">Março</option><option value="04">Abril</option>
-<option value="05">Maio</option><option value="06">Junho</option>
-<option value="07">Julho</option><option value="08">Agosto</option>
-<option value="09">Setembro</option><option value="10">Outubro</option>
-<option selected="" value="11">Novembro</option><option value="12">Dezembro</option>
-</select>
 <button class="top-action" onclick="goPage('relatorios')">Relatórios</button>
 </div>
 </header>
@@ -3135,7 +3123,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="contract-bank-head">
 <div>
 <h3>Contas bancárias do contrato</h3>
-<p>Cadastre todas as contas utilizadas pelo contrato. Em contratos já cadastrados, a conta é gravada imediatamente ao clicar em Adicionar.</p>
+<p>Cadastre cada conta bancária física apenas uma vez. Ao importar o extrato, escolha se o arquivo é da conta corrente ou da aplicação.</p>
 </div>
 <span class="badge-count" id="contractBankCount">0</span>
 </div>
@@ -3151,15 +3139,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div>
 <label>Conta *</label>
 <input id="ctBankAccount" placeholder="Ex.: 34.378-1"/>
-</div>
-<div>
-<label>Tipo</label>
-<select id="ctBankType">
-<option value="corrente">Conta corrente</option>
-<option value="aplicacao">Aplicação</option>
-<option value="poupanca">Poupança</option>
-<option value="outra">Outra</option>
-</select>
 </div>
 <div>
 <label>Finalidade / projeto</label>
@@ -3918,7 +3897,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="payment-toolbar">
 <div>
 <h3 style="margin:0 0 4px;color:#0b2f4a">Acompanhamento Conta Corrente ↔ Aplicação</h3>
-<p class="small">Aplicações e resgates não entram na lista de despesas. Permanecem registrados para posterior conferência com o extrato da conta de aplicação.</p>
+<p class="small">O sistema confere automaticamente os dois lados: saída da conta corrente e entrada na aplicação; ou saída da aplicação e entrada na conta corrente. Diferenças permanecem pendentes até os dois extratos serem importados.</p>
 </div>
 </div>
 <div class="bank-application-list" id="bankApplicationTransfersList"></div>
@@ -5208,6 +5187,67 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   const PHYSICAL_TEMPLATE_BASE64 = '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';
   let state = loadState();
 
+  function bankPhysicalAccountKey(account){
+    const agency=bankDigits(account?.agency||'');
+    const number=bankDigits(account?.account||'');
+    let bank=normalizeForChecklist(account?.bank||'');
+    if(bank.includes('BANCO DO BRASIL')||bank==='BB')bank='BB';
+    else if(bank.includes('CAIXA ECONOMICA')||bank==='CEF'||bank==='CAIXA')bank='CEF';
+    else if(bank.includes('BRADESCO'))bank='BRADESCO';
+    else if(bank.includes('BANCO DO NORDESTE')||bank==='BNB')bank='BNB';
+    /* Dentro do mesmo contrato, agência + conta identificam a conta física. */
+    return agency&&number?`${agency}|${number}`:[bank,agency,number].join('|');
+  }
+
+  function remapBankAccountReferences(remap){
+    if(!remap||!Object.keys(remap).length)return;
+    const mapId=value=>remap[value]||value;
+    state.bankStatements.forEach(item=>item.accountId=mapId(item.accountId));
+    state.bankEntries.forEach(item=>item.accountId=mapId(item.accountId));
+    state.documents.forEach(item=>{if(item.accountId)item.accountId=mapId(item.accountId)});
+    state.bankApplicationTransfers.forEach(item=>{
+      item.currentAccountId=mapId(item.currentAccountId);
+      item.applicationAccountId=mapId(item.applicationAccountId);
+    });
+    state.resourceTransfers.forEach(item=>{
+      if(item.originAccountId)item.originAccountId=mapId(item.originAccountId);
+      if(item.destinationAccountId)item.destinationAccountId=mapId(item.destinationAccountId);
+    });
+    state.financialReports.forEach(item=>{if(item.accountId)item.accountId=mapId(item.accountId)});
+  }
+
+  function consolidatePhysicalBankAccounts(){
+    const remap={};
+    let changed=false;
+    state.contracts.forEach(contract=>{
+      const accounts=Array.isArray(contract.bankAccounts)?contract.bankAccounts:[];
+      const unique=[];
+      const byKey=new Map();
+      accounts.forEach(account=>{
+        if(!account.id)account.id=`ba_${Date.now()}_${Math.random().toString(36).slice(2,9)}`;
+        const key=bankPhysicalAccountKey(account)||account.id;
+        const existing=byKey.get(key);
+        if(existing){
+          remap[account.id]=existing.id;
+          existing.purpose=existing.purpose||account.purpose||'';
+          existing.start=existing.start||account.start||'';
+          existing.end=existing.end||account.end||'';
+          if(existing.status==='encerrada'&&account.status!=='encerrada')existing.status=account.status;
+          changed=true;
+        }else{
+          account.type='conta_bancaria';
+          account.typeLabel='Conta bancária';
+          byKey.set(key,account);
+          unique.push(account);
+        }
+      });
+      if(unique.length!==accounts.length)changed=true;
+      contract.bankAccounts=unique;
+    });
+    remapBankAccountReferences(remap);
+    return changed;
+  }
+
   let bankAccountMigrationChanged=false;
   state.contracts.forEach(contract=>{
     if(!Array.isArray(contract.bankAccounts)){
@@ -5225,6 +5265,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       }
     });
   });
+  if(consolidatePhysicalBankAccounts())bankAccountMigrationChanged=true;
   if(bankAccountMigrationChanged){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
   state.payments.forEach(payment=>{if(!Array.isArray(payment.reimbursements))payment.reimbursements=[];if(!payment.fundingSource)payment.fundingSource='CONTRATO';if(payment.planItemId===undefined)payment.planItemId=''});
 
@@ -5573,8 +5614,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     refreshImportContractSelectors();
     const comp=document.getElementById('upCompetencia');
     if(comp && !comp.value){
-      const ano=document.getElementById('topAno')?.value||new Date().getFullYear();
-      const mes=document.getElementById('topMes')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+      const now=new Date();
+      const ano=now.getFullYear();
+      const mes=String(now.getMonth()+1).padStart(2,'0');
       comp.value=`${ano}-${mes}`;
     }
     document.getElementById('importModal').classList.add('open');
@@ -5752,7 +5794,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <div><small>Banco</small><br><strong>${safe(account.bank||'—')}</strong></div>
         <div><small>Agência</small><br>${safe(account.agency||'—')}</div>
         <div><small>Conta</small><br><strong>${safe(account.account||'—')}</strong></div>
-        <div><small>Tipo</small><br>${safe(account.typeLabel||account.type||'—')}</div>
         <div><small>Finalidade</small><br>${safe(account.purpose||'—')}</div>
         <div><small>Início</small><br>${safe(isoToBr(account.start)||'—')}</div>
         <div><small>Fim</small><br>${safe(isoToBr(account.end)||'—')}</div>
@@ -5766,7 +5807,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const bank=normalizeBankValue(document.getElementById('ctBankName').value);
     const agency=normalizeBankValue(document.getElementById('ctBankAgency').value);
     const account=normalizeBankValue(document.getElementById('ctBankAccount').value);
-    const type=document.getElementById('ctBankType').value;
     const purpose=normalizeBankValue(document.getElementById('ctBankPurpose').value);
     const start=document.getElementById('ctBankStart').value;
     const end=document.getElementById('ctBankEnd').value;
@@ -5780,29 +5820,20 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const duplicate=editingContractBankAccounts.some(item=>
       normalizeBankValue(item.bank)===bank&&
       bankDigits(item.agency)===bankDigits(agency)&&
-      bankDigits(item.account)===bankDigits(account)&&
-      item.type===type
+      bankDigits(item.account)===bankDigits(account)
     );
     if(duplicate){
-      alert('Esta conta já foi adicionada ao contrato com o mesmo tipo.');
+      alert('Esta conta bancária já foi adicionada ao contrato. Escolha o tipo do extrato somente no momento da importação.');
       return;
     }
 
-    const typeLabels={
-      corrente:'Conta corrente',
-      aplicacao:'Aplicação',
-      poupanca:'Poupança',
-      outra:'Outra'
-    };
-
     editingContractBankAccounts.push({
-      id:id(),bank,agency,account,type,typeLabel:typeLabels[type]||type,
+      id:id(),bank,agency,account,type:'conta_bancaria',typeLabel:'Conta bancária',
       purpose,start,end,status
     });
 
     ['ctBankName','ctBankAgency','ctBankAccount','ctBankPurpose','ctBankStart','ctBankEnd']
       .forEach(fieldId=>{const element=document.getElementById(fieldId);if(element)element.value=''});
-    document.getElementById('ctBankType').value='corrente';
     document.getElementById('ctBankStatus').value='ativa';
     renderContractBankAccounts();
 
@@ -8446,8 +8477,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     document.getElementById('payAccountabilityStatus').value='AGUARDANDO DOCUMENTO COMPROBATÓRIO';
     const evidence=document.getElementById('payEvidenceFiles');if(evidence)evidence.value='';
     const competence=document.getElementById('payCompetence');
-    const year=document.getElementById('topAno')?.value||new Date().getFullYear();
-    const month=document.getElementById('topMes')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+    const now=new Date();
+    const year=now.getFullYear();
+    const month=String(now.getMonth()+1).padStart(2,'0');
     competence.value=`${year}-${month}`;
     document.getElementById('paymentContractInfo').classList.add('hidden');
     renderPaymentEvidenceList();
@@ -9984,8 +10016,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const parts=[
       account.bank,
       account.agency?`Ag. ${account.agency}`:'',
-      account.account?`Conta ${account.account}`:'',
-      account.purpose
+      account.account?`Conta ${account.account}`:''
     ].filter(Boolean);
     return parts.join(' • ');
   }
@@ -10031,13 +10062,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
 
   function bankApplicationAccountForContract(contractId,currentAccountId=''){
+    const current=bankAccountById(contractId,currentAccountId);
+    if(current&&current.status!=='encerrada')return current;
     const contract=state.contracts.find(item=>item.id===contractId);
-    const accounts=Array.isArray(contract?.bankAccounts)?contract.bankAccounts:[];
-    return accounts.find(account=>
-      account.id!==currentAccountId&&
-      account.type==='aplicacao'&&
-      account.status!=='encerrada'
-    )||null;
+    return (contract?.bankAccounts||[]).find(account=>account.status!=='encerrada')||null;
   }
 
   function bankApplicationTransfersForStatement(statementId){
@@ -10045,9 +10073,23 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
   function bankApplicationTransfersFiltered(){
-    const selectedStatementIds=new Set(selectedBankStatements().map(item=>item.id));
+    const contractId=document.getElementById('bankFilterContract')?.value||'';
+    const year=document.getElementById('bankFilterYear')?.value||'';
+    const competence=document.getElementById('bankFilterCompetence')?.value||'';
+    const accountKey=document.getElementById('bankFilterAccount')?.value||'';
+
+    /*
+     * A conciliação Conta Corrente ↔ Aplicação sempre usa os dois extratos.
+     * O filtro “Tipo de extrato” continua valendo para a grade de lançamentos,
+     * mas não pode esconder a contrapartida necessária à conferência.
+     */
     return state.bankApplicationTransfers
-      .filter(item=>selectedStatementIds.has(item.statementId))
+      .filter(item=>
+        (!contractId||item.contractId===contractId)&&
+        (!year||String(item.competence||'').startsWith(year))&&
+        (!competence||item.competence===competence)&&
+        (!accountKey||`${item.contractId}|${item.currentAccountId||item.applicationAccountId}`===accountKey)
+      )
       .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   }
 
@@ -10657,60 +10699,112 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
 
+  function bankTransferDateKey(value){return String(value||'').slice(0,10)}
+
+  function markBankTransferMatch(currentRows,applicationRows,direction){
+    const matchId=id();
+    const currentTotal=currentRows.reduce((sum,item)=>sum+Number(item.amount||0),0);
+    const applicationTotal=applicationRows.reduce((sum,item)=>sum+Number(item.amount||0),0);
+    [...currentRows,...applicationRows].forEach(item=>{
+      item.reconciliationId=matchId;
+      item.reconciledDirection=direction;
+      item.status=Math.abs(currentTotal-applicationTotal)<=0.02?'CONCILIADO':'DIVERGENTE';
+      item.counterpartAmount=item.sourceStatementType==='conta_corrente'?applicationTotal:currentTotal;
+    });
+  }
+
+  function reconcileBankApplicationTransfers(contractId='',accountId='',competence=''){
+    const rows=state.bankApplicationTransfers.filter(item=>
+      (!contractId||item.contractId===contractId)&&
+      (!accountId||item.currentAccountId===accountId||item.applicationAccountId===accountId)&&
+      (!competence||item.competence===competence)
+    );
+    rows.forEach(item=>{
+      item.reconciliationId='';item.counterpartAmount=0;item.reconciledDirection='';
+      item.status=item.sourceStatementType==='aplicacao'
+        ?'AGUARDANDO_EXTRATO_CONTA_CORRENTE':'AGUARDANDO_EXTRATO_APLICACAO';
+    });
+    const currentRows=rows.filter(item=>item.sourceStatementType==='conta_corrente');
+    const applicationRows=rows.filter(item=>item.sourceStatementType==='aplicacao');
+    const tolerance=0.02;
+    const dateDistance=(a,b)=>Math.abs(accountabilityDaysBetween(a,b));
+
+    ['APLICACAO','RESGATE'].forEach(direction=>{
+      const current=currentRows.filter(item=>item.transferDirection===direction&&!item.reconciliationId);
+      const application=applicationRows.filter(item=>item.transferDirection===direction&&!item.reconciliationId);
+      current.forEach(cc=>{
+        const exact=application.find(app=>!app.reconciliationId&&dateDistance(cc.date,app.date)<=1&&Math.abs(Number(cc.amount||0)-Number(app.amount||0))<=tolerance);
+        if(exact)markBankTransferMatch([cc],[exact],direction);
+      });
+      const dates=[...new Set([...current.filter(item=>!item.reconciliationId).map(item=>bankTransferDateKey(item.date)),...application.filter(item=>!item.reconciliationId).map(item=>bankTransferDateKey(item.date))].filter(Boolean))];
+      dates.forEach(date=>{
+        const ccGroup=current.filter(item=>!item.reconciliationId&&dateDistance(item.date,date)<=1);
+        const appGroup=application.filter(item=>!item.reconciliationId&&dateDistance(item.date,date)<=1);
+        if(!ccGroup.length||!appGroup.length)return;
+        const ccTotal=ccGroup.reduce((sum,item)=>sum+Number(item.amount||0),0);
+        const appTotal=appGroup.reduce((sum,item)=>sum+Number(item.amount||0),0);
+        if(Math.abs(ccTotal-appTotal)<=tolerance)markBankTransferMatch(ccGroup,appGroup,direction);
+      });
+    });
+
+    const yields=applicationRows.filter(item=>item.transferDirection==='RENDIMENTO'&&!item.reconciliationId);
+    const currentCredits=currentRows.filter(item=>item.transferDirection==='RESGATE'&&!item.reconciliationId&&item.movementType==='CREDITO');
+    yields.forEach(app=>{
+      const cc=currentCredits.find(item=>!item.reconciliationId&&dateDistance(item.date,app.date)<=1&&Math.abs(Number(item.amount||0)-Number(app.amount||0))<=tolerance);
+      if(cc)markBankTransferMatch([cc],[app],'RENDIMENTO');
+    });
+  }
+
+  function bankApplicationReconciliationRows(){
+    reconcileBankApplicationTransfers();
+    const filtered=bankApplicationTransfersFiltered();
+    const groups=new Map();
+    filtered.forEach(item=>{
+      const key=item.reconciliationId||`single_${item.id}`;
+      if(!groups.has(key))groups.set(key,[]);
+      groups.get(key).push(item);
+    });
+    return [...groups.values()].map(items=>{
+      const current=items.filter(item=>item.sourceStatementType==='conta_corrente');
+      const application=items.filter(item=>item.sourceStatementType==='aplicacao');
+      const reference=items[0];
+      return {
+        date:reference.date,contractId:reference.contractId,
+        accountId:reference.currentAccountId||reference.applicationAccountId,
+        direction:reference.reconciledDirection||reference.transferDirection,
+        currentAmount:current.reduce((sum,item)=>sum+Number(item.amount||0),0),
+        applicationAmount:application.reduce((sum,item)=>sum+Number(item.amount||0),0),
+        status:items.some(item=>item.status==='DIVERGENTE')?'DIVERGENTE':items.every(item=>item.status==='CONCILIADO')?'CONCILIADO':reference.status
+      };
+    }).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  }
+
   function renderBankApplicationTransfers(){
     const box=document.getElementById('bankApplicationTransfersList');
     if(!box)return;
-
-    const transfers=bankApplicationTransfersFiltered();
-
-    box.innerHTML=transfers.map(transfer=>{
-      const currentAccount=bankAccountById(
-        transfer.contractId,
-        transfer.currentAccountId
-      );
-      const applicationAccount=bankAccountById(
-        transfer.contractId,
-        transfer.applicationAccountId
-      );
-
-      const statusLabel=transfer.status==='AGUARDANDO_EXTRATO_APLICACAO'
-        ? 'Aguardando extrato da aplicação'
-        : 'Conta de aplicação não cadastrada';
-
+    const rows=bankApplicationReconciliationRows();
+    const statusLabels={CONCILIADO:'CONCILIADO',DIVERGENTE:'VALORES DIVERGENTES',AGUARDANDO_EXTRATO_APLICACAO:'AGUARDANDO EXTRATO DA APLICAÇÃO',AGUARDANDO_EXTRATO_CONTA_CORRENTE:'AGUARDANDO EXTRATO DA CONTA CORRENTE'};
+    box.innerHTML=rows.map(row=>{
+      const account=bankAccountById(row.contractId,row.accountId);
+      const difference=Math.abs(row.currentAmount-row.applicationAmount);
+      const label=row.direction==='APLICACAO'?'APLICAÇÃO':row.direction==='RENDIMENTO'?'RENDIMENTO DO RESGATE':'RESGATE';
+      const className=row.status==='CONCILIADO'?'bank-status-ok':row.status==='DIVERGENTE'?'bank-status-error':'bank-status-warn';
+      const currentSideLabel=row.direction==='APLICACAO'
+        ? 'Saída da conta corrente'
+        : 'Entrada na conta corrente';
+      const applicationSideLabel=row.direction==='APLICACAO'
+        ? 'Entrada na aplicação'
+        : 'Saída da aplicação';
       return `<div class="bank-application-item">
-        <div>
-          <small>Data</small>
-          <strong>${safe(isoToBr(transfer.date)||'—')}</strong>
-        </div>
-        <div>
-          <small>Conta corrente</small>
-          ${safe(bankAccountLabel(currentAccount)||'—')}
-        </div>
-        <div>
-          <small>Movimento</small>
-          <span class="bank-application-tag ${transfer.transferDirection==='APLICACAO'?'apply':'redeem'}">
-            ${transfer.transferDirection==='APLICACAO'?'APLICAÇÃO':'RESGATE'}
-          </span>
-        </div>
-        <div>
-          <small>Valor</small>
-          <strong>${money(transfer.amount)}</strong>
-        </div>
-        <div>
-          <small>Conta de aplicação</small>
-          ${applicationAccount
-            ? safe(bankAccountLabel(applicationAccount))
-            : 'Não cadastrada'}
-        </div>
-        <div>
-          <small>Situação</small>
-          <span class="bank-status ${applicationAccount?'bank-status-warn':'bank-status-error'}">
-            ${safe(statusLabel)}
-          </span>
-        </div>
+        <div><small>Data</small><strong>${safe(isoToBr(row.date)||'—')}</strong></div>
+        <div><small>Conta bancária</small>${safe(bankAccountLabel(account)||'—')}</div>
+        <div><small>Movimento</small><span class="bank-application-tag ${row.direction==='APLICACAO'?'apply':'redeem'}">${safe(label)}</span></div>
+        <div><small>${safe(currentSideLabel)}</small><strong>${money(row.currentAmount)}</strong></div>
+        <div><small>${safe(applicationSideLabel)}</small><strong>${money(row.applicationAmount)}</strong></div>
+        <div><small>Diferença</small><strong>${money(difference)}</strong></div>
+        <div><small>Situação</small><span class="bank-status ${className}">${safe(statusLabels[row.status]||row.status||'PENDENTE')}</span></div>
       </div>`;
-    }).join('')||
-      '<div class="bank-application-empty">Nenhuma aplicação ou resgate identificado nos extratos selecionados.</div>';
+    }).join('')||'<div class="bank-application-empty">Nenhuma aplicação ou resgate identificado nos extratos selecionados.</div>';
   }
 
   function renderBankStatements(){
@@ -10862,9 +10956,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     const competence=document.getElementById('bankImportCompetence');
     if(!competence.value){
-      const year=document.getElementById('topAno')?.value||new Date().getFullYear();
-      const month=document.getElementById('topMes')?.value||
-        String(new Date().getMonth()+1).padStart(2,'0');
+      const now=new Date();
+      const year=now.getFullYear();
+      const month=String(now.getMonth()+1).padStart(2,'0');
       competence.value=`${year}-${month}`;
     }
 
@@ -11257,21 +11351,73 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     let openingBalance=null;
     let closingBalance=null;
     let balanceMode='';
-    lines.forEach(line=>{
+    let currentMovement=null;
+    const applicationTransfers=[];
+
+    const finishMovement=()=>{
+      if(!currentMovement)return;
+      const capital=Number(currentMovement.capital||0);
+      const interest=Number(currentMovement.interest||0);
+      const liquid=Number(currentMovement.liquid||0);
+      const yieldAmount=Math.max(0,interest||liquid-capital);
+      if(capital>0){
+        const isRedemption=currentMovement.transferDirection==='RESGATE';
+        applicationTransfers.push({
+          id:id(),date:currentMovement.date,
+          movementType:isRedemption?'DEBITO':'CREDITO',
+          transferDirection:currentMovement.transferDirection,
+          history:currentMovement.history,party:'',documentNumber:currentMovement.documentNumber,
+          debit:isRedemption?capital:0,credit:isRedemption?0:capital,
+          amount:capital,sourceSide:'APLICACAO',sourceRow:currentMovement.sourceRow
+        });
+      }
+      if(currentMovement.transferDirection==='RESGATE'&&yieldAmount>0){
+        applicationTransfers.push({
+          id:id(),date:currentMovement.date,movementType:'DEBITO',transferDirection:'RENDIMENTO',
+          history:`Rendimento do ${currentMovement.history}`,party:'',documentNumber:currentMovement.documentNumber,
+          debit:yieldAmount,credit:0,amount:yieldAmount,sourceSide:'APLICACAO',sourceRow:currentMovement.sourceRow
+        });
+      }
+      currentMovement=null;
+    };
+
+    lines.forEach((rawLine,lineIndex)=>{
+      const line=String(rawLine||'').replace(/\s+/g,' ').trim();
       const normalized=normalizeForChecklist(line);
-      if(normalized.includes('SALDO ANTERIOR'))balanceMode='OPENING';
-      else if(normalized.includes('SALDO FINAL'))balanceMode='CLOSING';
-      else if(balanceMode&&normalized.includes('VALOR CAPITAL')){
-        const values=String(line||'').match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[];
+      if(normalized.includes('SALDO ANTERIOR')){finishMovement();balanceMode='OPENING';return}
+      if(normalized.includes('SALDO FINAL')){finishMovement();balanceMode='CLOSING';return}
+      if(balanceMode&&normalized.includes('VALOR CAPITAL')){
+        const values=line.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[];
         if(values.length){
           const amount=parseBankNumber(values[values.length-1]);
-          if(balanceMode==='OPENING')openingBalance=amount;
-          else closingBalance=amount;
+          if(balanceMode==='OPENING')openingBalance=amount;else closingBalance=amount;
           balanceMode='';
         }
+        return;
+      }
+      const movementMatch=line.match(/^(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\s+(Resgate|Aplicação|Aplicacao)\s*-?\s*(.*)$/i);
+      if(movementMatch){
+        finishMovement();
+        currentMovement={
+          date:parseFlexibleDate(movementMatch[1],competence),
+          transferDirection:normalizeForChecklist(movementMatch[2]).includes('RESGATE')?'RESGATE':'APLICACAO',
+          history:`${movementMatch[2]} ${movementMatch[3]||''}`.trim(),
+          documentNumber:String(movementMatch[3]||'').replace(/\D/g,''),
+          capital:0,interest:0,liquid:0,sourceRow:lineIndex+1
+        };
+        return;
+      }
+      if(currentMovement){
+        const values=line.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[];
+        const amount=values.length?parseBankNumber(values[values.length-1]):0;
+        if(normalized.includes('VALOR CAPITAL'))currentMovement.capital=amount;
+        else if(normalized.includes('VALOR JUROS ATE MES ANT'))currentMovement.interest+=amount;
+        else if(normalized.includes('VALOR JUROS NO MES'))currentMovement.interest+=amount;
+        else if(normalized.includes('VALOR LIQUIDO'))currentMovement.liquid=amount;
       }
     });
-    return {rows:[],applicationTransfers:[],openingBalance,closingBalance,applicationDocumentOnly:true};
+    finishMovement();
+    return {rows:[],applicationTransfers,openingBalance,closingBalance,applicationDocumentOnly:true};
   }
 
   async function parseBankStatementFile(file,competence,type='conta_corrente'){
@@ -11440,7 +11586,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
             ${applicationTransfers.length} movimentação(ões) entre conta corrente e aplicação foram separadas para acompanhamento.
            </div>`
         : type==='aplicacao'
-          ? `<div class="notice ok">Extrato de aplicação identificado. O PDF será anexado para conferência e não entrará na conciliação dos pagamentos.</div>`
+          ? `<div class="notice ok">Extrato de aplicação identificado. As aplicações, resgates e rendimentos serão conferidos com o extrato da conta corrente.</div>`
           : `<div class="notice warn">Nenhum lançamento foi identificado automaticamente. Use “Adicionar linha manual” ou envie outro formato do extrato.</div>`;
       renderBankPreview();
     }catch(error){
@@ -11602,26 +11748,18 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const applicationAccount=bankApplicationAccountForContract(contractId,accountId);
       applicationTransfers.forEach(row=>{
         state.bankApplicationTransfers.push({
-          id:id(),
-          statementId,
-          contractId,
-          currentAccountId:accountId,
-          applicationAccountId:applicationAccount?.id||'',
-          competence,
-          date:row.date,
-          transferDirection:row.transferDirection,
-          movementType:row.movementType,
-          history:String(row.history||'').trim(),
-          party:String(row.party||'').trim(),
-          documentNumber:String(row.documentNumber||'').trim(),
-          sourceCode:String(row.sourceCode||'').trim(),
-          amount:bankEntryAmount(row),
-          status:applicationAccount
-            ? 'AGUARDANDO_EXTRATO_APLICACAO'
-            : 'CONTA_APLICACAO_NAO_CADASTRADA',
+          id:id(),statementId,contractId,currentAccountId:accountId,
+          applicationAccountId:applicationAccount?.id||accountId,competence,date:row.date,
+          transferDirection:row.transferDirection,movementType:row.movementType,
+          history:String(row.history||'').trim(),party:String(row.party||'').trim(),
+          documentNumber:String(row.documentNumber||'').trim(),sourceCode:String(row.sourceCode||'').trim(),
+          amount:Number(row.amount||bankEntryAmount(row)||0),sourceStatementType:type,
+          sourceSide:type==='aplicacao'?'APLICACAO':'CONTA_CORRENTE',
+          status:type==='aplicacao'?'AGUARDANDO_EXTRATO_CONTA_CORRENTE':'AGUARDANDO_EXTRATO_APLICACAO',
           createdAt:new Date().toISOString()
         });
       });
+      reconcileBankApplicationTransfers(contractId,accountId,competence);
 
       /* O extrato não cria pagamentos. A Relação de Pagamentos é a fonte oficial. */
       if(type==='conta_corrente')autoReconcileBankEntries(statementId);
@@ -12547,10 +12685,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const haystack=normalizeForChecklist(
         `${item.label||''} ${item.nup||''} ${item.observation||''} ${contract?.sacc||''} ${contract?.contrato||''}`
       );
+      const normalizedType=normalizeForChecklist(item.type||item.key?.split(':')?.[0]||item.label||'');
       return (!contractId||item.contractId===contractId)&&
         (!year||[item.periodStart,item.periodEnd,item.dueDate].some(value=>value?.startsWith(year)))&&
-        (!type||item.type===type)&&
-        accountabilityItemMatchesStatus(item,status)&&
+        (!type||normalizedType===normalizeForChecklist(type)||normalizedType.startsWith(normalizeForChecklist(type)))&&
+        accountabilityItemMatchesStatus(item,String(status||'').toUpperCase())&&
         (!search||haystack.includes(search));
     }).sort((a,b)=>(a.dueDate||'').localeCompare(b.dueDate||''));
 
@@ -12595,9 +12734,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <td>${safe(item.observation||'—')}</td>
         <td><button class="link-btn" onclick="openAccountabilityItemModal('${item.id}')">Atualizar</button></td>
       </tr>`;
-    }).join('')||'<tr><td colspan="13" class="empty">Nenhum cronograma de prestação de contas foi cadastrado.</td></tr>';
+    }).join('')||`<tr><td colspan="13" class="empty">${contractId||year||type||status||search?'Nenhuma prestação encontrada para os filtros internos selecionados.':'Nenhum cronograma de prestação de contas foi cadastrado.'}</td></tr>`;
     syncAccountabilityScrollbars();
   }
+  window.renderAccountabilityTracking=renderAccountabilityTracking;
 
   function accountabilityCurrentDocumentHtml(documentId,label){
     if(!documentId)return '<span>Nenhum arquivo anexado.</span>';
@@ -12832,8 +12972,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     clearPaymentPreview();
     refreshPaymentContractOptions();
     const competence=document.getElementById('payImportCompetence');
-    const year=document.getElementById('topAno')?.value||new Date().getFullYear();
-    const month=document.getElementById('topMes')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+    const now=new Date();
+    const year=now.getFullYear();
+    const month=String(now.getMonth()+1).padStart(2,'0');
     competence.value=`${year}-${month}`;
     document.getElementById('paymentImportModal').classList.add('open');
   }
@@ -14424,28 +14565,21 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     );
   };
 
-  function syncTopPeriod(){
-    const ano=document.getElementById('topAno')?.value||'';
-    const mes=document.getElementById('topMes')?.value||'';
-    const lastDay=new Date(Number(ano),Number(mes),0).getDate();
-    const pill=document.getElementById('positionPill');
-    if(pill) pill.textContent=`Posição em ${String(lastDay).padStart(2,'0')}/${mes}/${ano}`;
+  function currentCompetenceKey(){
+    const now=new Date();
+    return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  }
 
+  function applyCurrentDashboardCompetence(){
+    const competence=currentCompetenceKey();
+    const year=competence.slice(0,4);
     const fa=document.getElementById('filterAno');
     const fc=document.getElementById('filterCompetencia');
-    if(fa && [...fa.options].some(o=>o.value===ano)) fa.value=ano;
-    const comp=`${ano}-${mes}`;
-    if(fc && [...fc.options].some(o=>o.value===comp)) fc.value=comp;
-
-    const accountabilityYear=document.getElementById('accountabilityFilterYear');
-    if(accountabilityYear&&[...accountabilityYear.options].some(option=>option.value===ano)){
-      accountabilityYear.value=ano;
-    }
-
-    renderPageOnly(getActivePageName());
+    if(fa&&[...fa.options].some(option=>option.value===year))fa.value=year;
+    if(fc&&[...fc.options].some(option=>option.value===competence))fc.value=competence;
+    const pill=document.getElementById('positionPill');
+    if(pill)pill.textContent=`Competência ${competenceLabel(competence)}`;
   }
-  document.getElementById('topAno')?.addEventListener('change',syncTopPeriod);
-  document.getElementById('topMes')?.addEventListener('change',syncTopPeriod);
 
   function unique(field,source){return [...new Set(source.map(x=>x[field]).filter(Boolean))].sort()}
   function fillSelect(id,values,formatter=x=>x){
@@ -14454,14 +14588,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     if(values.includes(old))el.value=old;
   }
   function refreshSelects(){
-    const topAno=document.getElementById('topAno');
-    if(topAno){
-      const current=topAno.value||'2026';
-      const years=[...new Set([...state.imports.map(x=>x.competencia?.slice(0,4)).filter(Boolean),'2025','2026'])].sort();
-      topAno.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');
-      topAno.value=years.includes(current)?current:years[years.length-1];
-    }
-
     const source=[...state.imports,...state.contracts];
     fillSelect('filterSacc',unique('sacc',source));
     fillSelect('personSacc',unique('sacc',source));
@@ -14485,6 +14611,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     });
 
     const comps=[...new Set([
+      currentCompetenceKey(),
       ...state.imports.map(item=>item.competencia),
       ...state.payments.map(item=>item.competence),
       ...state.bankEntries.map(item=>item.competence),
@@ -15664,6 +15791,7 @@ Total bruto: ${money(a.proventos)}`)}
   function refreshAll(){
     monitorContractStatuses();
     refreshSelects();
+    applyCurrentDashboardCompetence();
     renderPageOnly(getActivePageName());
   }
   window.renderPeople=renderPeople; window.renderReport=renderReport; window.refreshAll=refreshAll;
@@ -15700,7 +15828,6 @@ Total bruto: ${money(a.proventos)}`)}
   clearPaymentForm();
   renderPaymentEvidenceList();
   renderContractBankAccounts();
-  syncTopPeriod();
   setInterval(()=>{
     const changed=monitorContractStatuses();
     if(changed&&getActivePageName()==='contratos')renderContracts();
