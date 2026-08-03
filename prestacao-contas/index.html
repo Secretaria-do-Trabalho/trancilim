@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v40</title>
+<title>Sistema de Prestação de Contas CG — v43</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -28,6 +28,30 @@
 body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !important}
 .btn,.btn-primary,.btn-secondary,.btn-danger,.nav button,.profile-light-btn,.profile-approved-actions button,.profile-action-row label,.profile-action-row button{font-family:Inter,Segoe UI,Arial,sans-serif !important;border-radius:12px !important;font-weight:800 !important}
 .side-brand,.institution{cursor:pointer}
+.portal-profile-card{cursor:pointer;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
+.portal-profile-card:hover{transform:translateY(-1px);background:rgba(255,255,255,.16);box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.profile-top-card{display:flex;align-items:center;gap:18px;padding:18px;border-radius:24px;background:#eef5f8;margin-bottom:18px}
+.profile-big-avatar{width:84px;height:84px;border-radius:50%;overflow:hidden;border:5px solid #1f9f60;box-shadow:0 10px 24px rgba(0,0,0,.08);background:#fff;display:grid;place-items:center;color:#08783e;font-weight:900;font-size:22px;flex:none}
+.profile-big-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-top-card h2{margin:0;color:#0b2f4a;font-size:18px}
+.profile-top-card p{margin:5px 0 0;color:#6c8290;font-size:13px;font-weight:700}
+.profile-action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-top:4px}
+.profile-field label{display:block;color:#6d8190;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.profile-field strong{display:block;color:#0b2f4a;font-size:13px}
+.profile-users-section{margin-top:22px;padding-top:18px;border-top:1px solid #d8e3e7}
+.profile-users-section h3{margin:0 0 14px;color:#0b2f4a;font-size:17px}
+.profile-users-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.profile-users-panel{border:1px solid #d8e4e8;border-radius:18px;background:#fff;min-height:170px;padding:16px}
+.profile-users-panel h4{margin:0 0 12px;color:#0b2f4a;font-size:14px}
+.profile-empty-note{color:#6d8190;font-size:12px}
+.profile-approved-card{border:1px solid #d9e4e8;border-radius:18px;background:#f6fafb;padding:14px}
+.profile-approved-card strong{display:block;color:#0b2f4a;font-size:15px;line-height:1.25}
+.profile-approved-meta{margin-top:8px;color:#6f8390;font-size:12px;line-height:1.45}
+.profile-approved-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.profile-badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;background:#e6f1ea;color:#64806f;font-size:12px;font-weight:800}
+.profile-light-btn{border:1px solid #dce6ea;background:#eef4f6;color:#0b5e91;padding:8px 12px;border-radius:12px;font-weight:800;cursor:pointer}
+@media(max-width:780px){.profile-grid,.profile-users-grid{grid-template-columns:1fr}.profile-top-card{align-items:flex-start;flex-direction:column}}
 
     :root{
       --bg:#eef4f5;
@@ -72,10 +96,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);margin-bottom:15px
     }
     .avatar{
-      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
-      background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35);flex:none
+      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+      background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35)
     }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .user-card strong{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .user-card small{font-size:11px;color:rgba(255,255,255,.85)}
     .nav{display:flex;flex-direction:column;gap:6px}
@@ -195,30 +218,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     .report-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .footer-note{font-size:12px;color:var(--muted);margin-top:12px}
     .hidden{display:none!important}
-    .portal-profile-card{cursor:pointer;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
-    .portal-profile-card:hover{transform:translateY(-1px);background:rgba(255,255,255,.16);box-shadow:0 12px 28px rgba(0,0,0,.12)}
-    .profile-top-card{display:flex;align-items:center;gap:18px;padding:18px;border-radius:24px;background:#eef5f8;margin-bottom:18px}
-    .profile-big-avatar{width:84px;height:84px;border-radius:50%;overflow:hidden;border:5px solid #1f9f60;box-shadow:0 10px 24px rgba(0,0,0,.08);background:#fff;display:grid;place-items:center;color:#08783e;font-weight:900;font-size:22px;flex:none}
-    .profile-big-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .profile-top-card h2{margin:0;color:#0b2f4a;font-size:18px}
-    .profile-top-card p{margin:5px 0 0;color:#6c8290;font-size:13px;font-weight:700}
-    .profile-action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-    .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 26px;margin-top:4px}
-    .profile-field label{display:block;color:#6d8190;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
-    .profile-field strong{display:block;color:#0b2f4a;font-size:13px}
-    .profile-users-section{margin-top:22px;padding-top:18px;border-top:1px solid #d8e3e7}
-    .profile-users-section h3{margin:0 0 14px;color:#0b2f4a;font-size:17px}
-    .profile-users-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .profile-users-panel{border:1px solid #d8e4e8;border-radius:18px;background:#fff;min-height:170px;padding:16px}
-    .profile-users-panel h4{margin:0 0 12px;color:#0b2f4a;font-size:14px}
-    .profile-empty-note{color:#6d8190;font-size:12px}
-    .profile-approved-card{border:1px solid #d9e4e8;border-radius:18px;background:#f6fafb;padding:14px}
-    .profile-approved-card strong{display:block;color:#0b2f4a;font-size:15px;line-height:1.25}
-    .profile-approved-meta{margin-top:8px;color:#6f8390;font-size:12px;line-height:1.45}
-    .profile-approved-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-    .profile-badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;background:#e6f1ea;color:#64806f;font-size:12px;font-weight:800}
-    .profile-light-btn{border:1px solid #dce6ea;background:#eef4f6;color:#0b5e91;padding:8px 12px;border-radius:12px;font-weight:800;cursor:pointer}
-    @media(max-width:780px){.profile-grid,.profile-users-grid{grid-template-columns:1fr}.profile-top-card{align-items:flex-start;flex-direction:column}}
     @media(max-width:1180px){
       .app-shell{grid-template-columns:245px minmax(0,1fr)}
       .institution .org{white-space:normal}
@@ -428,11 +427,69 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       white-space:nowrap;color:#5f7180;font-size:11px;margin-top:4px
     }
     .responsible-list-tools{
-      display:flex;gap:10px;align-items:end;flex-wrap:wrap
+      display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap
+    }
+    .responsible-import-grid{
+      display:grid;
+      grid-template-columns:minmax(260px,1fr) minmax(320px,1.5fr);
+      gap:14px;
+      align-items:end;
+    }
+    .responsible-import-summary{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin:16px 0;
+    }
+    .responsible-import-summary>div{
+      border:1px solid var(--line);
+      border-radius:13px;
+      padding:13px;
+      background:#f8fbfb;
+    }
+    .responsible-import-summary small{
+      display:block;
+      color:#65798a;
+      font-size:10px;
+      font-weight:900;
+      text-transform:uppercase;
+      margin-bottom:7px;
+    }
+    .responsible-import-summary strong{
+      font-size:20px;
+      color:#0b2f4a;
+    }
+    .responsible-import-file{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .responsible-import-issues{
+      color:#9a5a00;
+      font-size:11px;
+      line-height:1.45;
+      max-width:360px;
+    }
+    .responsible-import-ok{
+      color:#18794e;
+      font-size:11px;
+      font-weight:800;
+    }
+    .responsible-source-note{
+      margin-top:7px;
+      color:#6a7d89;
+      font-size:10px;
+    }
+    .tag.pending{
+      background:#fff2df;
+      color:#9a5a00;
     }
     @media(max-width:1250px){
       .acts-add{grid-template-columns:repeat(3,minmax(0,1fr))}
       .responsible-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .responsible-import-grid{grid-template-columns:1fr}
+      .responsible-import-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     @media(max-width:850px){
       .responsible-grid,.responsible-grid.four,.inline-add,.acts-add{
@@ -442,6 +499,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     }
     @media(max-width:520px){
       .summary-strip.five{grid-template-columns:1fr}
+      .responsible-import-summary{grid-template-columns:1fr}
     }
 
   
@@ -2036,6 +2094,171 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       line-height:1.2;
     }
 
+    /* v43 — acompanhamento compacto, legível e sem espaços excessivos */
+    #accountabilityTableWrap{
+      overflow-x:auto;
+    }
+
+    .accountability-table{
+      width:1298px !important;
+      min-width:1298px !important;
+      max-width:1298px !important;
+      table-layout:fixed !important;
+      border-collapse:collapse;
+    }
+
+    .accountability-table th,
+    .accountability-table td{
+      padding:8px 4px !important;
+      white-space:normal !important;
+      overflow-wrap:break-word;
+      word-break:normal;
+      vertical-align:top;
+      line-height:1.28;
+    }
+
+    .accountability-table th{
+      font-size:10.5px !important;
+      font-weight:900;
+    }
+
+    .accountability-table td{
+      font-size:10px !important;
+    }
+
+    .accountability-table th:nth-child(1),
+    .accountability-table td:nth-child(1){
+      width:230px !important;
+      min-width:230px !important;
+      max-width:230px !important;
+    }
+
+    .accountability-table th:nth-child(2),
+    .accountability-table td:nth-child(2){
+      width:76px !important;
+      min-width:76px !important;
+      max-width:76px !important;
+    }
+
+    .accountability-table th:nth-child(3),
+    .accountability-table td:nth-child(3){
+      width:76px !important;
+      min-width:76px !important;
+      max-width:76px !important;
+    }
+
+    .accountability-table th:nth-child(4),
+    .accountability-table td:nth-child(4){
+      width:94px !important;
+      min-width:94px !important;
+      max-width:94px !important;
+    }
+
+    .accountability-table th:nth-child(5),
+    .accountability-table td:nth-child(5){
+      width:82px !important;
+      min-width:82px !important;
+      max-width:82px !important;
+    }
+
+    .accountability-table th:nth-child(6),
+    .accountability-table td:nth-child(6){
+      width:82px !important;
+      min-width:82px !important;
+      max-width:82px !important;
+    }
+
+    .accountability-table th:nth-child(7),
+    .accountability-table td:nth-child(7){
+      width:102px !important;
+      min-width:102px !important;
+      max-width:102px !important;
+    }
+
+    .accountability-table th:nth-child(8),
+    .accountability-table td:nth-child(8){
+      width:78px !important;
+      min-width:78px !important;
+      max-width:78px !important;
+    }
+
+    .accountability-table th:nth-child(9),
+    .accountability-table td:nth-child(9){
+      width:100px !important;
+      min-width:100px !important;
+      max-width:100px !important;
+    }
+
+    .accountability-table th:nth-child(10),
+    .accountability-table td:nth-child(10){
+      width:100px !important;
+      min-width:100px !important;
+      max-width:100px !important;
+    }
+
+    .accountability-table th:nth-child(11),
+    .accountability-table td:nth-child(11){
+      width:112px !important;
+      min-width:112px !important;
+      max-width:112px !important;
+    }
+
+    .accountability-table th:nth-child(12),
+    .accountability-table td:nth-child(12){
+      width:104px !important;
+      min-width:104px !important;
+      max-width:104px !important;
+    }
+
+    .accountability-table th:nth-child(13),
+    .accountability-table td:nth-child(13){
+      width:62px !important;
+      min-width:62px !important;
+      max-width:62px !important;
+    }
+
+    .accountability-table .accountability-status{
+      font-size:8.7px !important;
+      padding:4px 5px;
+      line-height:1.18;
+    }
+
+    .accountability-table .accountability-period-title{
+      font-size:10.5px !important;
+      line-height:1.3;
+    }
+
+    .accountability-table .accountability-period-line{
+      font-size:9px !important;
+      gap:4px;
+    }
+
+    .accountability-table .accountability-period-month{
+      font-size:8px !important;
+      padding:3px 5px;
+    }
+
+    .accountability-table .link-btn{
+      font-size:9px !important;
+      line-height:1.18;
+    }
+
+    .accountability-contract-cell{
+      line-height:1.35;
+      text-align:left;
+    }
+
+    .accountability-contract-cell strong{
+      font-size:10.5px;
+      white-space:nowrap;
+    }
+
+    .accountability-contract-cell span{
+      font-size:9.5px;
+      color:#445f70;
+      white-space:nowrap;
+    }
+
     /* ======================================================
        Publicação v1 — dashboard gerencial
        ====================================================== */
@@ -2372,7 +2595,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <option value="09">Setembro</option><option value="10">Outubro</option>
 <option selected="" value="11">Novembro</option><option value="12">Dezembro</option>
 </select>
-<button class="top-action" onclick="goPage('agora')">Abrir Relação de Pessoal</button>
 <button class="top-action" onclick="goPage('relatorios')">Relatórios</button>
 </div>
 </header>
@@ -2886,7 +3108,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div>
 <div class="card">
 <div aria-label="Rolagem horizontal superior do acompanhamento da prestação de contas" class="payment-list-scroll" id="accountabilityTopScroll"><div class="payment-list-scroll-inner" id="accountabilityTopScrollInner"></div></div><div class="table-wrap" id="accountabilityTableWrap">
-<table class="accountability-table" style="width:100%; min-width:1450px">
+<table class="accountability-table">
 <thead>
 <tr>
 <th>Prestação de contas<br/>/ período</th>
@@ -2916,6 +3138,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <p>Cadastro das pessoas responsáveis, categorias, períodos de gestão e atos de nomeação, designação ou exoneração.</p>
 </div>
 <div class="actions">
+<button class="btn btn-primary" onclick="openResponsibleImportModal()">⇧ Importar documentos do Rol</button>
 <button class="btn btn-outline" onclick="clearResponsibleForm()">Novo cadastro</button>
 </div>
 </div>
@@ -2946,7 +3169,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="summary-strip five">
 <div class="summary-box"><small>Responsáveis cadastrados</small><strong id="rrTotal">0</strong></div>
 <div class="summary-box"><small>Em efetiva gestão</small><strong id="rrAtivos">0</strong></div>
-<div class="summary-box"><small>Categorias preenchidas</small><strong id="rrCategorias">0</strong></div>
+<div class="summary-box"><small>Com pendência</small><strong id="rrPendentes">0</strong></div>
 <div class="summary-box"><small>Atos cadastrados</small><strong id="rrAtos">0</strong></div>
 <div class="summary-box"><small>Atos sem publicação</small><strong id="rrSemPublicacao">0</strong></div>
 </div>
@@ -2990,6 +3213,22 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div>
 <label>Telefone *</label>
 <input id="rrTelefone" maxlength="15" oninput="maskResponsiblePhone(this)" placeholder="(85) 99999-9999"/>
+</div>
+<div>
+<label>Cargo/Função exercida *</label>
+<input id="rrCargo" placeholder="Cargo ou função exercida"/>
+</div>
+<div>
+<label>Data de nascimento *</label>
+<input id="rrNascimento" type="date"/>
+</div>
+<div>
+<label>Endereço funcional *</label>
+<input id="rrEnderecoFuncional" placeholder="Endereço funcional"/>
+</div>
+<div>
+<label>Endereço residencial *</label>
+<input id="rrEnderecoResidencial" placeholder="Endereço residencial"/>
 </div>
 <div>
 <label>Observação</label>
@@ -3072,6 +3311,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <label>Tipo de Ato *</label>
 <select id="rrActType">
 <option value="">Selecione o tipo do ato</option>
+<option value="Eleição">Eleição</option>
 <option value="Nomeação">Nomeação</option>
 <option value="Designação">Designação</option>
 <option value="Recondução">Recondução</option>
@@ -3102,7 +3342,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <option value="Outro meio oficial">Outro meio oficial</option>
 </select>
 </div>
-<button class="btn btn-primary" onclick="addResponsibleAct()">＋ Adicionar ato</button>
+<button class="btn btn-primary" id="rrActAddButton" onclick="addResponsibleAct()">＋ Adicionar ato</button>
 </div>
 <div class="file-field" style="margin-top:13px">
 <label>Publicação do Ato *</label>
@@ -3167,6 +3407,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <option value="ativo">Em efetiva gestão</option>
 <option value="encerrado">Gestão encerrada</option>
 <option value="futuro">Gestão futura</option>
+<option value="pendente">Cadastro pendente</option>
 </select>
 </div>
 </div>
@@ -3182,6 +3423,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <th>Representação / condição</th>
 <th>Período de gestão</th>
 <th>Atos</th>
+<th>Pendências</th>
 <th>Situação</th>
 <th>Ações</th>
 </tr>
@@ -3815,8 +4057,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="folder-main">
 <div class="folder-icon">♟</div>
 <div>
-<strong>Atos dos Responsáveis</strong>
-<small>Publicações de nomeação, designação, recondução, exoneração e dispensa.</small>
+<strong>Responsáveis da OS</strong>
+<small>Documentos do Rol e publicações de nomeação, eleição, designação, recondução, exoneração e dispensa.</small>
 </div>
 </div>
 <span class="badge-count" id="documentResponsibleCount">0</span>
@@ -3955,18 +4197,81 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div></section>
 <section class="page" id="page-pendencias">
 <div class="page-head">
-<div><h2>Pendências</h2><p>Central para identificar e resolver dados ausentes, divergentes ou despesas sem documento comprobatório.</p></div>
+<div><h2>Pendências</h2><p>Central para identificar e resolver dados ausentes, divergências, documentos pendentes e prestações de contas em atraso.</p></div>
 </div>
 <div class="summary-strip pending-summary">
 <div class="summary-box"><small>Total de pendências</small><strong id="pTotal">0</strong></div>
 <div class="summary-box"><small>CPF não informado</small><strong id="pCpf">0</strong></div>
 <div class="summary-box"><small>Função ausente</small><strong id="pFuncao">0</strong></div>
 <div class="summary-box"><small>Admissão ausente</small><strong id="pAdm">0</strong></div>
+<div class="summary-box"><small>Prestações em atraso</small><strong id="pPrestacaoAtrasada">0</strong></div>
+<div class="summary-box"><small>Rol de responsáveis</small><strong id="pRolResponsaveis">0</strong></div>
 <div class="summary-box"><small>Outras pendências</small><strong id="pOutras">0</strong></div>
 </div>
 <div class="pending-list" id="pendingList"></div>
 </section>
 </main>
+</div>
+</div>
+<div class="modal" id="responsibleImportModal">
+<div class="modal-box" style="width:min(1380px,100%)">
+<div class="modal-head">
+<div>
+<strong>Importar documentos do Rol de Responsáveis</strong>
+<div class="small">O sistema lê os PDFs, preenche os campos identificados e mantém como pendência tudo que não estiver no documento.</div>
+</div>
+<button class="close" onclick="closeResponsibleImportModal()">×</button>
+</div>
+<div class="modal-body">
+<div class="responsible-import-grid">
+<div>
+<label>Contrato de Gestão *</label>
+<select id="rrImportContractId" onchange="responsibleImportContractChanged()">
+<option value="">Selecione o contrato</option>
+</select>
+</div>
+<div>
+<label>Documentos em PDF *</label>
+<input accept="application/pdf,.pdf" id="rrImportFiles" multiple type="file"/>
+<div class="select-help">É possível selecionar juntos o Rol da Diretoria, a relação do Conselho, o responsável contábil e outros documentos.</div>
+</div>
+</div>
+<div class="responsible-contract-info hidden" id="rrImportContractInfo" style="margin-top:13px"></div>
+<div class="actions" style="margin-top:15px">
+<button class="btn btn-primary" onclick="processResponsibleDocuments()">Ler PDFs e criar prévia</button>
+<button class="btn btn-outline" onclick="clearResponsibleImportPreview()">Limpar prévia</button>
+</div>
+<div id="rrImportStatus"></div>
+<div class="hidden" id="rrImportPreviewArea">
+<div class="responsible-import-summary">
+<div><small>Arquivos lidos</small><strong id="rrImportFileCount">0</strong></div>
+<div><small>Pessoas encontradas</small><strong id="rrImportPersonCount">0</strong></div>
+<div><small>Campos preenchidos</small><strong id="rrImportFilledCount">0</strong></div>
+<div><small>Pendências previstas</small><strong id="rrImportPendingCount">0</strong></div>
+</div>
+<div class="table-wrap">
+<table style="min-width:1450px">
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Nome</th>
+<th>CPF</th>
+<th>Categoria</th>
+<th>Representação</th>
+<th>Cargo/Função</th>
+<th>Período(s)</th>
+<th>Campos pendentes</th>
+</tr>
+</thead>
+<tbody id="rrImportPreviewBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="modal-foot">
+<button class="btn btn-outline" onclick="closeResponsibleImportModal()">Cancelar</button>
+<button class="btn btn-primary hidden" id="confirmResponsibleImportButton" onclick="confirmResponsibleImport()">Confirmar importação</button>
+</div>
 </div>
 </div>
 <div class="modal" id="bankStatementImportModal">
@@ -4717,8 +5022,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   let selectedContractFile = null;
   let selectedAditivoFile = null;
   let editResponsibleId = null;
+  let editResponsibleActId = null;
   let responsibleDraftPeriods = [];
   let responsibleDraftActs = [];
+  let responsibleImportPreview = [];
+  let responsibleImportFiles = [];
   let editPaymentId = null;
   let paymentPreview = null;
   let selectedPaymentPdfFile = null;
@@ -5700,7 +6008,557 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       .replace(/(\d{5})(\d)/,'$1-$2');
   }
 
+
+  function responsibleEscapeRegex(value){
+    return String(value||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  }
+
+  function responsibleParseDate(value){
+    const match=String(value||'').match(/(\d{2})[./](\d{2})[./](\d{4})/);
+    return match?`${match[3]}-${match[2]}-${match[1]}`:'';
+  }
+
+  function responsibleExtractEmails(text){
+    return String(text||'').match(/[\w.+-]+@[\w.-]+\.[A-Za-zÀ-ÿ]{2,}/g)||[];
+  }
+
+  function responsibleSelectEmails(emails){
+    const personalDomain=/(gmail|yahoo|hotmail|outlook|live|icloud)\./i;
+    const clean=[...new Set((emails||[]).map(item=>item.trim().toLowerCase()).filter(Boolean))];
+    let pessoal=clean.find(item=>personalDomain.test(item))||'';
+    let funcional=clean.find(item=>!personalDomain.test(item))||'';
+    if(!funcional&&clean.length)funcional=clean[0];
+    if(!pessoal&&clean.length>1)pessoal=clean.find(item=>item!==funcional)||'';
+    return {funcional,pessoal};
+  }
+
+  function responsibleExtractPhone(text){
+    const matches=String(text||'').match(/\(?\d{2}\)?\s*\d{4,5}[.\s-]?\d{4}/g)||[];
+    if(!matches.length)return '';
+    const mobile=matches.findLast?matches.findLast(item=>item.replace(/\D/g,'').length===11):matches.slice().reverse().find(item=>item.replace(/\D/g,'').length===11);
+    return formatPhone(mobile||matches[matches.length-1]);
+  }
+
+  function responsibleExtractBetween(text,label,nextLabels=[]){
+    const next=nextLabels.map(responsibleEscapeRegex).join('|');
+    const end=next?`(?=\\n(?:${next})\\s*:|$)`:'$';
+    const regex=new RegExp(`${responsibleEscapeRegex(label)}\\s*:\\s*([\\s\\S]*?)${end}`,'i');
+    const match=String(text||'').match(regex);
+    return match?match[1].replace(/\s+/g,' ').trim():'';
+  }
+
+  function responsibleNormalizeName(value){
+    return String(value||'').replace(/\s+/g,' ').trim().toUpperCase();
+  }
+
+  function responsibleFieldCount(record){
+    const fields=[
+      record.cpf,record.nome,record.emailFuncional,record.emailPessoal,record.telefone,
+      record.cargo,record.nascimento,record.enderecoFuncional,record.enderecoResidencial,
+      record.categoria,record.representacao
+    ];
+    return fields.filter(Boolean).length+
+      (record.periods||[]).reduce((sum,item)=>sum+(item.de?1:0)+(item.ate?1:0),0)+
+      (record.acts||[]).reduce((sum,item)=>sum+
+        [item.type,item.page,item.actDate,item.publicationDate,item.publicationType,item.documentId].filter(Boolean).length,0);
+  }
+
+  function responsibleIssueList(record){
+    const issues=[];
+    const cpfDigits=String(record.cpf||'').replace(/\D/g,'');
+    if(!record.nome)issues.push('Nome não informado');
+    if(!record.cpf)issues.push('CPF não informado');
+    else if(cpfDigits.length!==11)issues.push('CPF incompleto ou inválido');
+    if(!record.emailFuncional)issues.push('E-mail funcional não informado');
+    if(!record.emailPessoal)issues.push('E-mail pessoal não informado');
+    if(!record.telefone)issues.push('Telefone não informado');
+    if(!record.cargo)issues.push('Cargo/Função não informado');
+    if(!record.nascimento)issues.push('Data de nascimento não informada');
+    if(!record.enderecoFuncional)issues.push('Endereço funcional não informado');
+    if(!record.enderecoResidencial)issues.push('Endereço residencial não informado');
+    if(!record.categoria)issues.push('Categoria não informada');
+    if(!record.representacao)issues.push('Representação/condição não informada');
+
+    const periods=record.periods||[];
+    if(!periods.length)issues.push('Período de efetiva gestão não informado');
+    periods.forEach((period,index)=>{
+      if(!period.de)issues.push(`Período ${index+1} sem data inicial`);
+      if(!period.ate)issues.push(`Período ${index+1} sem data final`);
+    });
+
+    const acts=record.acts||[];
+    if(!acts.length)issues.push('Ato de nomeação, eleição ou designação não informado');
+    acts.forEach((act,index)=>{
+      const prefix=`Ato ${index+1}`;
+      if(!act.type)issues.push(`${prefix} sem tipo`);
+      if(!act.page)issues.push(`${prefix} sem página do Diário`);
+      if(!act.actDate)issues.push(`${prefix} sem data do ato`);
+      if(!act.publicationDate)issues.push(`${prefix} sem data da publicação`);
+      if(!act.publicationType)issues.push(`${prefix} sem tipo da publicação`);
+      if(!act.documentId)issues.push(`${prefix} sem publicação anexada`);
+    });
+
+    return [...new Set(issues)];
+  }
+
+  function responsibleRepresentationFromLabel(label){
+    const value=String(label||'').toUpperCase();
+    if(value.includes('EMPREGADOS'))return 'Representante dos empregados da OS';
+    if(value.includes('ASSOCIADOS'))return 'Representante eleito dentre membros ou associados';
+    if(value.includes('SOCIEDADE CIVIL'))return 'Membro indicado pelas entidades da Sociedade Civil';
+    if(value.includes('GOVERNO DO ESTADO')||value.includes('/ SET')||value.includes('/ SEDUC'))return 'Representante da Secretaria';
+    if(value.includes('NOTÓRIO SABER'))return 'Membro indicado ou eleito, conforme estatuto';
+    return 'Membro indicado ou eleito, conforme estatuto';
+  }
+
+  function responsibleParseNamedDocument(text,fileName){
+    const records=[];
+    const normalized=String(text||'').replace(/\r/g,'');
+    const parts=normalized.split(/(?:✓|)?\s*NOME:\s*/i).slice(1);
+    const isAccountant=/\bCONTADOR\b/i.test(normalized)&&parts.length===1;
+
+    parts.forEach(part=>{
+      const lines=part.split('\n').map(item=>item.replace(/\s+/g,' ').trim()).filter(Boolean);
+      const nome=responsibleNormalizeName(lines[0]||'');
+      if(!nome)return;
+
+      const cpf=(part.match(/CPF:\s*([\d.-]+)/i)||[])[1]||'';
+      const cargo=responsibleExtractBetween(part,'CARGO EXERCIDO',[
+        'ATO ADMINISTRATIVO','PERÍODO DE EFETIVA GESTÃO','ENDEREÇO FUNCIONAL'
+      ]);
+      const administrativeAct=responsibleExtractBetween(part,'ATO ADMINISTRATIVO',[
+        'PERÍODO DE EFETIVA GESTÃO'
+      ]);
+      const periodMatch=part.match(/PERÍODO DE EFETIVA GESTÃO:\s*(\d{2}[./]\d{2}[./]\d{4})\s*a\s*(\d{2}[./]\d{2}[./]\d{4})/i);
+      const enderecoFuncional=responsibleExtractBetween(part,'ENDEREÇO FUNCIONAL',[
+        'ENDEREÇO RESIDENCIAL','TELEFONE FUNCIONAL','E-MAIL'
+      ]);
+      const enderecoResidencial=responsibleExtractBetween(part,'ENDEREÇO RESIDENCIAL',[
+        'CEP','TELEFONE FUNCIONAL','E-MAIL'
+      ]);
+      const nascimento=responsibleParseDate((part.match(/DATA DE NASCIMENTO:\s*(\d{2}[./]\d{2}[./]\d{4})/i)||[])[1]||'');
+      const emailFuncional=(part.match(/(?:^|\n)E-MAIL:\s*([^\s\n]+)/i)||[])[1]||'';
+      const emailPessoal=(part.match(/E-MAIL PARTICULAR:\s*([^\s\n]+)/i)||[])[1]||'';
+      const periods=periodMatch?[{
+        de:responsibleParseDate(periodMatch[1]),
+        ate:responsibleParseDate(periodMatch[2])
+      }]:[];
+
+      const actDate=responsibleParseDate((administrativeAct.match(/(\d{2}[./]\d{2}[./]\d{4})(?![\s\S]*\d{2}[./]\d{2}[./]\d{4})/)||[])[1]||'');
+      const acts=administrativeAct?[{
+        periodIndex:0,
+        type:/elei[cç][aã]o/i.test(administrativeAct)?'Eleição':'',
+        page:'',
+        actDate,
+        publicationDate:'',
+        publicationType:'',
+        documentId:'',
+        description:administrativeAct
+      }]:[];
+
+      records.push({
+        nome,
+        cpf:formatCpf(cpf),
+        emailFuncional:String(emailFuncional).toLowerCase(),
+        emailPessoal:String(emailPessoal).toLowerCase(),
+        telefone:responsibleExtractPhone(part),
+        cargo,
+        nascimento,
+        enderecoFuncional,
+        enderecoResidencial,
+        categoria:isAccountant?'Contador':'Diretoria',
+        representacao:isAccountant?'Não se aplica':'Membro indicado ou eleito, conforme estatuto',
+        observacao:`Importado do documento ${fileName}`,
+        periods,
+        acts
+      });
+    });
+    return records;
+  }
+
+  function responsibleParseCouncilDocument(text,fileName){
+    const normalized=String(text||'').replace(/\r/g,'').replace(/[ \t]+/g,' ');
+    const definitions=[
+      {label:'GOVERNO DO ESTADO DO CEARÁ / SET',representation:'Representante da Secretaria'},
+      {label:'GOVERNO DO ESTADO DO CEARÁ / SEDUC',representation:'Representante da Secretaria'},
+      {label:'SOCIEDADE CIVIL / DIEESE',representation:'Membro indicado pelas entidades da Sociedade Civil'},
+      {label:'SOCIEDADE CIVIL / FIEC',representation:'Membro indicado pelas entidades da Sociedade Civil'},
+      {label:'NOTÓRIO SABER',representation:'Membro indicado ou eleito, conforme estatuto'},
+      {label:'REPRESENTANTE DOS ASSOCIADOS',representation:'Representante eleito dentre membros ou associados'},
+      {label:'REPRESENTANTE DOS EMPREGADOS',representation:'Representante dos empregados da OS'}
+    ];
+
+    const found=[];
+    definitions.forEach(definition=>{
+      const flexible=responsibleEscapeRegex(definition.label)
+        .replace(/\s+/g,'\\s+')
+        .replace(/\\\//g,'\\s*\\/\\s*');
+      const match=new RegExp(flexible,'i').exec(normalized);
+      if(match)found.push({...definition,start:match.index,end:match.index+match[0].length});
+    });
+    found.sort((a,b)=>a.start-b.start);
+
+    const records=[];
+    found.forEach((marker,index)=>{
+      let block=normalized.slice(marker.end,found[index+1]?.start||normalized.length);
+      block=block.split(/Atualizado em|MEMBROS DO CONSELHO/i)[0];
+      const lines=block.split('\n').map(item=>item.replace(/\s+/g,' ').trim()).filter(Boolean);
+      const actIndex=lines.findIndex(line=>/\d+\s*[ªº]\s+(?:Ordinária|Extraordinária)/i.test(line));
+      const dateIndex=lines.findIndex(line=>/\d{2}[./]\d{2}[./]\d{4}/.test(line));
+      const stopIndex=[actIndex,dateIndex].filter(value=>value>=0).sort((a,b)=>a-b)[0]??1;
+      const nome=responsibleNormalizeName(lines.slice(0,stopIndex).join(' '));
+      if(!nome)return;
+
+      const atas=block.match(/\d+\s*[ªº]\s+(?:Ordinária|Extraordinária)/gi)||[];
+      const dates=(block.match(/\d{2}[./]\d{2}[./]\d{4}/g)||[]).map(responsibleParseDate);
+      const periods=[];
+      if(dates.length>=4){
+        const half=Math.floor(dates.length/2);
+        for(let position=0;position<half;position++){
+          periods.push({de:dates[position],ate:dates[position+half]||''});
+        }
+      }else if(dates.length>=2){
+        periods.push({de:dates[0],ate:dates[1]});
+      }
+
+      const emails=responsibleSelectEmails(responsibleExtractEmails(block));
+      const acts=periods.map((period,position)=>({
+        periodIndex:position,
+        type:'Eleição',
+        page:'',
+        actDate:period.de,
+        publicationDate:'',
+        publicationType:'',
+        documentId:'',
+        description:atas[position]?`Ata ${atas[position]}`:'Eleição para o Conselho de Administração'
+      }));
+
+      records.push({
+        nome,
+        cpf:'',
+        emailFuncional:emails.funcional,
+        emailPessoal:emails.pessoal,
+        telefone:responsibleExtractPhone(block),
+        cargo:marker.label,
+        nascimento:'',
+        enderecoFuncional:'',
+        enderecoResidencial:'',
+        categoria:'Conselho de Administração – Art. 3º da Lei 12.781/1997',
+        representacao:marker.representation||responsibleRepresentationFromLabel(marker.label),
+        observacao:`Importado do documento ${fileName}`,
+        periods,
+        acts
+      });
+    });
+    return records;
+  }
+
+  function responsibleParseDocument(lines,fileName){
+    const text=(lines||[]).join('\n');
+    if(/MEMBROS DO CONSELHO DE ADMINISTRAÇÃO/i.test(text)||
+       /SOCIEDADE CIVIL\s*\/\s*(DIEESE|FIEC)/i.test(text)){
+      return responsibleParseCouncilDocument(text,fileName);
+    }
+    return responsibleParseNamedDocument(text,fileName);
+  }
+
+  function responsiblePrepareImportedRecord(raw,contract,fileIndex){
+    const periods=(raw.periods||[]).map(item=>({
+      id:id(),
+      de:item.de||'',
+      ate:item.ate||''
+    }));
+    const acts=(raw.acts||[]).map(item=>({
+      id:id(),
+      periodId:periods[item.periodIndex||0]?.id||'',
+      type:item.type||'',
+      page:item.page||'',
+      actDate:item.actDate||'',
+      publicationDate:item.publicationDate||'',
+      publicationType:item.publicationType||'',
+      fileName:'',
+      documentId:'',
+      description:item.description||''
+    }));
+    return {
+      ...raw,
+      contractId:contract.id,
+      ug:contract.ug,
+      sacc:contract.sacc,
+      contrato:contract.contrato,
+      projeto:contract.projeto,
+      os:contract.os,
+      periods,
+      acts,
+      sourceFileIndex:fileIndex,
+      sourceFileName:responsibleImportFiles[fileIndex]?.name||''
+    };
+  }
+
+  function responsibleMergePeriods(existingPeriods,incomingPeriods){
+    const result=(existingPeriods||[]).map(item=>({...item}));
+    const map=new Map();
+    (incomingPeriods||[]).forEach(period=>{
+      let target=result.find(item=>item.de===period.de&&item.ate===period.ate);
+      if(!target){
+        target={...period,id:period.id||id()};
+        result.push(target);
+      }
+      map.set(period.id,target.id);
+    });
+    return {periods:result,idMap:map};
+  }
+
+  function responsibleMergeActs(existingActs,incomingActs,periodMap){
+    const result=(existingActs||[]).map(item=>({...item}));
+    (incomingActs||[]).forEach(act=>{
+      const incomingPeriodId=periodMap.get(act.periodId)||act.periodId||'';
+      const duplicate=result.find(item=>
+        item.type===act.type&&
+        item.actDate===act.actDate&&
+        (item.description||'')===(act.description||'')&&
+        item.periodId===incomingPeriodId
+      );
+      if(!duplicate){
+        result.push({...act,id:act.id||id(),periodId:incomingPeriodId});
+      }else{
+        ['page','publicationDate','publicationType','documentId','description'].forEach(field=>{
+          if(!duplicate[field]&&act[field])duplicate[field]=act[field];
+        });
+      }
+    });
+    return result;
+  }
+
+  function responsibleFillMissing(existing,incoming,field){
+    return existing[field]||incoming[field]||'';
+  }
+
+  window.openResponsibleImportModal=function(){
+    responsibleImportPreview=[];
+    responsibleImportFiles=[];
+    const select=document.getElementById('rrImportContractId');
+    select.innerHTML='<option value="">Selecione o contrato</option>'+
+      state.contracts.map(contract=>`<option value="${contract.id}">${safe(contract.sacc)} — ${safe(contract.contrato)} — ${safe(contract.projeto)}</option>`).join('');
+
+    const preferred=document.getElementById('rrContractId')?.value||
+      document.getElementById('payContextContractId')?.value||'';
+    if(state.contracts.some(contract=>contract.id===preferred))select.value=preferred;
+
+    document.getElementById('rrImportFiles').value='';
+    clearResponsibleImportPreview();
+    responsibleImportContractChanged();
+    document.getElementById('responsibleImportModal').classList.add('open');
+  }
+
+  window.closeResponsibleImportModal=function(){
+    document.getElementById('responsibleImportModal').classList.remove('open');
+  }
+
+  window.responsibleImportContractChanged=function(){
+    const contract=contractById(document.getElementById('rrImportContractId')?.value||'');
+    const info=document.getElementById('rrImportContractInfo');
+    if(!info)return;
+    if(!contract){
+      info.classList.add('hidden');
+      info.innerHTML='';
+      return;
+    }
+    info.classList.remove('hidden');
+    info.innerHTML=`<strong>${safe(contract.os)}</strong> • CNPJ ${safe(contract.cnpj)} • UG ${safe(contract.ug)} •
+      SACC/SCC ${safe(contract.sacc)} • Contrato ${safe(contract.contrato)} • Projeto/Lotação ${safe(contract.projeto)}`;
+  }
+
+  window.clearResponsibleImportPreview=function(){
+    responsibleImportPreview=[];
+    responsibleImportFiles=[];
+    const area=document.getElementById('rrImportPreviewArea');
+    const button=document.getElementById('confirmResponsibleImportButton');
+    const status=document.getElementById('rrImportStatus');
+    const body=document.getElementById('rrImportPreviewBody');
+    if(area)area.classList.add('hidden');
+    if(button)button.classList.add('hidden');
+    if(status)status.innerHTML='';
+    if(body)body.innerHTML='';
+  }
+
+  window.processResponsibleDocuments=async function(){
+    const contract=contractById(document.getElementById('rrImportContractId')?.value||'');
+    const files=[...document.getElementById('rrImportFiles').files];
+    const status=document.getElementById('rrImportStatus');
+
+    if(!contract){
+      alert('Selecione o contrato de gestão.');
+      return;
+    }
+    if(!files.length){
+      alert('Selecione pelo menos um documento em PDF.');
+      return;
+    }
+
+    responsibleImportPreview=[];
+    responsibleImportFiles=files;
+    status.innerHTML='<div class="notice info">Lendo os documentos e identificando os responsáveis...</div>';
+
+    const errors=[];
+    for(let fileIndex=0;fileIndex<files.length;fileIndex++){
+      const file=files[fileIndex];
+      try{
+        const lines=await extractLines(file);
+        const parsed=responsibleParseDocument(lines,file.name);
+        if(!parsed.length){
+          errors.push(`${file.name}: nenhuma pessoa identificada`);
+          continue;
+        }
+        parsed.forEach(record=>
+          responsibleImportPreview.push(responsiblePrepareImportedRecord(record,contract,fileIndex))
+        );
+      }catch(error){
+        console.error(error);
+        errors.push(`${file.name}: não foi possível ler o PDF`);
+      }
+    }
+
+    renderResponsibleImportPreview();
+    status.innerHTML=responsibleImportPreview.length
+      ? `<div class="notice ${errors.length?'warn':'ok'}">
+          ${responsibleImportPreview.length} responsável(is) identificado(s).
+          ${errors.length?` Atenção: ${safe(errors.join(' • '))}`:' Os campos ausentes serão registrados como pendência.'}
+        </div>`
+      : `<div class="notice error">Nenhum responsável foi identificado. O arquivo pode estar digitalizado como imagem ou possuir outro formato.</div>`;
+  }
+
+  function renderResponsibleImportPreview(){
+    const area=document.getElementById('rrImportPreviewArea');
+    const button=document.getElementById('confirmResponsibleImportButton');
+    const body=document.getElementById('rrImportPreviewBody');
+    if(!area||!button||!body)return;
+
+    const pendingTotal=responsibleImportPreview.reduce((sum,item)=>sum+responsibleIssueList(item).length,0);
+    const filledTotal=responsibleImportPreview.reduce((sum,item)=>sum+responsibleFieldCount(item),0);
+
+    document.getElementById('rrImportFileCount').textContent=responsibleImportFiles.length;
+    document.getElementById('rrImportPersonCount').textContent=responsibleImportPreview.length;
+    document.getElementById('rrImportFilledCount').textContent=filledTotal;
+    document.getElementById('rrImportPendingCount').textContent=pendingTotal;
+
+    body.innerHTML=responsibleImportPreview.map(item=>{
+      const issues=responsibleIssueList(item);
+      const periods=(item.periods||[]).map(period=>
+        `${isoToBr(period.de)||'—'} a ${isoToBr(period.ate)||'—'}`
+      ).join('<br>')||'—';
+      return `<tr>
+        <td>${safe(item.sourceFileName)}</td>
+        <td><strong>${safe(item.nome||'NÃO IDENTIFICADO')}</strong></td>
+        <td>${safe(item.cpf||'—')}</td>
+        <td>${safe(item.categoria||'—')}</td>
+        <td>${safe(item.representacao||'—')}</td>
+        <td>${safe(item.cargo||'—')}</td>
+        <td>${periods}</td>
+        <td>
+          ${issues.length
+            ? `<div class="responsible-import-issues">${issues.map(safe).join('<br>')}</div>`
+            : '<span class="responsible-import-ok">Cadastro completo</span>'}
+        </td>
+      </tr>`;
+    }).join('');
+
+    area.classList.toggle('hidden',!responsibleImportPreview.length);
+    button.classList.toggle('hidden',!responsibleImportPreview.length);
+  }
+
+  window.confirmResponsibleImport=async function(){
+    const contract=contractById(document.getElementById('rrImportContractId')?.value||'');
+    if(!contract||!responsibleImportPreview.length)return;
+
+    const sourceDocumentIds=new Map();
+
+    for(let fileIndex=0;fileIndex<responsibleImportFiles.length;fileIndex++){
+      const file=responsibleImportFiles[fileIndex];
+      let document=state.documents.find(item=>
+        item.contractId===contract.id&&
+        item.folder==='atos_responsaveis'&&
+        item.tipo==='rol_responsaveis'&&
+        item.name===file.name
+      );
+
+      if(!document){
+        const documentId=id();
+        let hasFile=false;
+        try{hasFile=await saveFileBlob(documentId,file)}catch(error){console.error(error)}
+        document={
+          id:documentId,
+          folder:'atos_responsaveis',
+          categoria:'responsavel',
+          tipo:'rol_responsaveis',
+          name:file.name,
+          mime:file.type||'application/pdf',
+          contractId:contract.id,
+          ug:contract.ug,
+          sacc:contract.sacc,
+          contrato:contract.contrato,
+          projeto:contract.projeto,
+          competencia:'',
+          hasFile,
+          createdAt:new Date().toISOString()
+        };
+        state.documents.push(document);
+      }
+      sourceDocumentIds.set(fileIndex,document.id);
+    }
+
+    let created=0;
+    let updated=0;
+
+    responsibleImportPreview.forEach(incoming=>{
+      const existing=state.responsibles.find(item=>
+        item.contractId===contract.id&&
+        responsibleNormalizeName(item.nome)===responsibleNormalizeName(incoming.nome)&&
+        item.categoria===incoming.categoria
+      );
+
+      const sourceDocumentId=sourceDocumentIds.get(incoming.sourceFileIndex)||'';
+      if(existing){
+        const merged=responsibleMergePeriods(existing.periods,incoming.periods);
+        existing.acts=responsibleMergeActs(existing.acts,incoming.acts,merged.idMap);
+        existing.periods=merged.periods;
+        [
+          'cpf','nome','emailFuncional','emailPessoal','telefone','cargo','nascimento',
+          'enderecoFuncional','enderecoResidencial','categoria','representacao'
+        ].forEach(field=>existing[field]=responsibleFillMissing(existing,incoming,field));
+        if(!existing.observacao)existing.observacao=incoming.observacao||'';
+        existing.sourceDocumentIds=[...new Set([...(existing.sourceDocumentIds||[]),sourceDocumentId].filter(Boolean))];
+        existing.updatedAt=new Date().toISOString();
+        updated++;
+      }else{
+        state.responsibles.push({
+          ...incoming,
+          id:id(),
+          sourceDocumentIds:[sourceDocumentId].filter(Boolean),
+          sourceFileIndex:undefined,
+          sourceFileName:undefined,
+          createdAt:new Date().toISOString(),
+          updatedAt:new Date().toISOString()
+        });
+        created++;
+      }
+    });
+
+    const pendingCount=state.responsibles
+      .filter(item=>item.contractId===contract.id)
+      .reduce((sum,item)=>sum+responsibleIssueList(item).length,0);
+
+    saveState();
+    closeResponsibleImportModal();
+    goPage('responsaveis');
+    alert(
+      `${created} responsável(is) cadastrado(s) e ${updated} atualizado(s). `+
+      `${pendingCount} campo(s) permanecem na aba Pendências para conferência.`
+    );
+  }
+
   window.maskResponsibleCpf=function(input){input.value=formatCpf(input.value)}
+
   window.maskResponsiblePhone=function(input){input.value=formatPhone(input.value)}
 
   function periodSituation(period){
@@ -5713,10 +6571,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   function periodSituationLabel(status){
     if(status==='ativo')return 'EM EFETIVA GESTÃO';
     if(status==='futuro')return 'GESTÃO FUTURA';
+    if(status==='pendente')return 'CADASTRO PENDENTE';
     return 'GESTÃO ENCERRADA';
   }
 
   function responsibleOverallStatus(r){
+    if(responsibleIssueList(r).length)return 'pendente';
     const statuses=(r.periods||[]).map(periodSituation);
     if(statuses.includes('ativo'))return 'ativo';
     if(statuses.includes('futuro'))return 'futuro';
@@ -5756,9 +6616,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   window.clearResponsibleForm=function(){
     editResponsibleId=null;
+    editResponsibleActId=null;
     responsibleDraftPeriods=[];
     responsibleDraftActs=[];
-    ['rrCpf','rrNome','rrEmailFuncional','rrEmailPessoal','rrTelefone','rrObservacao','rrPeriodoDe','rrPeriodoAte',
+    ['rrCpf','rrNome','rrEmailFuncional','rrEmailPessoal','rrTelefone','rrCargo','rrNascimento',
+     'rrEnderecoFuncional','rrEnderecoResidencial','rrObservacao','rrPeriodoDe','rrPeriodoAte',
      'rrActPage','rrActDate','rrPublicationDate'].forEach(id=>{
        const el=document.getElementById(id);if(el)el.value='';
      });
@@ -5766,6 +6628,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const el=document.getElementById(id);if(el)el.value='';
     });
     const file=document.getElementById('rrActFile');if(file)file.value='';
+    const actButton=document.getElementById('rrActAddButton');
+    if(actButton)actButton.textContent='＋ Adicionar ato';
     const display=document.getElementById('rrContractDisplay');if(display)display.value='';
     const info=document.getElementById('rrContractInfo');if(info){info.classList.add('hidden');info.innerHTML=''}
     renderResponsibleDraft();
@@ -5812,6 +6676,22 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     renderDocuments();
   }
 
+  window.loadResponsibleAct=function(actId){
+    const act=responsibleDraftActs.find(item=>item.id===actId);
+    if(!act)return;
+    editResponsibleActId=act.id;
+    document.getElementById('rrActPeriod').value=act.periodId||'';
+    document.getElementById('rrActType').value=act.type||'';
+    document.getElementById('rrActPage').value=act.page||'';
+    document.getElementById('rrActDate').value=act.actDate||'';
+    document.getElementById('rrPublicationDate').value=act.publicationDate||'';
+    document.getElementById('rrPublicationType').value=act.publicationType||'';
+    document.getElementById('rrActFile').value='';
+    const button=document.getElementById('rrActAddButton');
+    if(button)button.textContent='Salvar alterações do ato';
+    document.getElementById('rrActType').focus();
+  }
+
   window.addResponsibleAct=function(){
     const periodId=document.getElementById('rrActPeriod').value;
     const type=document.getElementById('rrActType').value;
@@ -5820,22 +6700,37 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const publicationDate=document.getElementById('rrPublicationDate').value;
     const publicationType=document.getElementById('rrPublicationType').value;
     const file=document.getElementById('rrActFile').files[0];
+    const existing=responsibleDraftActs.find(item=>item.id===editResponsibleActId);
 
-    if(!periodId||!type||!page||!actDate||!publicationDate||!publicationType||!file){
+    if(!periodId||!type||!page||!actDate||!publicationDate||!publicationType||(!file&&!existing?.documentId)){
       alert('Preencha todos os campos do ato e anexe a publicação.');
       return;
     }
     if(publicationDate<actDate && !confirm('A data da publicação está anterior à data do ato. Deseja continuar?'))return;
 
-    responsibleDraftActs.push({
-      id:id(),periodId,type,page,actDate,publicationDate,publicationType,
-      fileName:file.name,_file:file,documentId:''
-    });
+    const data={
+      id:existing?.id||id(),
+      periodId,type,page,actDate,publicationDate,publicationType,
+      fileName:file?.name||existing?.fileName||'',
+      _file:file||existing?._file,
+      documentId:existing?.documentId||'',
+      description:existing?.description||''
+    };
 
+    if(existing){
+      const position=responsibleDraftActs.findIndex(item=>item.id===existing.id);
+      responsibleDraftActs[position]=data;
+    }else{
+      responsibleDraftActs.push(data);
+    }
+
+    editResponsibleActId=null;
     ['rrActPage','rrActDate','rrPublicationDate'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('rrActType').value='';
     document.getElementById('rrPublicationType').value='';
     document.getElementById('rrActFile').value='';
+    const button=document.getElementById('rrActAddButton');
+    if(button)button.textContent='＋ Adicionar ato';
     renderResponsibleDraft();
   }
 
@@ -5894,7 +6789,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
             : '<span class="tag info">AGUARDANDO SALVAMENTO</span>'}
           <span class="act-file-name">${safe(a.fileName||'')}</span>
         </td>
-        <td><button class="link-btn" style="color:#b42318" onclick="removeResponsibleAct('${a.id}')">Excluir</button></td>
+        <td>
+          <button class="link-btn" onclick="loadResponsibleAct('${a.id}')">${responsibleIssueList({periods:[period||{}],acts:[a],nome:'TEMP',cpf:'00000000000',emailFuncional:'x',emailPessoal:'x',telefone:'x',cargo:'x',nascimento:'2020-01-01',enderecoFuncional:'x',enderecoResidencial:'x',categoria:'x',representacao:'x'}).length?'Preencher':'Editar'}</button>
+          <button class="link-btn" style="color:#b42318" onclick="removeResponsibleAct('${a.id}')">Excluir</button>
+        </td>
       </tr>`;
     }).join('')||'<tr><td colspan="8" class="empty">Nenhum ato cadastrado.</td></tr>';
   }
@@ -5906,24 +6804,20 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const emailFuncional=document.getElementById('rrEmailFuncional').value.trim().toLowerCase();
     const emailPessoal=document.getElementById('rrEmailPessoal').value.trim().toLowerCase();
     const telefone=formatPhone(document.getElementById('rrTelefone').value);
+    const cargo=document.getElementById('rrCargo').value.trim();
+    const nascimento=document.getElementById('rrNascimento').value;
+    const enderecoFuncional=document.getElementById('rrEnderecoFuncional').value.trim();
+    const enderecoResidencial=document.getElementById('rrEnderecoResidencial').value.trim();
     const categoria=document.getElementById('rrCategoria').value;
     const representacao=document.getElementById('rrRepresentacao').value;
     const observacao=document.getElementById('rrObservacao').value.trim();
 
-    if(!contract||!cpf||!nome||!emailFuncional||!emailPessoal||!telefone||!categoria||!representacao){
-      alert('Preencha todos os campos obrigatórios do contrato, da pessoa e da categoria.');
+    if(!contract){
+      alert('Selecione o contrato de gestão.');
       return;
     }
-    if(cpf.replace(/\D/g,'').length!==11){
-      alert('Informe um CPF com 11 dígitos.');
-      return;
-    }
-    if(!responsibleDraftPeriods.length){
-      alert('Adicione pelo menos um período de efetiva gestão.');
-      return;
-    }
-    if(!responsibleDraftActs.length){
-      alert('Adicione pelo menos um ato de nomeação, designação ou equivalente.');
+    if(!nome&&!cpf){
+      alert('Informe ao menos o nome ou o CPF para identificar o responsável.');
       return;
     }
 
@@ -5974,7 +6868,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       contrato:contract.contrato,
       projeto:contract.projeto,
       os:contract.os,
-      cpf,nome,emailFuncional,emailPessoal,telefone,categoria,representacao,observacao,
+      cpf,nome,emailFuncional,emailPessoal,telefone,cargo,nascimento,
+      enderecoFuncional,enderecoResidencial,categoria,representacao,observacao,
       periods:responsibleDraftPeriods.map(p=>({...p})),
       acts:responsibleDraftActs.map(a=>({...a,_file:undefined})),
       updatedAt:new Date().toISOString()
@@ -5986,7 +6881,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     saveState();
     clearResponsibleForm();
-    alert(idx>=0?'Cadastro do responsável atualizado.':'Responsável cadastrado.');
+    const savedRecord=state.responsibles.find(item=>item.id===recordId);
+    const pending=responsibleIssueList(savedRecord).length;
+    alert(
+      (idx>=0?'Cadastro do responsável atualizado.':'Responsável cadastrado.')+
+      (pending?` ${pending} campo(s) permanecem na aba Pendências.`:' Cadastro completo.')
+    );
     goPage('responsaveis');
   }
 
@@ -6002,6 +6902,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     document.getElementById('rrEmailFuncional').value=r.emailFuncional||'';
     document.getElementById('rrEmailPessoal').value=r.emailPessoal||'';
     document.getElementById('rrTelefone').value=r.telefone||'';
+    document.getElementById('rrCargo').value=r.cargo||'';
+    document.getElementById('rrNascimento').value=r.nascimento||'';
+    document.getElementById('rrEnderecoFuncional').value=r.enderecoFuncional||'';
+    document.getElementById('rrEnderecoResidencial').value=r.enderecoResidencial||'';
     document.getElementById('rrCategoria').value=r.categoria||'';
     document.getElementById('rrRepresentacao').value=r.representacao||'';
     document.getElementById('rrObservacao').value=r.observacao||'';
@@ -6041,7 +6945,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const categories=new Set(state.responsibles.map(r=>r.categoria).filter(Boolean));
     document.getElementById('rrTotal').textContent=state.responsibles.length;
     document.getElementById('rrAtivos').textContent=state.responsibles.filter(r=>responsibleOverallStatus(r)==='ativo').length;
-    document.getElementById('rrCategorias').textContent=categories.size;
+    document.getElementById('rrPendentes').textContent=state.responsibles.filter(r=>responsibleIssueList(r).length).length;
     document.getElementById('rrAtos').textContent=allActs.length;
     document.getElementById('rrSemPublicacao').textContent=allActs.filter(a=>!a.documentId).length;
 
@@ -6057,13 +6961,16 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <td>${safe(r.representacao)}</td>
         <td>${periods||'—'}</td>
         <td>${(r.acts||[]).length} ato(s)</td>
-        <td><span class="tag ${overall==='ativo'?'ok':overall==='futuro'?'info':'gray'}">${periodSituationLabel(overall)}</span></td>
+        <td>${responsibleIssueList(r).length
+          ? `<span class="tag pending">${responsibleIssueList(r).length} pendência(s)</span>`
+          : '<span class="tag ok">COMPLETO</span>'}</td>
+        <td><span class="tag ${overall==='ativo'?'ok':overall==='futuro'?'info':overall==='pendente'?'warn':'gray'}">${periodSituationLabel(overall)}</span></td>
         <td>
           <button class="link-btn" onclick="editResponsible('${r.id}')">Editar</button>
           <button class="link-btn" style="color:#b42318" onclick="deleteResponsible('${r.id}')">Excluir</button>
         </td>
       </tr>`;
-    }).join('')||'<tr><td colspan="10" class="empty">Nenhum responsável cadastrado para os filtros selecionados.</td></tr>';
+    }).join('')||'<tr><td colspan="11" class="empty">Nenhum responsável cadastrado para os filtros selecionados.</td></tr>';
 
     renderResponsibleDraft();
   }
@@ -10248,14 +11155,19 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const type=document.getElementById('accountabilityFilterType')?.value||'';
     const status=document.getElementById('accountabilityFilterStatus')?.value||'';
     const search=normalizeForChecklist(document.getElementById('accountabilitySearch')?.value||'');
+    const topYear=document.getElementById('topAno')?.value||'';
+    const topMonth=document.getElementById('topMes')?.value||'';
+    const topCompetence=topYear&&topMonth?`${topYear}-${topMonth}`:'';
 
     const rows=accountabilityAllItems().filter(item=>{
       const contract=contractById(item.contractId);
       const haystack=normalizeForChecklist(
         `${item.label||''} ${item.nup||''} ${item.observation||''} ${contract?.sacc||''} ${contract?.contrato||''}`
       );
+      const itemCompetence=accountabilityMonthKey(item.periodEnd||item.periodStart||item.dueDate);
       return (!contractId||item.contractId===contractId)&&
         (!year||[item.periodStart,item.periodEnd,item.dueDate].some(value=>value?.startsWith(year)))&&
+        (!topCompetence||itemCompetence===topCompetence)&&
         (!type||item.type===type)&&
         accountabilityItemMatchesStatus(item,status)&&
         (!search||haystack.includes(search));
@@ -10282,7 +11194,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const commission=accountabilityCommissionStatus(item);
       return `<tr>
         <td><strong class="accountability-period-title">${safe(accountabilityCompactTitle(item))}</strong><span class="accountability-period-line"><span>${safe(isoToBr(item.periodStart))} a ${safe(isoToBr(item.periodEnd))}</span><span class="accountability-period-month">${safe(accountabilityPeriodMonthLabel(item))}</span></span></td>
-        <td><strong>${safe(contract?.sacc||'—')}</strong><br>${safe(contract?.contrato||'—')}<br><small>${safe(contract?.coordenadoria||'—')}</small></td>
+        <td class="accountability-contract-cell"><strong>${safe(contract?.sacc||'—')}</strong><br><span>${safe(contract?.contrato||'—')}</span></td>
         <td><strong>${safe(isoToBr(item.dueDate)||'—')}</strong></td>
         <td>${safe(item.nup||'—')}</td>
         <td>${safe(isoToBr(item.submittedDate)||'—')}</td>
@@ -12131,12 +13043,19 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const lastDay=new Date(Number(ano),Number(mes),0).getDate();
     const pill=document.getElementById('positionPill');
     if(pill) pill.textContent=`Posição em ${String(lastDay).padStart(2,'0')}/${mes}/${ano}`;
+
     const fa=document.getElementById('filterAno');
     const fc=document.getElementById('filterCompetencia');
     if(fa && [...fa.options].some(o=>o.value===ano)) fa.value=ano;
     const comp=`${ano}-${mes}`;
     if(fc && [...fc.options].some(o=>o.value===comp)) fc.value=comp;
-    renderDashboard();
+
+    const accountabilityYear=document.getElementById('accountabilityFilterYear');
+    if(accountabilityYear&&[...accountabilityYear.options].some(option=>option.value===ano)){
+      accountabilityYear.value=ano;
+    }
+
+    renderPageOnly(getActivePageName());
   }
   document.getElementById('topAno')?.addEventListener('change',syncTopPeriod);
   document.getElementById('topMes')?.addEventListener('change',syncTopPeriod);
@@ -13011,6 +13930,34 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       )
     );
 
+    state.contracts.forEach(contract=>{
+      const responsibles=state.responsibles.filter(item=>item.contractId===contract.id);
+      if(!responsibles.length){
+        list.push({
+          kind:'responsibleRoll',
+          contractId:contract.id,
+          nome:'Rol de Responsáveis não cadastrado',
+          contrato:contract.contrato||'—',
+          competencia:'—',
+          problema:'Rol de responsáveis não informado'
+        });
+        return;
+      }
+
+      responsibles.forEach(responsible=>
+        responsibleIssueList(responsible).forEach(problem=>
+          list.push({
+            kind:'responsible',
+            responsibleId:responsible.id,
+            nome:responsible.nome||'Responsável sem nome',
+            contrato:responsible.contrato||contract.contrato||'—',
+            competencia:'—',
+            problema:problem
+          })
+        )
+      );
+    });
+
     state.payments.forEach(payment=>{
       const issues=paymentPendingIssueList(payment);
       if(!issues.length)return;
@@ -13045,6 +13992,21 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         });
       });
 
+
+    accountabilityAllItems()
+      .filter(item=>accountabilityDeliveryStatus(item).key==='ATRASADA')
+      .forEach(item=>{
+        const contract=contractById(item.contractId);
+        const daysLate=Math.abs(accountabilityDaysBetween(todayIsoLocal(),item.dueDate));
+        list.push({
+          kind:'accountability',
+          accountabilityItemId:item.id,
+          nome:item.label||'Prestação de contas',
+          contrato:contract?.contrato||'—',
+          competencia:accountabilityPeriodMonthLabel(item)||'—',
+          problema:`Prestação de contas em atraso — ${daysLate} dia(s)`
+        });
+      });
 
     state.resourceTransfers.forEach(item=>{const status=resourceTransferStatus(item);if(status.key==='ATRASADA'||!item.outgoingEntryId)list.push({kind:'resourceTransfer',transferId:item.id,nome:`Transferência ${isoToBr(item.transferDate)} — ${money(item.amount)}`,contrato:contractById(item.originContractId)?.contrato||'—',competencia:competenceLabel(item.transferDate?.slice(0,7))||'—',problema:status.key==='ATRASADA'?'Transferência em atraso':'Saída não localizada no extrato'})});
     state.financialReports.filter(financialReportHasDivergence).forEach(report=>list.push({kind:'financialReport',financialReportId:report.id,nome:'Demonstrativo de Receita e Despesa',contrato:contractById(report.contractId)?.contrato||'—',competencia:competenceLabel(report.competence)||'—',problema:'Valores da OS divergentes dos dados do sistema'}));
@@ -13085,12 +14047,18 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       list.filter(item=>item.problema==='Função ausente').length;
     document.getElementById('pAdm').textContent=
       list.filter(item=>item.problema==='Data de admissão ausente').length;
+    document.getElementById('pPrestacaoAtrasada').textContent=
+      list.filter(item=>item.kind==='accountability').length;
+    document.getElementById('pRolResponsaveis').textContent=
+      list.filter(item=>item.kind==='responsible'||item.kind==='responsibleRoll').length;
     document.getElementById('pOutras').textContent=
       list.filter(item=>![
         'CPF não informado',
         'Função ausente',
         'Data de admissão ausente'
-      ].includes(item.problema)).length;
+      ].includes(item.problema)&&
+        !['accountability','responsible','responsibleRoll'].includes(item.kind)
+      ).length;
 
     document.getElementById('pendingList').innerHTML=list.map(item=>`
       <div class="pending-item">
@@ -13101,20 +14069,61 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <div>
           ${item.kind==='person'
             ? `<button class="btn btn-outline" onclick="editPerson('${item.personId}')">Resolver</button>`
-            : item.kind==='payment'
+            : item.kind==='responsible'
+              ? `<button class="btn btn-outline" onclick="openResponsiblePending('${item.responsibleId}')">Preencher responsável</button>`
+              : item.kind==='responsibleRoll'
+                ? `<button class="btn btn-outline" onclick="openResponsibleRollPending('${item.contractId}')">Cadastrar Rol</button>`
+                : item.kind==='payment'
               ? `<button class="btn btn-outline" onclick="openPaymentPending('${item.paymentId}')">Editar pagamento</button>`
               : item.kind==='paymentEvidence'
                 ? `<button class="btn btn-outline" onclick="openPaymentEvidencePending('${item.paymentId}')">Anexar comprovante</button>`
                 : item.kind==='bankEntry'
                   ? `<button class="btn btn-outline" onclick="openBankEntryPending('${item.bankEntryId}')">Conciliar débito</button>`
-                  : item.kind==='resourceTransfer'
-                    ? `<button class="btn btn-outline" onclick="openResourceTransferPending('${item.transferId}')">Abrir transferência</button>`
-                    : item.kind==='financialReport'
-                      ? `<button class="btn btn-outline" onclick="openFinancialReportPending('${item.financialReportId}')">Abrir demonstrativo</button>`
-                      : `<button class="btn btn-outline" onclick="resolveIssue('${item.issueId}')">Marcar conferida</button>`}
+                  : item.kind==='accountability'
+                    ? `<button class="btn btn-outline" onclick="openAccountabilityPending('${item.accountabilityItemId}')">Abrir prestação</button>`
+                    : item.kind==='resourceTransfer'
+                      ? `<button class="btn btn-outline" onclick="openResourceTransferPending('${item.transferId}')">Abrir transferência</button>`
+                      : item.kind==='financialReport'
+                        ? `<button class="btn btn-outline" onclick="openFinancialReportPending('${item.financialReportId}')">Abrir demonstrativo</button>`
+                        : `<button class="btn btn-outline" onclick="resolveIssue('${item.issueId}')">Marcar conferida</button>`}
         </div>
       </div>`).join('')||
       '<div class="card empty">Nenhuma pendência aberta.</div>';
+  }
+
+  window.openResponsiblePending=function(responsibleId){
+    goPage('responsaveis');
+    setTimeout(()=>editResponsible(responsibleId),0);
+  }
+
+  window.openResponsibleRollPending=function(contractId){
+    goPage('responsaveis');
+    setTimeout(()=>{
+      clearResponsibleForm();
+      refreshResponsibleContractOptions(contractId);
+      document.getElementById('rrContractId').value=contractId;
+      responsibleContractChanged();
+      document.getElementById('rrNome').focus();
+    },0);
+  }
+
+  window.openAccountabilityPending=function(itemId){
+    const found=accountabilityItemById(itemId);
+    if(!found)return;
+
+    goPage('prestacao-contas');
+    setTimeout(()=>{
+      const contractFilter=document.getElementById('accountabilityFilterContract');
+      const statusFilter=document.getElementById('accountabilityFilterStatus');
+      const searchInput=document.getElementById('accountabilitySearch');
+
+      if(contractFilter)contractFilter.value=found.plan.contractId;
+      if(statusFilter)statusFilter.value='ATRASADA';
+      if(searchInput)searchInput.value='';
+      renderAccountabilityTracking();
+
+      setTimeout(()=>openAccountabilityItemModal(itemId),0);
+    },0);
   }
 
   window.openPaymentPending=function(paymentId){
@@ -13309,8 +14318,7 @@ Total bruto: ${money(a.proventos)}`)}
     const changed=monitorContractStatuses();
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
-
-<script data-trancelim-integration-v148>
+<script data-trancelim-integration-v152>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   const DEFAULT_PHOTO='../assets/david-profile.png';
