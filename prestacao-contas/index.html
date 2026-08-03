@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v46</title>
+<title>Sistema de Prestação de Contas CG — v160</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -5240,6 +5240,37 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
     localStorage.setItem(PAYMENT_V14_RESET_MARKER,'1');
+  }
+
+  /* v160 — limpeza única solicitada das abas Pagamentos e Extratos. */
+  const PAYMENT_BANK_RESET_V160_MARKER='prestacao_contas_cg_reset_pagamentos_extratos_v160';
+  if(!localStorage.getItem(PAYMENT_BANK_RESET_V160_MARKER)){
+    const paymentBankFolders=[
+      'relatorios_pagamentos',
+      'comprovantes_pagamentos',
+      'extratos_bancarios'
+    ];
+
+    paymentTestDocumentIdsToDelete.push(
+      ...state.documents
+        .filter(document=>paymentBankFolders.includes(document.folder))
+        .map(document=>document.id)
+    );
+    paymentTestDocumentIdsToDelete=[...new Set(paymentTestDocumentIdsToDelete)];
+
+    state.payments=[];
+    state.paymentReports=[];
+    state.bankStatements=[];
+    state.bankEntries=[];
+    state.bankLinks=[];
+    state.bankApplicationTransfers=[];
+    state.documents=state.documents.filter(document=>
+      !paymentBankFolders.includes(document.folder)
+    );
+    state.issues=state.issues.filter(issue=>issue.module!=='pagamentos');
+
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    localStorage.setItem(PAYMENT_BANK_RESET_V160_MARKER,'1');
   }
   let preview = null;
   let editId = null;

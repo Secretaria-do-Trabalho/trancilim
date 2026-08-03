@@ -53,3 +53,8 @@ Depois abra com Ctrl+F5.
 - Atualizado o Sistema de Prestação de Contas CG para a v46, com a função Copiar responsável.
 
 - Acompanhamento da Prestação de Contas independente dos filtros gerais do dashboard; usa somente os filtros internos da própria aba.
+
+
+## v160
+- limpeza automática única dos dados das abas Pagamentos e Extratos;
+- preservados contratos, responsáveis, pessoal, prestações de contas e demais módulos.
