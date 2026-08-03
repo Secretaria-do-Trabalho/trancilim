@@ -12367,19 +12367,16 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const type=document.getElementById('accountabilityFilterType')?.value||'';
     const status=document.getElementById('accountabilityFilterStatus')?.value||'';
     const search=normalizeForChecklist(document.getElementById('accountabilitySearch')?.value||'');
-    const topYear=document.getElementById('topAno')?.value||'';
-    const topMonth=document.getElementById('topMes')?.value||'';
-    const topCompetence=topYear&&topMonth?`${topYear}-${topMonth}`:'';
 
+    // Esta aba é independente dos filtros gerais do dashboard.
+    // Somente os filtros próprios abaixo (Contrato, Exercício, Tipo, Situação e Busca) limitam a relação.
     const rows=accountabilityAllItems().filter(item=>{
       const contract=contractById(item.contractId);
       const haystack=normalizeForChecklist(
         `${item.label||''} ${item.nup||''} ${item.observation||''} ${contract?.sacc||''} ${contract?.contrato||''}`
       );
-      const itemCompetence=accountabilityMonthKey(item.periodEnd||item.periodStart||item.dueDate);
       return (!contractId||item.contractId===contractId)&&
         (!year||[item.periodStart,item.periodEnd,item.dueDate].some(value=>value?.startsWith(year)))&&
-        (!topCompetence||itemCompetence===topCompetence)&&
         (!type||item.type===type)&&
         accountabilityItemMatchesStatus(item,status)&&
         (!search||haystack.includes(search));

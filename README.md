@@ -51,3 +51,5 @@ Depois abra com Ctrl+F5.
 - Adicionada leitura dos relatórios do Conselho de Administração 2024 e do Conselho Fiscal.
 - Mantidas as correções do dashboard, a integração de login, perfil, foto e retorno ao portal.
 - Atualizado o Sistema de Prestação de Contas CG para a v46, com a função Copiar responsável.
+
+- Acompanhamento da Prestação de Contas independente dos filtros gerais do dashboard; usa somente os filtros internos da própria aba.
