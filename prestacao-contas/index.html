@@ -95,12 +95,14 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     .side-brand p{font-size:12px;margin:5px 0 0;color:rgba(255,255,255,.88)}
     .user-card{
       display:flex;align-items:center;gap:11px;padding:11px;border-radius:18px;
-      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);margin-bottom:15px
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);margin-bottom:15px;min-width:0
     }
     .avatar{
-      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
-      background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35)
+      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;
+      background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35);flex:none
     }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+    .avatar span{display:grid;place-items:center;width:100%;height:100%}
     .user-card strong{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .user-card small{font-size:11px;color:rgba(255,255,255,.85)}
     .nav{display:flex;flex-direction:column;gap:6px}
