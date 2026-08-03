@@ -1,4 +1,4 @@
-# TRANCELIM - v156
+# TRANCELIM - v161
 
 ## Atualização principal
 - login integrado ao Supabase Auth;
@@ -58,3 +58,15 @@ Depois abra com Ctrl+F5.
 ## v160
 - limpeza automática única dos dados das abas Pagamentos e Extratos;
 - preservados contratos, responsáveis, pessoal, prestações de contas e demais módulos.
+
+
+## v161
+- corrigida a importação do Relatório Mensal de Pagamentos em PDF, mantendo número do processo, PESSOAL e CUSTEIO;
+- o extrato bancário deixou de criar pagamentos artificiais;
+- corrigida a leitura de documentos bancários longos colados ao valor;
+- em linhas bancárias com valor do lançamento e saldo, a conciliação usa o valor do lançamento;
+- conciliação automática por documento, data e valor, inclusive quando um débito bancário reúne várias linhas do relatório;
+- Pix rejeitado/estornado é identificado e não aumenta o valor pago;
+- extrato CDB é guardado como documento de aplicação e não entra na conciliação operacional;
+- incluídos totais separados de PESSOAL e CUSTEIO;
+- limpeza única dos dados incorretos de Pagamentos e Extratos para nova importação.

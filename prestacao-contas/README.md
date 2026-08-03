@@ -1,4 +1,4 @@
-# Sistema de Prestação de Contas CG — v46
+# Sistema de Prestação de Contas CG — v161
 
 ## Rol de Responsáveis
 
@@ -23,3 +23,13 @@ Ao copiar:
 
 Depois, basta selecionar o outro Contrato de Gestão, fazer os ajustes
 necessários e clicar em **Salvar responsável**.
+
+
+## Importação e conciliação v161
+
+- Relação de Pagamentos é a fonte oficial dos pagamentos.
+- Extrato de conta corrente não cria pagamentos automaticamente.
+- A conciliação usa documento, data de compensação e valor.
+- Um débito pode ser conciliado com várias linhas que tenham o mesmo documento e totalizem seu valor.
+- Débitos estornados por Pix rejeitado são separados dos débitos efetivos.
+- Extratos de aplicação/CDB ficam anexados, sem integrar a conciliação de despesas.

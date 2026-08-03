@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v160</title>
+<title>Sistema de Prestação de Contas CG — v161</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -416,6 +416,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     .summary-strip.five{
       grid-template-columns:repeat(5,minmax(0,1fr))
     }
+    .summary-strip.seven{
+      grid-template-columns:repeat(7,minmax(0,1fr))
+    }
     .current-period{
       background:#e7f7ed;color:#18794e
     }
@@ -733,9 +736,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         grid-template-columns:1fr
       }
       .summary-strip.five{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .summary-strip.seven{grid-template-columns:repeat(3,minmax(0,1fr))}
     }
     @media(max-width:520px){
       .summary-strip.five{grid-template-columns:1fr}
+      .summary-strip.seven{grid-template-columns:1fr}
       .responsible-import-summary{grid-template-columns:1fr}
     }
 
@@ -3686,8 +3691,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <button class="btn btn-outline" onclick="openPaymentImportModal()">⇧ Importar PDF da OS</button>
 </div>
 </div>
-<div class="summary-strip five">
+<div class="summary-strip seven">
 <div class="summary-box"><small>Pagamentos cadastrados</small><strong id="payTotalCount">0</strong></div>
+<div class="summary-box info"><small>Total de pessoal</small><strong id="payTotalPersonal">R$ 0,00</strong></div>
+<div class="summary-box ok"><small>Total de custeio</small><strong id="payTotalCusteio">R$ 0,00</strong></div>
 <div class="summary-box"><small>Valor dos documentos</small><strong id="payTotalDocuments">R$ 0,00</strong></div>
 <div class="summary-box"><small>Valor pago</small><strong id="payTotalPaid">R$ 0,00</strong></div>
 <div class="summary-box"><small>Com pendência</small><strong id="payPendingCount">0</strong></div>
@@ -3886,7 +3893,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="bank-summary-grid">
 <div class="bank-summary-box info"><small>Contas com extrato</small><strong id="bankAccountsWithStatement">0</strong></div>
 <div class="bank-summary-box warn"><small>Contas sem extrato</small><strong id="bankAccountsWithoutStatement">0</strong></div>
-<div class="bank-summary-box"><small>Total de débitos</small><strong id="bankTotalDebits">R$ 0,00</strong></div>
+<div class="bank-summary-box"><small>Débitos efetivos</small><strong id="bankTotalDebits">R$ 0,00</strong></div>
+<div class="bank-summary-box warn"><small>Débitos estornados</small><strong id="bankTotalReversed">R$ 0,00</strong></div>
 <div class="bank-summary-box info"><small>Total de créditos</small><strong id="bankTotalCredits">R$ 0,00</strong></div>
 <div class="bank-summary-box"><small>Pagamentos conciliados</small><strong id="bankPaymentsReconciled">0</strong></div>
 <div class="bank-summary-box warn"><small>Pagamentos não encontrados</small><strong id="bankPaymentsMissing">0</strong></div>
@@ -5271,6 +5279,32 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
     localStorage.setItem(PAYMENT_BANK_RESET_V160_MARKER,'1');
+  }
+
+  /* v161 - limpa uma única vez a importação incorreta para permitir nova leitura corrigida. */
+  const PAYMENT_BANK_RESET_V161_MARKER='prestacao_contas_cg_reset_importacao_corrigida_v161';
+  if(!localStorage.getItem(PAYMENT_BANK_RESET_V161_MARKER)){
+    const paymentBankFolders=[
+      'relatorios_pagamentos',
+      'comprovantes_pagamentos',
+      'extratos_bancarios'
+    ];
+    paymentTestDocumentIdsToDelete.push(
+      ...state.documents
+        .filter(document=>paymentBankFolders.includes(document.folder))
+        .map(document=>document.id)
+    );
+    paymentTestDocumentIdsToDelete=[...new Set(paymentTestDocumentIdsToDelete)];
+    state.payments=[];
+    state.paymentReports=[];
+    state.bankStatements=[];
+    state.bankEntries=[];
+    state.bankLinks=[];
+    state.bankApplicationTransfers=[];
+    state.documents=state.documents.filter(document=>!paymentBankFolders.includes(document.folder));
+    state.issues=state.issues.filter(issue=>issue.module!=='pagamentos');
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+    localStorage.setItem(PAYMENT_BANK_RESET_V161_MARKER,'1');
   }
   let preview = null;
   let editId = null;
@@ -10051,7 +10085,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
   function bankPaymentReferenceDate(payment){
-    return payment.compensationDate||payment.issueDate||'';
+    const compensation=payment.compensationDate||'';
+    const compensationYear=Number(compensation.slice(0,4)||0);
+    if(compensation&&compensationYear>=2000)return compensation;
+    return payment.issueDate||compensation||'';
   }
 
   function bankEntryReferenceCompetence(entry){
@@ -10106,6 +10143,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
   function bankEntryStatusMeta(entry){
+    if(entry.reversalEntryId){
+      return entry.movementType==='DEBITO'
+        ? {key:'ESTORNADO',label:'DÉBITO ESTORNADO / PIX REJEITADO',className:'bank-status-neutral'}
+        : {key:'ESTORNO',label:'CRÉDITO DE ESTORNO',className:'bank-status-info'};
+    }
     if(entry.movementType==='CREDITO'){
       return {key:'CREDITO',label:'CRÉDITO LISTADO',className:'bank-status-info'};
     }
@@ -10193,105 +10235,166 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     return link;
   }
 
-  function autoReconcileBankEntries(statementId=''){
-    const targetEntries=state.bankEntries.filter(entry=>
-      entry.movementType==='DEBITO'&&
-      (!statementId||entry.statementId===statementId)
-    );
-
+  function clearAutomaticBankLinks(targetEntries){
     const targetIds=new Set(targetEntries.map(entry=>entry.id));
+    const linkedReversalCreditIds=new Set(
+      targetEntries.map(entry=>entry.reversalEntryId).filter(Boolean)
+    );
     state.bankLinks=state.bankLinks.filter(link=>
       !targetIds.has(link.entryId)||link.mode==='manual'
     );
-
     targetEntries.forEach(entry=>{
       entry.suggestedPaymentId='';
       entry.suggestedScore=0;
-
-      if(bankEntryLinks(entry.id).length)return;
-
-      const competence=bankEntryReferenceCompetence(entry);
-      const candidates=state.payments
-        .filter(payment=>
-          payment.contractId===entry.contractId&&
-          (!competence||payment.competence===competence)
-        )
-        .map(payment=>({
-          payment,
-          ...bankPaymentCandidateScore(entry,payment)
-        }))
-        .filter(candidate=>candidate.remaining>.01)
-        .sort((a,b)=>b.score-a.score);
-
-      const best=candidates[0];
-      const second=candidates[1];
-
-      if(
-        best&&
-        best.amountDiff<=.02&&
-        best.score>=82&&
-        (!second||best.score-second.score>=10)
-      ){
-        createBankLink(
-          entry.id,
-          best.payment.id,
-          bankEntryAmount(entry),
-          'automatico',
-          best.score
-        );
-      }else if(best&&best.score>=50){
-        entry.suggestedPaymentId=best.payment.id;
-        entry.suggestedScore=best.score;
-      }
+      entry.reversalEntryId='';
     });
+    state.bankEntries.forEach(entry=>{
+      if(linkedReversalCreditIds.has(entry.id))entry.reversalEntryId='';
+    });
+  }
 
-    /* Um pagamento pode ter dois débitos. A combinação só é automática
-       quando a soma é exata, as datas são próximas e existe uma única dupla. */
-    const unmatched=targetEntries.filter(entry=>
-      bankEntryLinks(entry.id).length===0
+  function unreconciledPaymentRows(entry,maxDays=1){
+    const competence=bankEntryReferenceCompetence(entry);
+    return state.payments.filter(payment=>
+      payment.source!=='extrato'&&
+      payment.contractId===entry.contractId&&
+      (!competence||payment.competence===competence)&&
+      paymentLinkedAmount(payment.id)<Number(payment.paidValue||0)-.01&&
+      daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=maxDays
     );
+  }
 
-    state.payments.forEach(payment=>{
+  function linkEntryToPaymentRows(entry,payments,confidence=100){
+    payments.forEach(payment=>{
+      const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
+      if(remaining>.01)createBankLink(entry.id,payment.id,remaining,'automatico',confidence);
+    });
+  }
+
+  function reconcileExactSinglePayments(entries){
+    entries.forEach(entry=>{
+      if(bankEntryLinks(entry.id).length)return;
+      const amount=bankEntryAmount(entry);
+      const entryDoc=bankDigits(entry.documentNumber);
+      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
+        const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
+        if(Math.abs(remaining-amount)>.02)return false;
+        const paymentDoc=bankDigits(payment.cheque);
+        return !entryDoc||!paymentDoc||entryDoc===paymentDoc;
+      });
+      const exactDocument=candidates.filter(payment=>{
+        const paymentDoc=bankDigits(payment.cheque);
+        return entryDoc&&paymentDoc&&entryDoc===paymentDoc;
+      });
+      const selected=exactDocument.length===1
+        ? exactDocument[0]
+        : (!entryDoc&&candidates.length===1?candidates[0]:null);
+      if(selected)createBankLink(entry.id,selected.id,amount,'automatico',100);
+    });
+  }
+
+  function reconcileGroupedPaymentsByDocument(entries){
+    entries.forEach(entry=>{
+      if(bankEntryLinks(entry.id).length)return;
+      const entryDoc=bankDigits(entry.documentNumber);
+      if(!entryDoc)return;
+      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>
+        bankDigits(payment.cheque)===entryDoc
+      );
+      if(candidates.length<2)return;
+      const total=candidates.reduce((sum,payment)=>
+        sum+Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id)),0
+      );
+      if(Math.abs(total-bankEntryAmount(entry))<=.02)linkEntryToPaymentRows(entry,candidates,98);
+    });
+  }
+
+  function reconcileUniqueValueAndDate(entries){
+    entries.forEach(entry=>{
+      if(bankEntryLinks(entry.id).length)return;
+      const amount=bankEntryAmount(entry);
+      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
+        const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
+        return Math.abs(remaining-amount)<=.02;
+      });
+      if(candidates.length===1)createBankLink(entry.id,candidates[0].id,amount,'automatico',92);
+    });
+  }
+
+  function reconcileSplitBankDebits(entries){
+    const unmatched=entries.filter(entry=>bankEntryLinks(entry.id).length===0);
+    state.payments.filter(payment=>payment.source!=='extrato').forEach(payment=>{
       const remaining=Number(payment.paidValue||0)-paymentLinkedAmount(payment.id);
       if(remaining<=.02)return;
-
-      const competence=payment.competence;
       const possible=unmatched.filter(entry=>
         entry.contractId===payment.contractId&&
-        bankEntryReferenceCompetence(entry)===competence&&
-        daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=3
+        bankEntryReferenceCompetence(entry)===payment.competence&&
+        daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=1
       );
-
       const pairs=[];
       for(let i=0;i<possible.length;i++){
         for(let j=i+1;j<possible.length;j++){
           const sum=bankEntryAmount(possible[i])+bankEntryAmount(possible[j]);
-          if(Math.abs(sum-remaining)<=.02){
-            const simA=tokenSimilarity(
-              `${possible[i].party||''} ${possible[i].history||''}`,
-              `${payment.creditor||''} ${payment.expenseNature||''}`
-            );
-            const simB=tokenSimilarity(
-              `${possible[j].party||''} ${possible[j].history||''}`,
-              `${payment.creditor||''} ${payment.expenseNature||''}`
-            );
-            if(simA>=.15||simB>=.15){
-              pairs.push([possible[i],possible[j]]);
-            }
-          }
+          if(Math.abs(sum-remaining)<=.02)pairs.push([possible[i],possible[j]]);
         }
       }
-
       if(pairs.length===1){
         pairs[0].forEach(entry=>
-          createBankLink(
-            entry.id,
-            payment.id,
-            bankEntryAmount(entry),
-            'automatico',
-            88
-          )
+          createBankLink(entry.id,payment.id,bankEntryAmount(entry),'automatico',88)
         );
+      }
+    });
+  }
+
+  function identifyReversedBankDebits(entries){
+    const availableDebits=entries.filter(entry=>
+      bankEntryLinks(entry.id).length===0&&!entry.reversalEntryId
+    );
+    const rejectedCredits=state.bankEntries.filter(entry=>{
+      if(entry.movementType!=='CREDITO'||entry.reversalEntryId)return false;
+      const text=normalizeForChecklist(`${entry.history||''} ${entry.party||''}`);
+      return text.includes('REJEITADO')||text.includes('ESTORNO')||
+        text.includes('DEVOLVIDO')||text.includes('NAO EFETUADO');
+    });
+    rejectedCredits.forEach(credit=>{
+      const amount=bankEntryAmount(credit);
+      const candidates=availableDebits.filter(debit=>
+        !debit.reversalEntryId&&
+        debit.contractId===credit.contractId&&
+        debit.accountId===credit.accountId&&
+        debit.competence===credit.competence&&
+        Math.abs(bankEntryAmount(debit)-amount)<=.02&&
+        daysBetweenIso(debit.date,credit.date)<=1
+      ).sort((a,b)=>Math.abs(Number(a.sourceRow||0)-Number(credit.sourceRow||0))-
+        Math.abs(Number(b.sourceRow||0)-Number(credit.sourceRow||0)));
+      const debit=candidates[0];
+      if(debit){
+        debit.reversalEntryId=credit.id;
+        credit.reversalEntryId=debit.id;
+      }
+    });
+  }
+
+  function autoReconcileBankEntries(statementId=''){
+    const targetEntries=state.bankEntries.filter(entry=>
+      entry.movementType==='DEBITO'&&(!statementId||entry.statementId===statementId)
+    );
+    clearAutomaticBankLinks(targetEntries);
+    reconcileExactSinglePayments(targetEntries);
+    reconcileGroupedPaymentsByDocument(targetEntries);
+    reconcileUniqueValueAndDate(targetEntries);
+    reconcileSplitBankDebits(targetEntries);
+    identifyReversedBankDebits(targetEntries);
+    targetEntries.forEach(entry=>{
+      if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
+      const candidates=unreconciledPaymentRows(entry,2)
+        .map(payment=>({payment,...bankPaymentCandidateScore(entry,payment)}))
+        .filter(candidate=>candidate.remaining>.01)
+        .sort((a,b)=>b.score-a.score);
+      const best=candidates[0];
+      if(best&&best.score>=50){
+        entry.suggestedPaymentId=best.payment.id;
+        entry.suggestedScore=best.score;
       }
     });
   }
@@ -10510,11 +10613,15 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     ).length;
 
     const accountsWithout=eligibleAccounts.length-accountsWith;
-    const totalDebits=entries.reduce((sum,entry)=>sum+Number(entry.debit||0),0);
+    const totalDebits=entries.filter(entry=>entry.movementType==='DEBITO'&&!entry.reversalEntryId)
+      .reduce((sum,entry)=>sum+Number(entry.debit||0),0);
+    const totalReversed=entries.filter(entry=>entry.movementType==='DEBITO'&&entry.reversalEntryId)
+      .reduce((sum,entry)=>sum+Number(entry.debit||0),0);
     const totalCredits=entries.reduce((sum,entry)=>sum+Number(entry.credit||0),0);
     const entryStatuses=entries.map(entry=>bankEntryStatusMeta(entry));
 
     const relevantPayments=state.payments.filter(payment=>
+      payment.source!=='extrato'&&
       (!selectedContractId||payment.contractId===selectedContractId)&&
       (!selectedCompetence||payment.competence===selectedCompetence)
     );
@@ -10523,6 +10630,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     document.getElementById('bankAccountsWithStatement').textContent=accountsWith;
     document.getElementById('bankAccountsWithoutStatement').textContent=Math.max(0,accountsWithout);
     document.getElementById('bankTotalDebits').textContent=money(totalDebits);
+    document.getElementById('bankTotalReversed').textContent=money(totalReversed);
     document.getElementById('bankTotalCredits').textContent=money(totalCredits);
     document.getElementById('bankPaymentsReconciled').textContent=
       paymentStatuses.filter(status=>status.key==='CONCILIADO').length;
@@ -10937,23 +11045,34 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     };
   }
 
+  function separateMergedBankDocumentAndAmount(line){
+    return String(line||'').replace(
+      /(\d{2,3}(?:\.\d{3}){4})(?=(\d{1,3}(?:\.\d{3})*,\d{2}\s*[CD](?:\s|$)))/gi,
+      '$1 '
+    );
+  }
+
+  function bankDirectionalAmounts(line){
+    const normalized=separateMergedBankDocumentAndAmount(line);
+    const pattern=/(?<![\d.])((?:\d{1,3}(?:\.\d{3})*|\d+),\d{2})\s*([CD])(?=\s|$)/gi;
+    return [...normalized.matchAll(pattern)].map(match=>({
+      raw:match[0].trim(),amountText:match[1],direction:match[2].toUpperCase(),
+      amount:parseBankNumber(match[1]),index:match.index,
+      end:Number(match.index||0)+match[0].length,normalizedLine:normalized
+    }));
+  }
+
   function parseBankPdfLines(lines,competence){
     const entries=[];
     const applicationTransfers=[];
     let openingBalance=null;
     let closingBalance=null;
 
-    const valuePattern=/-?\s*(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}\s*[CD]?/gi;
-
     const balanceFromLine=line=>{
-      const values=[...String(line||'').matchAll(valuePattern)]
-        .map(match=>match[0].trim());
+      const values=bankDirectionalAmounts(line);
       if(!values.length)return null;
-      const raw=values[values.length-1];
-      const value=parseBankNumber(raw);
-      const normalized=normalizeForChecklist(raw);
-      const sign=normalized.endsWith('D')?-1:1;
-      return value*sign;
+      const last=values[values.length-1];
+      return last.amount*(last.direction==='D'?-1:1);
     };
 
     lines.forEach(line=>{
@@ -10965,7 +11084,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     });
 
     for(let lineIndex=0;lineIndex<lines.length;lineIndex++){
-      const originalLine=String(lines[lineIndex]||'').replace(/\s+/g,' ').trim();
+      const originalLine=separateMergedBankDocumentAndAmount(
+        String(lines[lineIndex]||'').replace(/\s+/g,' ').trim()
+      );
       if(!originalLine)continue;
 
       const normalizedLine=normalizeForChecklist(originalLine);
@@ -11000,24 +11121,19 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const date=parseFlexibleDate(originalLine,competence);
       if(!date)continue;
 
-      const amountMatches=[...originalLine.matchAll(valuePattern)]
-        .map(match=>match[0].trim());
-
+      const amountMatches=bankDirectionalAmounts(originalLine);
       if(!amountMatches.length)continue;
 
-      /*
-       * O último valor com vírgula é o valor do lançamento. Números como
-       * 40.101 ou 18.568 são documentos e não entram nesse padrão.
-       */
-      const amountText=amountMatches[amountMatches.length-1];
-      const amount=parseBankNumber(amountText);
+      /* Primeiro valor C/D = lançamento; último valor, quando existe, = saldo. */
+      const transactionAmount=amountMatches[0];
+      const amountText=transactionAmount.amountText;
+      const amount=transactionAmount.amount;
       if(!amount)continue;
-
-      const movementType=normalizeBankMovement('',originalLine,amountText);
+      const movementType=transactionAmount.direction==='C'?'CREDITO':'DEBITO';
 
       let transactionText=originalLine
-        .replace(/\b\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?\b/,' ')
-        .replace(amountText,' ')
+        .slice(0,transactionAmount.index)
+        .replace(/^(?:\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?\s*){1,2}/,' ')
         .replace(/\s+/g,' ')
         .trim();
 
@@ -11137,7 +11253,28 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     };
   }
 
-  async function parseBankStatementFile(file,competence){
+  function parseApplicationPdfLines(lines,competence){
+    let openingBalance=null;
+    let closingBalance=null;
+    let balanceMode='';
+    lines.forEach(line=>{
+      const normalized=normalizeForChecklist(line);
+      if(normalized.includes('SALDO ANTERIOR'))balanceMode='OPENING';
+      else if(normalized.includes('SALDO FINAL'))balanceMode='CLOSING';
+      else if(balanceMode&&normalized.includes('VALOR CAPITAL')){
+        const values=String(line||'').match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[];
+        if(values.length){
+          const amount=parseBankNumber(values[values.length-1]);
+          if(balanceMode==='OPENING')openingBalance=amount;
+          else closingBalance=amount;
+          balanceMode='';
+        }
+      }
+    });
+    return {rows:[],applicationTransfers:[],openingBalance,closingBalance,applicationDocumentOnly:true};
+  }
+
+  async function parseBankStatementFile(file,competence,type='conta_corrente'){
     const extension=(file.name.split('.').pop()||'').toLowerCase();
 
     if(['xlsx','xls','csv'].includes(extension)){
@@ -11151,7 +11288,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     if(extension==='pdf'){
       const lines=await extractLines(file);
-      return parseBankPdfLines(lines,competence);
+      return type==='aplicacao'?parseApplicationPdfLines(lines,competence):parseBankPdfLines(lines,competence);
     }
 
     throw new Error('Formato não suportado. Utilize PDF, CSV, XLSX ou XLS.');
@@ -11278,7 +11415,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       '<div class="notice info">Lendo o arquivo e identificando créditos e débitos...</div>';
 
     try{
-      const parsed=await parseBankStatementFile(file,competence);
+      const parsed=await parseBankStatementFile(file,competence,type);
       const rows=Array.isArray(parsed)?parsed:(parsed.rows||[]);
       const applicationTransfers=Array.isArray(parsed?.applicationTransfers)
         ? parsed.applicationTransfers
@@ -11302,7 +11439,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
             ${rows.length} lançamento(s) operacional(is) identificado(s).
             ${applicationTransfers.length} movimentação(ões) entre conta corrente e aplicação foram separadas para acompanhamento.
            </div>`
-        : `<div class="notice warn">Nenhum lançamento foi identificado automaticamente. Use “Adicionar linha manual” ou envie outro formato do extrato.</div>`;
+        : type==='aplicacao'
+          ? `<div class="notice ok">Extrato de aplicação identificado. O PDF será anexado para conferência e não entrará na conciliação dos pagamentos.</div>`
+          : `<div class="notice warn">Nenhum lançamento foi identificado automaticamente. Use “Adicionar linha manual” ou envie outro formato do extrato.</div>`;
       renderBankPreview();
     }catch(error){
       console.error(error);
@@ -11323,7 +11462,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const rows=bankStatementPreview?.rows||[];
     const applicationTransfers=bankStatementPreview?.applicationTransfers||[];
 
-    if(!contractId||!accountId||!competence||(!rows.length&&!applicationTransfers.length)){
+    if(!contractId||!accountId||!competence||
+      (type!=='aplicacao'&&!rows.length&&!applicationTransfers.length)){
       alert('A prévia ainda não possui lançamentos para importar.');
       return;
     }
@@ -11450,6 +11590,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           party:String(row.party||'').trim(),
           documentNumber:String(row.documentNumber||'').trim(),
           sourceCode:String(row.sourceCode||'').trim(),
+          sourceRow:Number(row.sourceRow||0),
           debit:row.movementType==='DEBITO'?Number(row.debit||0):0,
           credit:row.movementType==='CREDITO'?Number(row.credit||0):0,
           suggestedPaymentId:'',
@@ -11482,8 +11623,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         });
       });
 
-      state.bankEntries.filter(entry=>entry.statementId===statementId&&entry.movementType==='DEBITO').forEach(createPaymentFromBankEntry);
-      autoReconcileBankEntries(statementId);
+      /* O extrato não cria pagamentos. A Relação de Pagamentos é a fonte oficial. */
+      if(type==='conta_corrente')autoReconcileBankEntries(statementId);
       saveState();
 
       clearBankStatementPreview();
@@ -12578,6 +12719,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const accountabilityStatus=document.getElementById('payFilterAccountabilityStatus')?.value||'';
 
     return state.payments.filter(p=>
+      p.source!=='extrato'&&
       (!q||[p.process,p.cheque,p.expenseNature,p.expenseType,p.creditor].some(v=>(v||'').toLowerCase().includes(q))) &&
       (!contextContractId||p.contractId===contextContractId) &&
       (!contextYear||paymentYear(p)===contextYear) &&
@@ -12609,10 +12751,14 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const visibleRows=rows.slice((paymentCurrentPage-1)*PAYMENT_PAGE_SIZE,paymentCurrentPage*PAYMENT_PAGE_SIZE);
     const totalDocument=rows.reduce((s,p)=>s+Number(p.documentValue||0),0);
     const totalPaid=rows.reduce((s,p)=>s+Number(p.paidValue||0),0);
+    const totalPersonal=rows.filter(p=>p.expenseType==='PESSOAL').reduce((s,p)=>s+Number(p.paidValue||0),0);
+    const totalCusteio=rows.filter(p=>p.expenseType==='CUSTEIO').reduce((s,p)=>s+Number(p.paidValue||0),0);
     const pending=rows.filter(p=>paymentPendingIssueList(p).length>0).length;
     const competences=new Set(rows.map(p=>p.competence).filter(Boolean));
 
     document.getElementById('payTotalCount').textContent=rows.length;
+    document.getElementById('payTotalPersonal').textContent=money(totalPersonal);
+    document.getElementById('payTotalCusteio').textContent=money(totalCusteio);
     document.getElementById('payTotalDocuments').textContent=money(totalDocument);
     document.getElementById('payTotalPaid').textContent=money(totalPaid);
     document.getElementById('payPendingCount').textContent=pending;
@@ -12860,15 +13006,13 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           .replace(/\s+/g,separator===' ' ? ' ' : '')
           .trim();
 
-        const process=rowItems
-          .filter(item=>
-            item.x>=viewport.width*0.10&&
-            item.x<typeStart&&
-            item.text!==event.anchor.text
-          )
-          .map(item=>item.text)
-          .join(' ')
-          .trim();
+        const rowLine=rowItems.slice().sort((a,b)=>a.x-b.x)
+          .map(item=>item.text).join(' ').replace(/\s+/g,' ').trim();
+        const processFromColumns=rowItems
+          .filter(item=>item.x>=viewport.width*0.10&&item.x<typeStart&&item.text!==event.anchor.text)
+          .map(item=>item.text).join(' ').trim();
+        const processMatch=rowLine.match(/^\s*\d{2}\/\d{4}\s+(\d{4}\s*\/\s*\d{2}|-)(?=\s|$)/);
+        const process=(processMatch?.[1]||processFromColumns||'').replace(/\s*\/\s*/g,'/').trim();
 
         const sourceExpenseType=zoneText(typeStart,natureStart,' ');
 
@@ -13448,6 +13592,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       state.payments=state.payments.filter(
         payment=>!removedOld.some(old=>old.id===payment.id)
       );
+
+      /* Reexecuta a conciliação também quando o relatório é importado depois do extrato. */
+      autoReconcileBankEntries();
 
       const reportRecord={
         id:reportId,
@@ -14503,7 +14650,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     ).length;
 
     const payments=state.payments.filter(payment=>
-      dashboardFieldsMatch(payment,filters)&&dashboardTemporalMatch(payment,filters)
+      payment.source!=='extrato'&&dashboardFieldsMatch(payment,filters)&&dashboardTemporalMatch(payment,filters)
     );
     const paidValue=payments.reduce((sum,payment)=>sum+Number(payment.paidValue||0),0);
     const paymentsWithoutEvidence=payments.filter(payment=>
@@ -14516,7 +14663,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const debits=bankEntries.filter(entry=>entry.movementType==='DEBITO');
     const credits=bankEntries.filter(entry=>entry.movementType==='CREDITO');
     const unmatchedDebits=debits.filter(entry=>
-      ['NAO_ENCONTRADO','PARCIAL','DIVERGENTE'].includes(bankEntryStatusMeta(entry).key)
+      !entry.reversalEntryId&&['NAO_ENCONTRADO','PARCIAL','DIVERGENTE'].includes(bankEntryStatusMeta(entry).key)
     );
     const creditsTotal=credits.reduce((sum,entry)=>sum+Number(entry.credit||0),0);
     const debitsTotal=debits.reduce((sum,entry)=>sum+Number(entry.debit||0),0);
