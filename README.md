@@ -1,4 +1,4 @@
-# TRANCELIM - v155
+# TRANCELIM - v156
 
 ## Atualização principal
 - login integrado ao Supabase Auth;
@@ -46,7 +46,8 @@ Depois abra com Ctrl+F5.
 - v154: Sistema de Prestação de Contas CG atualizado para v43 (filtros de acompanhamento), mantendo integração do portal TRANCELIM.
 
 
-## v155
+## v156
 - Sistema de Prestação de Contas CG atualizado para a versão v45.
 - Adicionada leitura dos relatórios do Conselho de Administração 2024 e do Conselho Fiscal.
 - Mantidas as correções do dashboard, a integração de login, perfil, foto e retorno ao portal.
+- Atualizado o Sistema de Prestação de Contas CG para a v46, com a função Copiar responsável.

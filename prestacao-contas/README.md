@@ -1,48 +1,25 @@
-# Sistema de Prestação de Contas CG — v45
+# Sistema de Prestação de Contas CG — v46
 
-## Novos relatórios reconhecidos
+## Rol de Responsáveis
 
-O importador do **Rol de Responsáveis pela Organização Social** agora reconhece:
+### Barra de rolagem superior
 
-### Conselho de Administração - 2024
+A tabela de responsáveis possui agora uma barra de rolagem horizontal acima do
+cabeçalho. A barra superior e a barra inferior permanecem sincronizadas.
 
-O sistema lê o relatório cadastral e identifica:
+### Copiar responsável
 
-- nome;
-- CPF;
-- e-mail funcional;
-- e-mail pessoal, quando informado;
-- telefone;
-- endereço funcional;
-- endereço residencial;
-- data de nascimento;
-- instituição ou condição representada;
-- data do Termo de Posse;
-- período do mandato.
+Foi acrescentada a ação **Copiar**.
 
-A data do Termo de Posse é criada como ato do tipo **Termo de Posse**.
-Página, publicação e documento do ato continuam pendentes quando não constarem
-no relatório.
+Ao copiar:
 
-### Cadastro dos Membros - Conselho Fiscal
+- o cadastro original não é alterado;
+- os dados pessoais são preenchidos automaticamente;
+- categoria, representação, endereços e observações são mantidos;
+- períodos de gestão são copiados;
+- atos são copiados;
+- publicações anexadas aos atos são duplicadas e vinculadas ao novo contrato;
+- o campo Contrato fica vazio para selecionar o novo vínculo.
 
-O sistema lê as tabelas por instituição e identifica os conselheiros titulares
-e suplentes, preenchendo:
-
-- nome;
-- CPF;
-- nascimento;
-- endereço comercial;
-- setor/cargo;
-- telefone ou celular;
-- e-mail comercial;
-- endereço residencial;
-- e-mail particular;
-- instituição representada;
-- condição de titular ou suplente.
-
-Os registros escritos como **SEM INDICAÇÃO** não são criados.
-
-Como o relatório do Conselho Fiscal não apresenta mandato nem ato de
-designação/publicação, esses itens permanecem como pendência para preenchimento
-na prévia editável.
+Depois, basta selecionar o outro Contrato de Gestão, fazer os ajustes
+necessários e clicar em **Salvar responsável**.

@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v45</title>
+<title>Sistema de Prestação de Contas CG — v46</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -54,6 +54,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 @media(max-width:780px){.profile-grid,.profile-users-grid{grid-template-columns:1fr}.profile-top-card{align-items:flex-start;flex-direction:column}}
 
 
+    :root{
     :root{
       --bg:#eef4f5;
       --card:#ffffff;
@@ -97,10 +98,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);margin-bottom:15px
     }
     .avatar{
-      width:42px;height:42px;min-width:42px;min-height:42px;border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;
+      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
       background:#fff;color:var(--primary);font-weight:900;border:3px solid rgba(255,255,255,.35)
     }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
     .user-card strong{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .user-card small{font-size:11px;color:rgba(255,255,255,.85)}
     .nav{display:flex;flex-direction:column;gap:6px}
@@ -677,6 +677,16 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       color:#167443;
       font-size:11px;
       font-weight:900;
+    }
+
+    #responsiblesBody td:last-child .link-btn{
+      display:block;
+      margin:0 0 7px;
+      white-space:nowrap;
+    }
+
+    #responsiblesBody td:last-child .link-btn:last-child{
+      margin-bottom:0;
     }
 
     .responsible-import-empty{
@@ -2777,7 +2787,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="avatar" id="portalSidebarAvatar"><span>U</span></div>
 <div style="min-width:0">
 <strong id="portalSidebarName">Usuário</strong>
-<small id="portalSidebarRole">Perfil</small>
+<small id="portalSidebarRole">Perfil de acesso</small>
 </div>
 </div>
 <nav class="nav">
@@ -3640,8 +3650,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </select>
 </div>
 </div>
-<div class="table-wrap" style="margin-top:16px">
-<table style="min-width:1700px">
+<div aria-label="Rolagem horizontal superior" class="payment-top-scroll" id="responsiblesTopScroll" style="margin-top:16px">
+<div class="payment-top-scroll-inner" id="responsiblesTopScrollInner"></div>
+</div>
+<div class="table-wrap" id="responsiblesTableWrap">
+<table id="responsiblesTable" style="min-width:1700px">
 <thead>
 <tr>
 <th>SACC/SCC</th>
@@ -5235,6 +5248,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   let selectedContractFile = null;
   let selectedAditivoFile = null;
   let editResponsibleId = null;
+  let copyResponsibleSourceId = null;
   let editResponsibleActId = null;
   let responsibleDraftPeriods = [];
   let responsibleDraftActs = [];
@@ -7681,6 +7695,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   window.clearResponsibleForm=function(){
     editResponsibleId=null;
+    copyResponsibleSourceId=null;
     editResponsibleActId=null;
     responsibleDraftPeriods=[];
     responsibleDraftActs=[];
@@ -7894,9 +7909,46 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     );
     if(duplicate && !confirm('Já existe esta pessoa na mesma categoria e contrato. Deseja cadastrar outro vínculo mesmo assim?'))return;
 
+    const wasCopy=Boolean(copyResponsibleSourceId&&!editResponsibleId);
     const recordId=editResponsibleId||id();
 
     for(const act of responsibleDraftActs){
+      if(act._copySourceDocumentId && !act.documentId){
+        const sourceDocument=state.documents.find(
+          document=>document.id===act._copySourceDocumentId
+        );
+
+        if(sourceDocument){
+          const documentId=id();
+          let hasFile=false;
+
+          try{
+            const sourceBlob=await getFileBlob(sourceDocument.id);
+            if(sourceBlob)hasFile=await saveFileBlob(documentId,sourceBlob);
+          }catch(error){
+            console.error(error);
+          }
+
+          state.documents.push({
+            ...sourceDocument,
+            id:documentId,
+            contractId:contract.id,
+            responsibleId:recordId,
+            actId:act.id,
+            ug:contract.ug,
+            sacc:contract.sacc,
+            contrato:contract.contrato,
+            projeto:contract.projeto,
+            hasFile,
+            createdAt:new Date().toISOString()
+          });
+
+          act.documentId=documentId;
+        }
+
+        delete act._copySourceDocumentId;
+      }
+
       if(act._file && !act.documentId){
         const documentId=id();
         let hasFile=false;
@@ -7936,7 +7988,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       cpf,nome,emailFuncional,emailPessoal,telefone,cargo,nascimento,
       enderecoFuncional,enderecoResidencial,categoria,representacao,observacao,
       periods:responsibleDraftPeriods.map(p=>({...p})),
-      acts:responsibleDraftActs.map(a=>({...a,_file:undefined})),
+      acts:responsibleDraftActs.map(a=>({
+        ...a,
+        _file:undefined,
+        _copySourceDocumentId:undefined
+      })),
       updatedAt:new Date().toISOString()
     };
 
@@ -7949,7 +8005,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const savedRecord=state.responsibles.find(item=>item.id===recordId);
     const pending=responsibleIssueList(savedRecord).length;
     alert(
-      (idx>=0?'Cadastro do responsável atualizado.':'Responsável cadastrado.')+
+      (idx>=0
+        ? 'Cadastro do responsável atualizado.'
+        : wasCopy
+          ? 'Responsável copiado para o contrato selecionado.'
+          : 'Responsável cadastrado.')+
       (pending?` ${pending} campo(s) permanecem na aba Pendências.`:' Cadastro completo.')
     );
     goPage('responsaveis');
@@ -7957,6 +8017,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   window.editResponsible=function(responsibleId){
     const r=state.responsibles.find(x=>x.id===responsibleId);if(!r)return;
+    copyResponsibleSourceId=null;
     editResponsibleId=r.id;
     responsibleDraftPeriods=(r.periods||[]).map(p=>({...p}));
     responsibleDraftActs=(r.acts||[]).map(a=>({...a}));
@@ -7977,6 +8038,55 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     responsibleContractChanged();
     renderResponsibleDraft();
     window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  window.copyResponsible=function(responsibleId){
+    const source=state.responsibles.find(item=>item.id===responsibleId);
+    if(!source)return;
+
+    editResponsibleId=null;
+    copyResponsibleSourceId=source.id;
+    editResponsibleActId=null;
+
+    const periodIdMap=new Map();
+    responsibleDraftPeriods=(source.periods||[]).map(period=>{
+      const newPeriod={...period,id:id()};
+      periodIdMap.set(period.id,newPeriod.id);
+      return newPeriod;
+    });
+
+    responsibleDraftActs=(source.acts||[]).map(act=>({
+      ...act,
+      id:id(),
+      periodId:periodIdMap.get(act.periodId)||'',
+      documentId:'',
+      _file:undefined,
+      _copySourceDocumentId:act.documentId||''
+    }));
+
+    refreshResponsibleContractOptions();
+    document.getElementById('rrContractId').value='';
+    document.getElementById('rrContractDisplay').value='Selecione o novo contrato para a cópia';
+    document.getElementById('rrCpf').value=source.cpf||'';
+    document.getElementById('rrNome').value=source.nome||'';
+    document.getElementById('rrEmailFuncional').value=source.emailFuncional||'';
+    document.getElementById('rrEmailPessoal').value=source.emailPessoal||'';
+    document.getElementById('rrTelefone').value=source.telefone||'';
+    document.getElementById('rrCargo').value=source.cargo||'';
+    document.getElementById('rrNascimento').value=source.nascimento||'';
+    document.getElementById('rrEnderecoFuncional').value=source.enderecoFuncional||'';
+    document.getElementById('rrEnderecoResidencial').value=source.enderecoResidencial||'';
+    document.getElementById('rrCategoria').value=source.categoria||'';
+    document.getElementById('rrRepresentacao').value=source.representacao||'';
+    document.getElementById('rrObservacao').value=source.observacao||'';
+
+    responsibleContractChanged();
+    renderResponsibleDraft();
+    window.scrollTo({top:0,behavior:'smooth'});
+
+    setTimeout(()=>{
+      document.getElementById('rrContractId')?.focus();
+    },350);
   }
 
   window.deleteResponsible=async function(responsibleId){
@@ -8032,12 +8142,48 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <td><span class="tag ${overall==='ativo'?'ok':overall==='futuro'?'info':overall==='pendente'?'warn':'gray'}">${periodSituationLabel(overall)}</span></td>
         <td>
           <button class="link-btn" onclick="editResponsible('${r.id}')">Editar</button>
+          <button class="link-btn" style="color:#176b92" onclick="copyResponsible('${r.id}')">Copiar</button>
           <button class="link-btn" style="color:#b42318" onclick="deleteResponsible('${r.id}')">Excluir</button>
         </td>
       </tr>`;
     }).join('')||'<tr><td colspan="11" class="empty">Nenhum responsável cadastrado para os filtros selecionados.</td></tr>';
 
     renderResponsibleDraft();
+    syncResponsibleListScrollbars();
+  }
+
+  function syncResponsibleListScrollbars(){
+    const top=document.getElementById('responsiblesTopScroll');
+    const inner=document.getElementById('responsiblesTopScrollInner');
+    const wrap=document.getElementById('responsiblesTableWrap');
+    const table=document.getElementById('responsiblesTable');
+
+    if(!top||!inner||!wrap||!table)return;
+
+    requestAnimationFrame(()=>{
+      inner.style.width=`${table.scrollWidth}px`;
+      top.scrollLeft=wrap.scrollLeft;
+    });
+
+    if(top.dataset.synchronized==='1')return;
+
+    let locked=false;
+
+    top.addEventListener('scroll',()=>{
+      if(locked)return;
+      locked=true;
+      wrap.scrollLeft=top.scrollLeft;
+      locked=false;
+    });
+
+    wrap.addEventListener('scroll',()=>{
+      if(locked)return;
+      locked=true;
+      top.scrollLeft=wrap.scrollLeft;
+      locked=false;
+    });
+
+    top.dataset.synchronized='1';
   }
 
 
@@ -14275,27 +14421,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     },filters);
   }
 
-  function dashboardReferenceDate(filters){
-    if(filters.comp){
-      const [year,month]=filters.comp.split('-').map(Number);
-      return accountabilityIso(new Date(year,month,0,12,0,0));
-    }
-    if(filters.ano)return `${filters.ano}-12-31`;
-    return todayIsoLocal();
-  }
-
-  function dashboardAccountabilityDeliveryStatus(item,referenceDate){
-    if(item.submittedDate){
-      const days=accountabilityDaysBetween(item.dueDate,item.submittedDate);
-      if(days<=0)return {key:'APRESENTADA',label:'APRESENTADA NO PRAZO',className:'ok'};
-      return {key:'APRESENTADA',label:`APRESENTADA COM ${days} DIA(S) DE ATRASO`,className:'warn'};
-    }
-    if(item.dueDate&&item.dueDate<=referenceDate){
-      return {key:'ATRASADA',label:'EM ATRASO',className:'error'};
-    }
-    return {key:'AGUARDANDO',label:'AGUARDANDO APRESENTAÇÃO',className:'info'};
-  }
-
   function dashboardIssueMatches(issue,filters){
     if(!filters.sacc&&!filters.contrato&&!filters.projeto&&!filters.ano&&!filters.comp)return true;
 
@@ -14317,33 +14442,25 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   function renderDashboard(){
     const filters=currentFilters();
     const today=todayIsoLocal();
-    const referenceDate=dashboardReferenceDate(filters);
 
     const contracts=state.contracts.filter(contract=>dashboardContractMatch(contract,filters));
     const activeContracts=contracts.filter(contract=>
       contract.situacao==='ativo'&&(!contract.fim||contract.fim>=today)
     );
 
-    // O período selecionado organiza os indicadores do mês, mas as prestações
-    // vencidas continuam acumuladas até que a data de apresentação seja informada.
-    const accountabilityScope=accountabilityAllItems().filter(item=>
-      dashboardFieldsMatch(item,filters)
-    );
-    const accountabilityItems=accountabilityScope.filter(item=>
-      dashboardTemporalMatch(item,filters)
+    const accountabilityItems=accountabilityAllItems().filter(item=>
+      dashboardFieldsMatch(item,filters)&&dashboardTemporalMatch(item,filters)
     );
     const accountabilityDelivery=accountabilityItems.map(item=>({
       item,
-      status:dashboardAccountabilityDeliveryStatus(item,referenceDate)
+      status:accountabilityDeliveryStatus(item)
     }));
     const accountabilityAnalysis=accountabilityItems.map(item=>({
       item,
       status:accountabilityAnalysisStatus(item)
     }));
 
-    const pcOverdue=accountabilityScope.filter(item=>
-      !item.submittedDate&&item.dueDate&&item.dueDate<=referenceDate
-    ).length;
+    const pcOverdue=accountabilityDelivery.filter(entry=>entry.status.key==='ATRASADA').length;
     const pcSubmitted=accountabilityDelivery.filter(entry=>entry.status.key==='APRESENTADA').length;
     const pcWaitingPresentation=accountabilityDelivery.filter(entry=>entry.status.key==='AGUARDANDO').length;
     const pcWaitingAnalysis=accountabilityAnalysis.filter(entry=>
@@ -15412,7 +15529,7 @@ Total bruto: ${money(a.proventos)}`)}
     const changed=monitorContractStatuses();
     if(changed&&getActivePageName()==='contratos')renderContracts();
   },60*60*1000);</script>
-<script data-trancelim-integration-v155>
+<script data-trancelim-integration-v156>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   const DEFAULT_PHOTO='../assets/david-profile.png';
