@@ -14,7 +14,7 @@
       --azul:#153747;
       --azul-medio:#176d98;
       --azul-claro:#eaf3f8;
-      --ciano:#50bdca;
+      --ciano:#4EBCC5;
       --turquesa:#48b8a9;
       --laranja:#f25b35;
       --laranja-2:#ff9b2f;
@@ -47,7 +47,7 @@
       justify-content:center;
       padding:80px 10% 80px 7%;
       overflow:hidden;
-      background:linear-gradient(145deg,#34b957 0%,#20a852 48%,#118444 100%);
+      background:var(--verde-2);
       clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
     }
 
@@ -57,7 +57,7 @@
       inset:0;
       background:
         linear-gradient(90deg,var(--laranja) 0 34px,transparent 34px),
-        linear-gradient(180deg,var(--turquesa) 0 15%,transparent 15% 75%,var(--ciano) 75% 100%);
+        linear-gradient(180deg,var(--verde-2) 0 15%,var(--ciano) 15% 75%,var(--verde-2) 75% 100%);
       opacity:.96;
       pointer-events:none;
     }
@@ -83,19 +83,25 @@
 
     .brand-logo-plate{
       width:100%;
-      padding:24px 28px;
-      border-radius:22px;
-      background:rgba(255,255,255,.97);
-      box-shadow:0 22px 48px rgba(0,70,37,.22);
+      padding:0;
+      border-radius:0;
+      background:transparent;
+      box-shadow:none;
     }
 
-    .brand-logo{display:block;width:100%;height:auto}
+    .brand-logo{
+      display:block;
+      width:100%;
+      height:auto;
+      filter:drop-shadow(0 10px 16px rgba(8,55,72,.15));
+    }
 
     .brand-intro{
-      max-width:470px;
+      max-width:500px;
       margin:30px auto 0;
+      transform:translateY(14px);
       font-size:14px;
-      line-height:1.55;
+      line-height:1.58;
       font-weight:650;
       text-shadow:0 1px 1px rgba(0,0,0,.12);
     }
@@ -150,6 +156,7 @@
       min-height:43px;border:0;border-radius:4px;background:linear-gradient(135deg,var(--verde),#07964c);
       color:#fff;font-weight:850;cursor:pointer;transition:filter .15s ease,transform .15s ease
     }
+    .request-button{background:linear-gradient(135deg,var(--verde),#07964c)}
     .login-button:hover{filter:brightness(1.04)}
     .login-button:active{transform:translateY(1px)}
     .login-error{min-height:17px;margin-top:10px;color:var(--erro);font-size:11px;line-height:1.35;text-align:center}
@@ -166,6 +173,31 @@
     .support-card a,.support-card span{display:block;color:#304f5e;font-size:10px;line-height:1.5;text-decoration:none;word-break:break-word}
     .support-card a:hover{text-decoration:underline}
     .login-footer{margin-top:15px;color:#8b989d;font-size:9px;text-align:center}
+
+
+    .request-modal-backdrop{
+      position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+      padding:20px;background:rgba(18,45,61,.48);
+    }
+    .request-modal-backdrop.active{display:flex}
+    .request-modal{width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;border:1px solid var(--borda);border-radius:14px;box-shadow:0 24px 64px rgba(18,45,61,.28)}
+    .request-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 22px 15px;border-bottom:1px solid #e1e9ec}
+    .request-modal-head h2{margin:0;color:var(--azul);font-size:20px}
+    .request-modal-head p{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.45}
+    .request-close{width:34px;height:34px;border:0;border-radius:9px;background:#eef3f5;color:#55707e;font-size:20px;line-height:1}
+    .request-form{padding:18px 22px 22px}
+    .request-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .request-field{margin-bottom:12px}
+    .request-field.full{grid-column:1/-1}
+    .request-field label{display:block;margin-bottom:6px;color:#465f6d;font-size:11px;font-weight:700}
+    .request-field input,.request-field select,.request-field textarea{width:100%;border:1px solid #b9cbd4;border-radius:5px;padding:10px 11px;background:#f7fafb;color:var(--texto);outline:none}
+    .request-field textarea{min-height:82px;resize:vertical}
+    .request-field input:focus,.request-field select:focus,.request-field textarea:focus{border-color:#6aa987;box-shadow:0 0 0 3px rgba(8,132,66,.08)}
+    .request-modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:6px}
+    .request-cancel{min-height:41px;padding:0 15px;border:1px solid #c8d7dd;border-radius:5px;background:#fff;color:#496575;font-weight:800}
+    .request-submit{min-height:41px;padding:0 17px;border:0;border-radius:5px;background:linear-gradient(135deg,var(--verde),#07964c);color:#fff;font-weight:850}
+    .request-message{display:none;margin-top:13px;padding:11px 12px;border:1px solid #bfe4cd;border-radius:6px;background:#eef9f2;color:#086b35;font-size:11px;line-height:1.4}
+    .request-message.active{display:block}
 
     /* PORTAL APÓS O LOGIN */
     #portalScreen{flex-direction:column;background:linear-gradient(135deg,rgba(8,132,66,.07),transparent 34%),linear-gradient(315deg,rgba(242,91,53,.06),transparent 28%),#f2f7f8}
@@ -208,9 +240,9 @@
     @media(max-width:900px){
       #loginScreen.active{flex-direction:column}
       .login-visual{width:100%;min-height:42vh;padding:52px 12vw;clip-path:none}
-      .login-visual::before{background:linear-gradient(90deg,var(--laranja) 0 18px,transparent 18px),linear-gradient(180deg,var(--turquesa) 0 18%,transparent 18% 82%,var(--ciano) 82% 100%)}
+      .login-visual::before{background:linear-gradient(90deg,var(--laranja) 0 18px,transparent 18px),linear-gradient(180deg,var(--verde-2) 0 18%,var(--ciano) 18% 82%,var(--verde-2) 82% 100%)}
       .login-visual::after{width:18px;height:18%;}
-      .brand-logo-plate{padding:18px 21px;border-radius:17px}
+      .brand-logo-plate{padding:0;border-radius:0}
       .brand-intro{margin-top:18px;font-size:12px}
       .login-access{min-height:auto;padding:34px 22px 44px}
     }
@@ -224,6 +256,7 @@
       .user-area{width:100%;justify-content:space-between}
       .user-meta{text-align:left}
       .systems,.systems.single{grid-template-columns:1fr}
+      .request-grid{grid-template-columns:1fr}
       .portal-main{padding-top:34px}
     }
   </style>
@@ -236,9 +269,9 @@
           <img class="brand-logo" src="./assets/logo-trancilim.png" alt="TRANCILIM — Sistema Integrado de Controle e Gestão">
         </div>
         <div class="brand-intro">
-          <strong>Acesso integrado aos sistemas da COAFI</strong>
-          Cada usuário visualiza somente os módulos autorizados para o seu perfil.
-          Solicitações de cadastro, alteração de acesso ou recuperação de senha devem ser encaminhadas ao administrador do sistema.
+          <strong>TRANCILIM — Sistema Integrado de Controle e Gestão</strong>
+          O TRANCILIM reúne, em um único portal, os sistemas internos da COAFI.
+          Com acesso organizado por perfil, centraliza rotinas, informações e permissões para tornar a gestão mais segura, ágil e integrada.
         </div>
       </div>
     </aside>
@@ -269,9 +302,9 @@
 
           <div class="login-actions">
             <button class="login-button" type="submit">Entrar</button>
+            <button class="login-button request-button" id="requestAccessButton" type="button">Solicitar cadastro</button>
           </div>
           <div class="login-error" id="loginError" role="alert"></div>
-          <p class="provisional-note">Versão de demonstração: a validação definitiva será vinculada ao Supabase Auth.</p>
         </form>
 
         <div class="support-card">
@@ -289,6 +322,52 @@
       </div>
     </main>
   </section>
+
+  <div class="request-modal-backdrop" id="requestModal" aria-hidden="true">
+    <div class="request-modal" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
+      <div class="request-modal-head">
+        <div>
+          <h2 id="requestModalTitle">Solicitar cadastro</h2>
+          <p>Preencha os dados. A solicitação ficará aguardando análise e aprovação do administrador.</p>
+        </div>
+        <button class="request-close" id="requestCloseButton" type="button" aria-label="Fechar">×</button>
+      </div>
+      <form class="request-form" id="requestForm">
+        <div class="request-grid">
+          <div class="request-field">
+            <label for="requestName">Nome completo</label>
+            <input id="requestName" required>
+          </div>
+          <div class="request-field">
+            <label for="requestEmail">E-mail institucional</label>
+            <input id="requestEmail" type="email" required>
+          </div>
+          <div class="request-field">
+            <label for="requestUnit">Setor / unidade</label>
+            <input id="requestUnit" required>
+          </div>
+          <div class="request-field">
+            <label for="requestModule">Módulo solicitado</label>
+            <select id="requestModule" required>
+              <option value="">Selecione</option>
+              <option value="patrimonio">Gestão Patrimonial</option>
+              <option value="prestacao-contas">Prestação de Contas CG</option>
+              <option value="ambos">Ambos os sistemas</option>
+            </select>
+          </div>
+          <div class="request-field full">
+            <label for="requestReason">Justificativa do acesso</label>
+            <textarea id="requestReason" required></textarea>
+          </div>
+        </div>
+        <div class="request-modal-actions">
+          <button class="request-cancel" id="requestCancelButton" type="button">Cancelar</button>
+          <button class="request-submit" type="submit">Enviar solicitação</button>
+        </div>
+        <div class="request-message" id="requestMessage">Solicitação registrada. Ela ficará pendente até a análise e aprovação do administrador.</div>
+      </form>
+    </div>
+  </div>
 
   <section class="screen" id="portalScreen">
     <div class="portal-top-line"></div>
@@ -386,6 +465,12 @@
     const systemsGrid = document.getElementById('systemsGrid');
     const noAccess = document.getElementById('noAccess');
     const logoutButton = document.getElementById('logoutButton');
+    const requestAccessButton = document.getElementById('requestAccessButton');
+    const requestModal = document.getElementById('requestModal');
+    const requestCloseButton = document.getElementById('requestCloseButton');
+    const requestCancelButton = document.getElementById('requestCancelButton');
+    const requestForm = document.getElementById('requestForm');
+    const requestMessage = document.getElementById('requestMessage');
 
     function normalize(value) {
       return String(value || '')
@@ -484,7 +569,45 @@
       showLogin();
     });
 
-    const query = new URLSearchParams(window.location.search);
+
+    function openRequestModal() {
+      requestMessage.classList.remove('active');
+      requestModal.classList.add('active');
+      requestModal.setAttribute('aria-hidden', 'false');
+      setTimeout(() => document.getElementById('requestName').focus(), 50);
+    }
+
+    function closeRequestModal() {
+      requestModal.classList.remove('active');
+      requestModal.setAttribute('aria-hidden', 'true');
+    }
+
+    requestAccessButton.addEventListener('click', openRequestModal);
+    requestCloseButton.addEventListener('click', closeRequestModal);
+    requestCancelButton.addEventListener('click', closeRequestModal);
+    requestModal.addEventListener('click', function(event) {
+      if (event.target === requestModal) closeRequestModal();
+    });
+
+    requestForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const requests = JSON.parse(localStorage.getItem('trancilim_access_requests') || '[]');
+      requests.push({
+        id: `request-${Date.now()}`,
+        name: document.getElementById('requestName').value.trim(),
+        email: document.getElementById('requestEmail').value.trim(),
+        unit: document.getElementById('requestUnit').value.trim(),
+        module: document.getElementById('requestModule').value,
+        reason: document.getElementById('requestReason').value.trim(),
+        status: 'PENDENTE',
+        requestedAt: new Date().toISOString()
+      });
+      localStorage.setItem('trancilim_access_requests', JSON.stringify(requests));
+      requestForm.reset();
+      requestMessage.classList.add('active');
+    });
+
+        const query = new URLSearchParams(window.location.search);
     const savedSession = readSession();
     if (savedSession) {
       showPortal(savedSession);
