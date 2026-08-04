@@ -11831,13 +11831,15 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const candidates=state.payments
       .filter(payment=>
         payment.contractId===entry.contractId&&
-        payment.competence===bankEntryReferenceCompetence(entry)
+        payment.competence===bankEntryReferenceCompetence(entry)&&
+        paymentLinkedAmount(payment.id)<=0.02
       )
       .map(payment=>({
         payment,
         score:bankPaymentCandidateScore(entry,payment).score,
-        remaining:Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id))
+        remaining:Number(payment.paidValue||0)
       }))
+      .filter(candidate=>candidate.remaining>0.02)
       .sort((a,b)=>b.score-a.score);
 
     const select=document.getElementById('bankLinkPayment');
@@ -11860,10 +11862,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     document.getElementById('bankLinkCandidates').innerHTML=candidates.length?`
       <div class="notice info">
-        ${candidates.length} pagamento(s) da mesma competência foram localizados.
+        ${candidates.length} pagamento(s) sem vínculo da mesma competência foram localizados.
         Os mais prováveis aparecem primeiro.
       </div>`:
-      '<div class="notice warn">Nenhum pagamento da mesma competência foi localizado.</div>';
+      '<div class="notice warn">Nenhum pagamento sem vínculo foi localizado nesta competência.</div>';
 
     renderBankExistingLinks();
     document.getElementById('bankLinkModal').classList.add('open');
