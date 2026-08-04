@@ -30,7 +30,7 @@
 </script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=167">
+<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=179">
 <title>Sistema de Gestão Patrimonial - SGP</title>
 <style>
 
@@ -44,6 +44,7 @@ button,.primary,.secondary,.delete-btn,.refresh-btn,.btn,.nav button,.actions-ro
   font-weight:800 !important;
 }
 .header-title-logo,.side-head{cursor:pointer}
+
 :root{
   --verde:#18a83a;
   --verde-escuro:#087a32;
@@ -4813,6 +4814,54 @@ button.doc-link-v106:hover,
 }
 @media(max-width:1000px){
   .v125-report .cards{grid-template-columns:1fr}
+}
+
+
+/* v128 - código do item do catálogo + justificativa de divergência */
+.v128-base-info{
+  margin:10px 0 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#eefaf5;
+  border:1px solid #c9eddc;
+  color:#075d32;
+  font-weight:900;
+  font-size:12px;
+}
+.v128-just-box{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid #f2d1a7;
+  background:#fff8ef;
+  border-radius:14px;
+}
+.v128-just-box label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-weight:900;
+  color:#7a4200;
+}
+.v128-just-box textarea{
+  width:100%;
+  min-height:78px;
+  resize:vertical;
+  border-radius:12px;
+}
+.v128-th-codigo,
+.v128-td-codigo{
+  min-width:150px;
+}
+.v128-codigo-input{
+  min-width:135px;
+}
+.v128-entrada-nf{
+  color:#075d32;
+  font-weight:950;
+}
+.v128-divergencia-ok{
+  color:#075d32;
+  font-weight:950;
 }
 
 </style>
@@ -31127,6 +31176,320 @@ function depAcumuladaTotalAteMesAnterior(){
 
 </script>
 
+<script>
+
+(function(){
+  // v128 - Cadastro por lote: Código do item do catálogo + justificativa de divergência.
+  // Regra: valor de entrada dos bens sempre usa a NF como base; NE global e OF podem divergir com justificativa.
+
+  function esc128(v){
+    return String(v ?? "").replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]));
+  }
+  function parseBR128(v){
+    try{return parseNumeroBR(v);}catch(e){return Number(String(v||"").replace(/[R$\s]/g,"").replace(/\./g,"").replace(",", ".")) || 0;}
+  }
+  function fmt128(n){
+    n = Number(n || 0);
+    return n.toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function moeda128(n){
+    try{return moeda(n);}catch(e){return "R$ " + fmt128(n);}
+  }
+  function normPat128(v){ return String(v ?? "").trim(); }
+  function normNF128(v){ return String(v || "").replace(/\D/g,"").replace(/^0+/,"") || String(v || "").trim(); }
+  function normNE128(v){ return String(v || "").trim().toUpperCase(); }
+  function valorEq128(a,b){ return Math.abs(Number(a||0)-Number(b||0)) < 0.02; }
+
+  function extCache128(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+  function saveExtCache128(c){try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(c || {}));}catch(e){}}
+
+  function garantirCampoJustificativa128(){
+    const conf = document.getElementById("conferenciaV100");
+    if(!conf) return;
+    if(!document.getElementById("justDivergenciaV128")){
+      conf.insertAdjacentHTML("afterend", `
+        <div class="v128-base-info">Valor de entrada/base de incorporação: <span class="v128-entrada-nf">Nota Fiscal</span>. A NE pode ser global e a NF parcial; quando houver diferença, registre a justificativa abaixo.</div>
+        <div class="v128-just-box">
+          <label>Justificativa quando houver diferença entre NF, NE, OF e/ou itens
+            <textarea id="justDivergenciaV128" placeholder="Ex.: Empenho global; esta NF é parcial da aquisição. O valor de entrada no patrimônio será o valor da Nota Fiscal."></textarea>
+          </label>
+        </div>
+      `);
+    }
+    const nfLabel = document.querySelector('label:has(#nfValorV100) span');
+    if(nfLabel && !/base/i.test(nfLabel.textContent || "")) nfLabel.textContent = "Valor total da NF (base da entrada)";
+  }
+
+  function garantirTabelaItens128(){
+    const table = document.querySelector("#itensBodyV100")?.closest("table");
+    if(!table) return;
+    const headRow = table.querySelector("thead tr");
+    if(headRow && !headRow.querySelector(".v128-th-codigo")){
+      const th = document.createElement("th");
+      th.className = "v128-th-codigo";
+      th.textContent = "Cód. item catálogo";
+      headRow.insertBefore(th, headRow.children[1] || null);
+    }
+    document.querySelectorAll("#itensBodyV100 tr").forEach(tr=>{
+      if(!tr.querySelector(".itemCodCatalogoV128") && tr.children.length){
+        const td = document.createElement("td");
+        td.className = "v128-td-codigo";
+        td.innerHTML = `<input class="itemCodCatalogoV128 v128-codigo-input" value="${esc128(tr.dataset.codCatalogo || "")}" placeholder="Código do item">`;
+        tr.insertBefore(td, tr.children[1] || null);
+      }
+    });
+  }
+
+  function itensForm128(){
+    return [...document.querySelectorAll("#itensBodyV100 tr")].map((tr,idx)=>({
+      idx,
+      codigoItemCatalogo: tr.querySelector(".itemCodCatalogoV128")?.value?.trim() || tr.dataset.codCatalogo || "",
+      desc: tr.querySelector(".itemDesc")?.value?.trim() || "",
+      qtd: Math.max(1, parseInt(tr.querySelector(".itemQtd")?.value || "1", 10) || 1),
+      valorUnit: parseBR128(tr.querySelector(".itemUnit")?.value || "0"),
+      valorTotal: parseBR128(tr.querySelector(".itemTotal")?.value || "0")
+    })).filter(i=>i.desc);
+  }
+
+  window.addItemV100 = function(item={}){
+    const tbody=document.getElementById("itensBodyV100");
+    if(!tbody) return;
+    garantirTabelaItens128();
+    const n=tbody.querySelectorAll("tr").length+1;
+    const cod = item.codigoItemCatalogo || item.codItem || item.codigo || item.cod || "";
+    tbody.insertAdjacentHTML("beforeend",`<tr data-cod-catalogo="${esc128(cod)}">
+      <td>${n}</td>
+      <td class="v128-td-codigo"><input class="itemCodCatalogoV128 v128-codigo-input" value="${esc128(cod)}" placeholder="Código do item" oninput="gerarBensV100(false)"></td>
+      <td><input class="itemDesc" value="${esc128(item.desc||"")}" oninput="gerarBensV100(false)" placeholder="Descrição até UNIDADE"></td>
+      <td><input class="itemQtd" type="number" min="1" value="${esc128(item.qtd||1)}" oninput="calcItemTotalV100(this);gerarBensV100(true)"></td>
+      <td><input class="itemUnit" value="${esc128(item.valorUnit?fmt128(item.valorUnit):"")}" oninput="calcItemTotalV100(this);gerarBensV100(false)"></td>
+      <td><input class="itemTotal" value="${esc128(item.valorTotal?fmt128(item.valorTotal):"")}" oninput="calcItemUnitV100(this);gerarBensV100(false)"></td>
+      <td><button type="button" onclick="this.closest('tr').remove();renumItensV100();gerarBensV100(true)">Remover</button></td>
+    </tr>`);
+    garantirTabelaItens128();
+  };
+
+  window.renumItensV100 = function(){
+    [...document.querySelectorAll("#itensBodyV100 tr")].forEach((tr,i)=>{ if(tr.children[0]) tr.children[0].textContent=i+1; });
+  };
+
+  window.aplicarItensV100 = function(itens){
+    const tbody=document.getElementById("itensBodyV100");
+    if(!tbody) return;
+    tbody.innerHTML="";
+    (itens && itens.length ? itens : [{desc:"",qtd:1}]).forEach(item=>window.addItemV100(item));
+    garantirTabelaItens128();
+    gerarBensV100(true);
+  };
+
+  window.gerarBensV100 = function(recriar=true){
+    const tbody=document.getElementById("bensBodyV100");
+    if(!tbody) return;
+    garantirTabelaItens128();
+    garantirCampoJustificativa128();
+    const inicial=document.getElementById("tomboInicialV100")?.value || (typeof proxTombo === "function" ? proxTombo() : "000001");
+    const sit=document.getElementById("sitPadraoV100")?.value || "Em uso";
+    const itens=itensForm128();
+    const antigos=[];
+    tbody.querySelectorAll("tr").forEach((tr,idx)=>antigos[idx]={
+      pat:tr.querySelector(".bemPat")?.value||"",
+      setor:tr.querySelector(".bemSetor")?.value||"",
+      resp:tr.querySelector(".bemResp")?.value||"",
+      sit:tr.querySelector(".bemSit")?.value||sit
+    });
+    let html="", seq=0;
+    itens.forEach((item,g)=>{
+      for(let i=0;i<item.qtd;i++){
+        const old=antigos[seq]||{};
+        let pat="";
+        try{ pat=recriar?gerarTombo(inicial,seq):(old.pat||gerarTombo(inicial,seq)); }
+        catch(e){ pat = /^\d+$/.test(String(inicial)) ? String(Number(inicial)+seq).padStart(String(inicial).length,"0") : (seq?`${inicial}-${seq+1}`:inicial); }
+        html+=`<tr data-cod-catalogo="${esc128(item.codigoItemCatalogo||"")}">
+          <td>${seq+1}</td><td>${g+1}</td>
+          <td><input class="bemPat" value="${esc128(pat)}"></td>
+          <td><input class="bemDesc" value="${esc128(item.desc)}"></td>
+          <td><input class="bemValor" value="${esc128(fmt128(item.valorUnit||0))}"><input type="hidden" class="bemCodCatalogoV128" value="${esc128(item.codigoItemCatalogo||"")}"></td>
+          <td><input class="bemSetor" value="${esc128(old.setor||"")}" placeholder="Setor"></td>
+          <td><input class="bemResp" value="${esc128(old.resp||"")}" placeholder="Responsável"></td>
+          <td><select class="bemSit">${["Em uso","A depreciar","Totalmente depreciado","Em ajuste","Baixado"].map(x=>`<option ${x===(old.sit||sit)?"selected":""}>${x}</option>`).join("")}</select></td>
+        </tr>`;
+        seq++;
+      }
+    });
+    tbody.innerHTML = html || `<tr><td colspan="8" class="empty">Informe os itens da aquisição.</td></tr>`;
+    compararDocs();
+  };
+
+  window.compararDocs = function(){
+    const nfVal=parseBR128(document.getElementById("nfValorV100")?.value||"0");
+    const neVal=parseBR128(document.getElementById("neValorV100")?.value||"0");
+    const ofVal=parseBR128(document.getElementById("ofValorV100")?.value||"0");
+    const totalItens=itensForm128().reduce((s,i)=>s+(i.valorTotal || i.qtd*i.valorUnit),0);
+    const just=(document.getElementById("justDivergenciaV128")?.value||"").trim();
+    const arr=[];
+    const okNF = nfVal>0 && valorEq128(nfVal,totalItens);
+    const okNE = !neVal || valorEq128(neVal,totalItens) || !!just;
+    const okOF = !ofVal || valorEq128(ofVal,totalItens) || !!just;
+
+    if(okNF && okNE && okOF){
+      arr.push(just ? "Confirmado com justificativa: NF é a base da entrada e a diferença da NE/OF foi justificada." : "Confirmado: NF, itens e valores conferem. Valor de entrada pela Nota Fiscal.");
+    }else{
+      if(!okNF) arr.push(`Divergência: NF ${moeda128(nfVal)} x itens ${moeda128(totalItens)}. Ajuste os itens, pois a base da entrada é a NF.`);
+      if(neVal && !valorEq128(neVal,totalItens)) arr.push(just ? `Diferença justificada: NE ${moeda128(neVal)} x itens/NF ${moeda128(totalItens)}.` : `Atenção: NE ${moeda128(neVal)} x itens ${moeda128(totalItens)}. Se a NE for global, preencha a justificativa.`);
+      if(ofVal && !valorEq128(ofVal,totalItens)) arr.push(just ? `Diferença justificada: OF ${moeda128(ofVal)} x itens/NF ${moeda128(totalItens)}.` : `Atenção: OF ${moeda128(ofVal)} x itens ${moeda128(totalItens)}. Preencha a justificativa se for parcial/global.`);
+      if(!neVal) arr.push("Atenção: valor da NE não identificado/preenchido.");
+      if(!ofVal) arr.push("Atenção: valor da OF não identificado/preenchido.");
+    }
+    const neNum=document.getElementById("neNumeroV100")?.value||"";
+    const ofEmp=document.getElementById("ofEmpenhoV100")?.value||"";
+    if(neNum && ofEmp && neNum.replace(/^0+/,"") !== ofEmp.replace(/^0+/,"")) arr.push(`Divergência: NE ${neNum} x empenho da OF ${ofEmp}.`);
+    const el=document.getElementById("conferenciaV100");
+    if(el){
+      el.textContent=arr.join("\n");
+      el.className="status-v100 " + (arr[0]?.startsWith("Confirmado") || just ? "" : "warn");
+    }
+  };
+
+  async function salvarExtSupabaseV128(ext){
+    const key=normPat128(ext?.numero_patrimonial);
+    if(!key) return;
+    const cache=extCache128();
+    const anterior=cache[key] || {};
+    cache[key] = {
+      ...anterior,
+      codigoItemCatalogo: ext.codigoItemCatalogo !== undefined ? (ext.codigoItemCatalogo || anterior.codigoItemCatalogo || "") : (anterior.codigoItemCatalogo || ""),
+      justificativaDivergencia: ext.justificativaDivergencia !== undefined ? (ext.justificativaDivergencia || anterior.justificativaDivergencia || "") : (anterior.justificativaDivergencia || ""),
+      valorEntradaNF: ext.valorEntradaNF !== undefined ? ext.valorEntradaNF : anterior.valorEntradaNF,
+      valorNE: ext.valorNE !== undefined ? ext.valorNE : anterior.valorNE,
+      valorOF: ext.valorOF !== undefined ? ext.valorOF : anterior.valorOF,
+      valorItens: ext.valorItens !== undefined ? ext.valorItens : anterior.valorItens
+    };
+    saveExtCache128(cache);
+
+    // Mantém compatibilidade com versões sem as novas colunas.
+    if(typeof salvarExtSupabaseV95 === "function"){
+      await salvarExtSupabaseV95({
+        numero_patrimonial:key,
+        notaEmpenho:ext.notaEmpenho || anterior.notaEmpenho || "",
+        categoriaPrincipal:ext.categoriaPrincipal || anterior.categoriaPrincipal || "",
+        categoriaSecundaria:ext.categoriaSecundaria || anterior.categoriaSecundaria || "",
+        depreciavel:ext.depreciavel !== false,
+        fornecedor:ext.fornecedor || anterior.fornecedor || "",
+        cnpj:ext.cnpj || anterior.cnpj || ""
+      });
+    }
+
+    try{
+      if(!window.supabaseClient) return;
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if(!session?.user) return;
+      const payload={
+        numero_patrimonial:key,
+        codigo_item_catalogo: cache[key].codigoItemCatalogo || null,
+        justificativa_divergencia: cache[key].justificativaDivergencia || null,
+        valor_entrada_nf: cache[key].valorEntradaNF || null,
+        valor_ne: cache[key].valorNE || null,
+        valor_of: cache[key].valorOF || null,
+        valor_itens: cache[key].valorItens || null,
+        atualizado_em: new Date().toISOString()
+      };
+      const { error } = await supabaseClient.from("bens_patrimoniais_ext").upsert(payload, { onConflict:"numero_patrimonial" });
+      if(error) console.warn("Campos v128 não enviados à base. Rode o script SQL v128 se quiser compartilhar esses campos:", error);
+    }catch(e){ console.warn("Campos v128 ficaram locais; base ainda precisa do script SQL:", e); }
+  }
+
+  function capturarExtrasLote128(){
+    const nfVal=parseBR128(document.getElementById("nfValorV100")?.value||"0");
+    const neVal=parseBR128(document.getElementById("neValorV100")?.value||"0");
+    const ofVal=parseBR128(document.getElementById("ofValorV100")?.value||"0");
+    const totalItens=itensForm128().reduce((s,i)=>s+(i.valorTotal || i.qtd*i.valorUnit),0);
+    const just=(document.getElementById("justDivergenciaV128")?.value||"").trim();
+    const cp=document.getElementById("catPrincV100")?.value||"";
+    const cs=document.getElementById("catSecV100")?.value||"";
+    const fornecedor=document.getElementById("fornecedorV100")?.value?.trim()||"";
+    const cnpj=document.getElementById("cnpjV100")?.value?.trim()||"";
+    const ne=document.getElementById("neNumeroV100")?.value?.trim() || document.getElementById("ofEmpenhoV100")?.value?.trim() || "";
+    const rows=[...document.querySelectorAll("#bensBodyV100 tr")].filter(r=>r.querySelector(".bemPat"));
+    return rows.map(r=>({
+      numero_patrimonial:r.querySelector(".bemPat")?.value?.trim()||"",
+      codigoItemCatalogo:r.querySelector(".bemCodCatalogoV128")?.value?.trim() || r.dataset.codCatalogo || "",
+      justificativaDivergencia:just,
+      valorEntradaNF:nfVal,
+      valorNE:neVal,
+      valorOF:ofVal,
+      valorItens:totalItens,
+      notaEmpenho:ne,
+      categoriaPrincipal:cp,
+      categoriaSecundaria:cs,
+      depreciavel:cs !== "Obras de arte",
+      fornecedor,
+      cnpj
+    })).filter(x=>x.numero_patrimonial);
+  }
+
+  const salvarLoteAnteriorV128 = window.salvarLotePatrimonialV100;
+  window.salvarLotePatrimonialV100 = async function(){
+    garantirCampoJustificativa128();
+    garantirTabelaItens128();
+    const nfVal=parseBR128(document.getElementById("nfValorV100")?.value||"0");
+    const neVal=parseBR128(document.getElementById("neValorV100")?.value||"0");
+    const ofVal=parseBR128(document.getElementById("ofValorV100")?.value||"0");
+    const totalItens=itensForm128().reduce((s,i)=>s+(i.valorTotal || i.qtd*i.valorUnit),0);
+    const just=(document.getElementById("justDivergenciaV128")?.value||"").trim();
+    if((neVal && !valorEq128(neVal,totalItens) || ofVal && !valorEq128(ofVal,totalItens)) && !just){
+      alert("Existe diferença entre NF/itens e NE/OF. Como o empenho pode ser global e a NF parcial, preencha a justificativa antes de salvar.");
+      return;
+    }
+    if(nfVal && totalItens && !valorEq128(nfVal,totalItens)){
+      alert("O valor dos itens precisa fechar com a Nota Fiscal, porque a entrada patrimonial será pela NF. Ajuste os itens/quantidades/valores.");
+      return;
+    }
+    const extras=capturarExtrasLote128();
+    if(typeof salvarLoteAnteriorV128 === "function") await salvarLoteAnteriorV128();
+    for(const ex of extras) await salvarExtSupabaseV128(ex);
+  };
+
+  function initLoteV128(){
+    garantirCampoJustificativa128();
+    garantirTabelaItens128();
+    compararDocs();
+  }
+
+  const abrirCadastroAnteriorV128 = window.abrirCadastro;
+  window.abrirCadastro = function(pat=null){
+    if(typeof abrirCadastroAnteriorV128 === "function") abrirCadastroAnteriorV128(pat);
+    if(!pat){
+      setTimeout(initLoteV128, 80);
+      setTimeout(initLoteV128, 400);
+    }
+  };
+
+  // Quando NF/NE/OF preencherem itens depois da leitura, garante que o código vindo da OF apareça.
+  const lerOFAnteriorV128 = window.lerOFV100;
+  window.lerOFV100 = async function(){
+    if(typeof lerOFAnteriorV128 === "function") await lerOFAnteriorV128();
+    setTimeout(initLoteV128, 80);
+  };
+  const lerNFAnteriorV128 = window.lerNFV100;
+  window.lerNFV100 = async function(){
+    if(typeof lerNFAnteriorV128 === "function") await lerNFAnteriorV128();
+    setTimeout(initLoteV128, 80);
+  };
+  const lerNEAnteriorV128 = window.lerNEV100;
+  window.lerNEV100 = async function(){
+    if(typeof lerNEAnteriorV128 === "function") await lerNEAnteriorV128();
+    setTimeout(initLoteV128, 80);
+  };
+
+  setInterval(()=>{
+    if(document.getElementById("itensBodyV100")) initLoteV128();
+  }, 1500);
+})();
+
+</script>
 <script data-trancilim-patrimonio-integration>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';

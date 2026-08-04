@@ -1,4 +1,4 @@
-# TRANCELIM v178
+# TRANCELIM v179
 
 - Prestação de Contas CG atualizada para a versão integrada v171.
 - Aba Execução da Receita e Despesa corrigida para buscar saldo anterior e totais consolidados da Relação de Pagamentos.
@@ -8,7 +8,7 @@
 - Login, portal, Patrimônio, perfil, foto, favicon e navegação preservados.
 - Nenhum dado é apagado por esta atualização.
 
-## Atualização v178 — Encerramento Mensal
+## Atualização v179 — Encerramento Mensal
 - O botão “Copiar despacho” copia somente o destinatário, o corpo e a assinatura selecionados, sem De, Para, Data, Assunto ou NUP.
 - Alterar o NUP atualiza automaticamente o WhatsApp e os demais campos do modelo que utilizem o NUP.
 - Cada processo da UG na competência vale 1 ponto no percentual: processo aberto fica pendente e processo concluído fica realizado.
@@ -151,3 +151,6 @@ Depois abra com Ctrl+F5.
 - Encerramento Mensal: SEM, navegação padronizada e despacho Montserrat Normal 11.
 - Botão Copiar despacho corrigido com cópia rica e fallback.
 - Cabeçalho institucional abre o dashboard interno; marca do sistema retorna ao portal.
+
+
+Atualização v179: Sistema de Gestão Patrimonial integrado na versão v128, preservando login único, perfil, foto, favicon e navegação do portal.
