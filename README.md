@@ -1,3 +1,13 @@
+# TRANCELIM v184
+
+- Sistema de Gestão Patrimonial atualizado para a v133.
+- A tabela Depreciação Mensal agora exibe a coluna “Início da requisição”.
+- A coluna “Depr. Acum.” passa a calcular a depreciação dos exercícios anteriores até 31/12 do ano anterior ao exercício selecionado.
+- Bens iniciados em 2024 e 2025 deixam de aparecer com depreciação acumulada zerada quando houver data de início e base depreciável.
+- O cálculo respeita valor residual, taxa, data de início e saldo acumulado informado, sem reduzir o bem abaixo do residual.
+- Competência persistente, OCR de NF/OF, edição completa e demais módulos preservados.
+- Nenhum dado cadastrado é apagado.
+
 # TRANCELIM v182
 
 - Sistema de Gestão Patrimonial atualizado para a v131.
@@ -169,3 +179,6 @@ Atualização v180: Sistema de Gestão Patrimonial integrado na versão v128, pr
 - OCR automático em Nota Fiscal e Ordem de Fornecimento digitalizadas.
 - Itens, quantidades, valores e código de item da OF são levados para “Itens diferentes da aquisição”.
 - OCR é usado apenas quando o PDF não possui texto pesquisável.
+
+
+Atualização v185/v134: correção do salvamento do tombo na edição completa; migração dos dados complementares para o novo número patrimonial; validação de tombo duplicado; retorno à lista de bens após salvar.
