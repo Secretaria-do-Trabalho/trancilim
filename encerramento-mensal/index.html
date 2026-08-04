@@ -13,8 +13,8 @@
 </script>
 
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=167">
-<title>TRANCELIM — Sistema de Encerramento Mensal</title>
+<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=168">
+<title>TRANCILIM - Encerramento Mensal</title>
 <style>
 :root{--green:#087a38;--green2:#05672f;--green3:#15a64a;--nav:#075e32;--nav2:#0b4f3f;--orange:#ff641f;--cyan:#70c5d3;--teal:#4ab7ad;--blue:#063b5c;--blue2:#075c86;--bg:#eff7f6;--card:#fff;--text:#082c47;--muted:#63798c;--border:#d6e5e7;--danger:#c3342f;--shadow:0 14px 34px rgba(15,64,73,.10)}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:260px 1fr}.sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#087f3d 0%,#066b35 52%,#075a48 100%);color:white;padding:24px 16px;overflow:hidden}.brand{display:flex;gap:13px;align-items:center;margin-bottom:24px}.brandmark{width:49px;height:49px;border-radius:16px;background:linear-gradient(135deg,#0aa24b,#58c8c1);display:grid;place-items:center;font-weight:950;font-size:16px;box-shadow:0 8px 18px rgba(0,0,0,.13)}.brand h1{font-size:19px;line-height:1.2;margin:0}.brand p{font-size:12px;margin:5px 0 0}.user-card{display:flex;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.23);background:rgba(255,255,255,.10);padding:10px;border-radius:18px;margin-bottom:14px}.avatar{width:42px;height:42px;border-radius:50%;background:white;color:var(--green);display:grid;place-items:center;font-weight:900;border:2px solid rgba(255,255,255,.75)}.user-card strong{display:block;font-size:13px;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-card small{font-size:10px}.nav{display:grid;gap:7px}.nav button{border:0;background:transparent;color:white;text-align:left;padding:12px 14px;border-radius:12px;cursor:pointer;font-weight:800;display:flex;gap:11px;align-items:center}.nav button:hover,.nav button.active{background:white;color:var(--green2)}.nav-icon{width:17px;text-align:center}.status-box{position:absolute;left:16px;right:16px;bottom:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.17);border-radius:18px;padding:14px;font-size:11px}.status-box strong{display:block;font-size:13px;margin-top:7px}.main{min-width:0}.stripe{height:13px;display:grid;grid-template-columns:7% 10% 19% 28% 20% 16%}.stripe i:nth-child(1){background:var(--orange)}.stripe i:nth-child(2){background:var(--cyan);clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}.stripe i:nth-child(3){background:#fff}.stripe i:nth-child(4){background:#159c3a;clip-path:polygon(4% 0,100% 0,96% 100%,0 100%)}.stripe i:nth-child(5){background:#29aa83}.stripe i:nth-child(6){background:var(--teal)}
@@ -177,22 +177,9 @@ input:focus,select:focus,textarea:focus{outline:3px solid rgba(73,183,170,.18);b
 }
 
 
-/* ===== Fluxos de Processos e Despachos — v25 ===== */
+/* ===== Fluxos de Processos e Despachos — v26 ===== */
 html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layout,.conf-layout>div,.card{min-width:0}.content{overflow-x:hidden}
 .conf-table-wrap{overflow-x:auto;scrollbar-width:none}.conf-table-wrap::-webkit-scrollbar{height:0}.conf-table-scroll-top{display:block!important;margin:2px 0 12px;height:16px}
-/* Ajustes v166: barra lateral fixa e correções visuais do Encerramento Mensal */
-@media (min-width:981px){
-  .app{display:block;min-height:100vh}
-  .sidebar{position:fixed!important;left:0;top:0;bottom:0;width:320px;height:100vh;overflow-y:auto;overflow-x:hidden;z-index:30;padding:28px 18px 110px}
-  .main{margin-left:320px;min-width:0}
-  .topbar{top:0;z-index:20}
-  .content{max-width:none;margin:0;padding:28px 26px 45px}
-  .report-layout{grid-template-columns:minmax(280px,300px) minmax(0,1fr);gap:18px}
-  .report-controls{position:sticky;top:108px}
-}
-@media (max-width:980px){
-  .main{margin-left:0}
-}
 .workflow-toolbar{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}.workflow-filters{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;flex:1}.workflow-kpis{margin-bottom:18px}.section-note{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.45}.workflow-table{min-width:1080px}.process-table{min-width:1760px}.workflow-table td{vertical-align:top}.workflow-table .cell-text{max-width:250px;line-height:1.38}.workflow-table .cell-message{max-width:300px;white-space:normal;line-height:1.38}.workflow-table .cell-actions{display:flex;gap:6px;flex-wrap:wrap}.workflow-template-card{margin-top:18px}.template-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:12px}.template-item{border:1px solid var(--border);border-radius:16px;padding:14px;background:#f9fcfc}.template-item h4{margin:0 0 5px;font-size:14px}.template-item p{margin:0 0 8px;color:var(--muted);font-size:12px;line-height:1.42}.template-item .template-meta{font-size:11px;color:#718796;margin-bottom:10px}.workflow-modal{width:min(920px,calc(100vw - 32px))}.workflow-check{display:flex!important;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid #d7e6e8;border-radius:14px;background:#f6fbfa;font-weight:700!important;line-height:1.4}.workflow-check input{width:18px;height:18px;min-height:0;margin-top:1px}.workflow-preview{font-family:"Times New Roman",serif;color:#111;line-height:1.55;background:#fff;border:1px solid #dfe7e9;border-radius:12px;padding:32px;white-space:pre-wrap}.workflow-preview h2{text-align:center;margin:0 0 26px}.workflow-preview .preview-subject{margin:18px 0}.workflow-preview .preview-sign{text-align:center;margin-top:54px;font-weight:bold}.copy-button{white-space:nowrap}.deadline-ok{font-weight:800;color:#087a38}.deadline-late{font-weight:800;color:#c3342f}
 @media(max-width:1150px){.workflow-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.template-grid{grid-template-columns:1fr}}
 @media(max-width:720px){.workflow-toolbar{align-items:stretch;flex-direction:column}.workflow-filters{grid-template-columns:1fr}}
@@ -200,6 +187,18 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 
 .workflow-field-help{display:block;margin-top:7px;color:var(--muted);font-size:11px;line-height:1.45;font-weight:500}
 #process-subject,#dispatch-subject{background:#fff!important;cursor:text!important}
+
+/* Integração TRANCELIM v168: barra lateral fixa e layout preservado */
+@media (min-width:981px){
+  .app{display:block;min-height:100vh}
+  .sidebar{position:fixed!important;left:0;top:0;bottom:0;width:292px;height:100vh;overflow-y:auto;overflow-x:hidden;z-index:30;padding-bottom:110px}
+  .main{margin-left:292px;min-width:0}
+  .topbar{top:0;z-index:20}
+  .content{max-width:none;margin:0;padding:28px 26px 45px}
+  .report-layout{grid-template-columns:minmax(280px,300px) minmax(0,1fr);gap:18px}
+  .report-controls{position:sticky;top:108px}
+}
+@media (max-width:980px){.main{margin-left:0}}
 </style>
 </head>
 <body>
@@ -325,12 +324,6 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 const STORAGE='trancilim_encerramento_v2';
 const initial={ugs:[{id:'ug-set',code:'590001',acronym:'SET',name:'SECRETARIA DO TRABALHO',owner:'SECRETARIA DO TRABALHO',active:true},{id:'ug-fet',code:'560901',acronym:'FET',name:'FUNDO ESTADUAL DO TRABALHO - FET',owner:'SECRETARIA DO TRABALHO',active:true},{id:'ug-fimpc',code:'561001',acronym:'FIMPC',name:'FIMPC',owner:'SECRETARIA DO TRABALHO',active:true},{id:'ug-ferdt',code:'590101',acronym:'FERDT',name:'FERDT',owner:'SECRETARIA DO TRABALHO',active:true}],accounts:[],responsibles:[],snapshots:[],anexo3Docs:{},anexo3Closed:{}};
 let state=JSON.parse(localStorage.getItem(STORAGE)||'null')||structuredClone(initial),currentUgId=null;state.ugs=state.ugs||[];state.accounts=state.accounts||[];state.responsibles=state.responsibles||[];state.snapshots=state.snapshots||[];state.anexo3Docs=state.anexo3Docs||{};state.anexo3Closed=state.anexo3Closed||{};
-(function ensureDefaultUgLabels(){const versionKey='trancelim_encerramento_ug_defaults_v166';if(localStorage.getItem(versionKey))return;const defaults={
-'ug-set':{code:'590001',acronym:'SET',name:'SECRETARIA DO TRABALHO',owner:'SECRETARIA DO TRABALHO'},
-'ug-fet':{code:'560901',acronym:'FET',name:'FUNDO ESTADUAL DO TRABALHO - FET',owner:'SECRETARIA DO TRABALHO'},
-'ug-fimpc':{code:'561001',acronym:'FIMPC',name:'FIMPC',owner:'SECRETARIA DO TRABALHO'},
-'ug-ferdt':{code:'590101',acronym:'FERDT',name:'FERDT',owner:'SECRETARIA DO TRABALHO'}
-};let changed=false;Object.entries(defaults).forEach(([id,data])=>{const ug=state.ugs.find(x=>x.id===id);if(ug){['code','acronym','name','owner'].forEach(k=>{if(!ug[k]||ug[k]===id||ug[k]==='UNIDADE GESTORA'){ug[k]=data[k];changed=true;}})}else{state.ugs.push({id,active:true,...data});changed=true;}});if(changed)localStorage.setItem(STORAGE,JSON.stringify(state));localStorage.setItem(versionKey,'1');})();
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
 const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 function uid(p){return p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}function persist(){localStorage.setItem(STORAGE,JSON.stringify(state))}function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function statusHtml(on){return `<span class="status ${on?'':'off'}"><i class="dot"></i>${on?'Ativa':'Inativa'}</span>`}function formatRef(ref){const [y,m]=ref.split('-');return `${m}/${y}`}function activeInRef(a,ref){if(!a.active)return false;const start=ref+'-01',end=ref+'-31';return(!a.start||a.start<=end)&&(!a.end||a.end>=start)}function makeLine(u,a,type){return{ug:u.code,bank:a.bank,agency:a.agency,operation:a.operation||'',account:a.number,name:a.name,owner:a.owner,type,mark:a.mark}}function linesForUg(ugId,ref){const u=state.ugs.find(x=>x.id===ugId);if(!u)return[];const r=[];state.accounts.filter(a=>a.ugId===ugId&&activeInRef(a,ref)).forEach(a=>{if(a.current)r.push(makeLine(u,a,'Conta Corrente'));if(a.investment)r.push(makeLine(u,a,'Investimento'))});return r}
@@ -360,10 +353,17 @@ function fillReportUgs(){const s=document.getElementById('report-ug'),old=s.valu
 function saveSnapshot(){const ugId=document.getElementById('report-ug').value,ref=document.getElementById('report-ref').value,u=state.ugs.find(x=>x.id===ugId),rows=linesForUg(ugId,ref),i=state.snapshots.findIndex(s=>s.ugId===ugId&&s.ref===ref);const snap={id:i>=0?state.snapshots[i].id:uid('snap'),ugId,ref,rows,createdAt:new Date().toISOString()};if(i>=0){if(!confirm('Substituir o fechamento já salvo?'))return;state.snapshots[i]=snap}else state.snapshots.push(snap);persist();renderAll();toast('Referência fechada.')}function renderHistory(){const ugId=document.getElementById('report-ug').value,list=state.snapshots.filter(s=>s.ugId===ugId).sort((a,b)=>b.ref.localeCompare(a.ref));document.getElementById('history-list').innerHTML=list.map(s=>`<div class="history-item"><div><strong>${formatRef(s.ref)}</strong><br>${s.rows.length} linha(s)</div><button class="btn small danger" onclick="deleteSnapshot('${s.id}')">Excluir</button></div>`).join('')||'<div class="report-note">Nenhum fechamento salvo.</div>'}function deleteSnapshot(id){if(confirm('Excluir este fechamento?')){state.snapshots=state.snapshots.filter(s=>s.id!==id);persist();renderAll()}}
 function fillReport2Ugs(){const s=document.getElementById('report2-ug');if(!s)return;const old=s.value;s.innerHTML=state.ugs.map(u=>`<option value="${u.id}">${esc(u.code)} - ${esc(u.acronym)}</option>`).join('');if(state.ugs.some(u=>u.id===old))s.value=old;else if(state.ugs[0])s.value=state.ugs[0].id}
 function titleCasePt(v){const keep=new Set(['de','da','do','das','dos','e']);return String(v||'').toLowerCase().split(/(\s+|-)/).map((w,i)=>{if(/^\s+$|^-$/.test(w))return w;if(keep.has(w)&&i>0)return w;return w.length<=5&&/^[a-z0-9]+$/.test(w)&&['set','fet','fimpc','ferdt'].includes(w)?w.toUpperCase():w.charAt(0).toUpperCase()+w.slice(1)}).join('')}
-function declarationUgName(u){if(!u)return'';let n=titleCasePt(u.name).replace(/\s+-\s+/g,' - ');const a=String(u.acronym||'').toUpperCase();if(a&&!new RegExp('(?:^|[\\s-])'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$','i').test(n))n+='-'+a;return n}
+function declarationUgName(u){if(!u)return'';let n=titleCasePt(u.name).replace(/\s+-\s+/g,' - ');const a=String(u.acronym||'').toUpperCase();if(a&&!new RegExp('(?:^|[\s-])'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$','i').test(n))n+='-'+a;return n}
+function declarationFundName(u){if(!u)return'';const names={
+ '560901':'Fundo Estadual do Trabalho-FET',
+ '561001':'Fundo de Investimento em Microcrédito do Ceará – FIMPC',
+ '590101':'Fundo Estadual de Recomposição de Danos Trabalhistas – FERDT'
+};return names[String(u.code)]||declarationUgName(u)}
+function declarationAssignmentBlock(u){if(!u)return'';const secretaria='590001 – Secretaria do Trabalho-SET';if(String(u.code)==='590001'||String(u.acronym||'').toUpperCase()==='SET')return secretaria;return `${secretaria}, responsável pelo ${declarationFundName(u)} (UG - ${u.code})`}
+
 function longDate(v){if(!v)return'';const [y,m,d]=v.split('-');return `${d} de ${months[Number(m)-1].toLowerCase()} de ${y}`}
-function declarationData(showMessage=false){const ugId=document.getElementById('report2-ug')?.value,u=state.ugs.find(x=>x.id===ugId),r=state.responsibles.find(x=>x.ugId===ugId),ref=document.getElementById('report2-ref')?.value||'2026-06',date=document.getElementById('report2-date')?.value||'',location=(document.getElementById('report2-location')?.value||'Fortaleza-CE').trim();if((!u||!r)&&showMessage)toast(!u?'Selecione uma Unidade Gestora.':'Cadastre a pessoa responsável dentro desta UG.');if(!u||!r)return null;return{u,r,ref,date,location,reference:formatRef(ref),dateLong:longDate(date),personLine:`${r.name}, ${r.role}, ${r.registration}, CPF ${r.cpf}`,ugBlock:`${u.code} – ${declarationUgName(u)}`}}
-function renderReport2(){const ugId=document.getElementById('report2-ug')?.value,u=state.ugs.find(x=>x.id===ugId),r=state.responsibles.find(x=>x.ugId===ugId),ref=document.getElementById('report2-ref')?.value||'2026-06',location=(document.getElementById('report2-location')?.value||'Fortaleza-CE').trim(),date=document.getElementById('report2-date')?.value||'';document.getElementById('report2-reference').textContent='Referência: '+formatRef(ref);document.getElementById('report2-ref-pill').textContent='Referência '+formatRef(ref);document.getElementById('report2-person-line').textContent=r?`${r.name}, ${r.role}, ${r.registration}, CPF ${r.cpf}`:'pessoa responsável não cadastrada';document.getElementById('report2-ug-block').textContent=u?`${u.code} – ${declarationUgName(u)}`:'';document.getElementById('report2-date-text').textContent=`${location}, ${longDate(date)}.`;document.getElementById('report2-sign-name').textContent=r?.name||'Pessoa não cadastrada';document.getElementById('report2-sign-role').textContent=r?.signatureRole||'Cargo não cadastrado';const warn=document.getElementById('report2-warning');if(r){warn.style.display='none';warn.textContent=''}else{warn.style.display='block';warn.textContent='Esta UG ainda não possui pessoa responsável cadastrada. Abra a UG e use “Cadastrar pessoa responsável”.'}}
+function declarationData(showMessage=false){const ugId=document.getElementById('report2-ug')?.value,u=state.ugs.find(x=>x.id===ugId),r=state.responsibles.find(x=>x.ugId===ugId),ref=document.getElementById('report2-ref')?.value||'2026-06',date=document.getElementById('report2-date')?.value||'',location=(document.getElementById('report2-location')?.value||'Fortaleza-CE').trim();if((!u||!r)&&showMessage)toast(!u?'Selecione uma Unidade Gestora.':'Cadastre a pessoa responsável dentro desta UG.');if(!u||!r)return null;return{u,r,ref,date,location,reference:formatRef(ref),dateLong:longDate(date),personLine:`${r.name}, ${r.role}, ${r.registration}, CPF ${r.cpf}`,ugBlock:declarationAssignmentBlock(u)}}
+function renderReport2(){const ugId=document.getElementById('report2-ug')?.value,u=state.ugs.find(x=>x.id===ugId),r=state.responsibles.find(x=>x.ugId===ugId),ref=document.getElementById('report2-ref')?.value||'2026-06',location=(document.getElementById('report2-location')?.value||'Fortaleza-CE').trim(),date=document.getElementById('report2-date')?.value||'';document.getElementById('report2-reference').textContent='Referência: '+formatRef(ref);document.getElementById('report2-ref-pill').textContent='Referência '+formatRef(ref);document.getElementById('report2-person-line').textContent=r?`${r.name}, ${r.role}, ${r.registration}, CPF ${r.cpf}`:'pessoa responsável não cadastrada';document.getElementById('report2-ug-block').textContent=u?declarationAssignmentBlock(u):'';document.getElementById('report2-date-text').textContent=`${location}, ${longDate(date)}.`;document.getElementById('report2-sign-name').textContent=r?.name||'Pessoa não cadastrada';document.getElementById('report2-sign-role').textContent=r?.signatureRole||'Cargo não cadastrado';const warn=document.getElementById('report2-warning');if(r){warn.style.display='none';warn.textContent=''}else{warn.style.display='block';warn.textContent='Esta UG ainda não possui pessoa responsável cadastrada. Abra a UG e use “Cadastrar pessoa responsável”.'}}
 
 const A3_SAMPLE=[
 {account:'29054-8',accountingCurrent:0,accountingInvestment:2844478.15,current:true,investment:true,pdf:true},
@@ -472,34 +472,26 @@ function exportPdf2(){const d=declarationData(true);if(!d)return;if(!d.date)retu
 function exportPdf(){const ref=document.getElementById('report-ref').value,rows=linesForUg(document.getElementById('report-ug').value,ref);downloadBytes(buildPdf(rows,ref),'application/pdf',FILE_BASE+'.pdf');toast('PDF gerado no modelo oficial.')}function exportBackup(){downloadBytes(new TextEncoder().encode(JSON.stringify(state,null,2)),'application/json','TRANCILIM_encerramento_backup.json')}
 initMonths();renderAll();
 </script><script src="assets/justification_template.js"></script><script src="assets/conference.js"></script><script src="assets/workflow.js"></script>
-<script data-trancelim-encerramento-integration-v165>
+<script data-trancelim-encerramento-integration-v168>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
-  function initials(name){
-    return String(name||'Usuário').split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase()||'U';
-  }
-  function readSession(){
-    try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(error){return null;}
-  }
+  function initials(name){return String(name||'Usuário').split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase()||'U';}
+  function readSession(){try{return JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');}catch(error){return null;}}
   function renderPortalProfile(){
-    const session=readSession();
-    if(!session) return;
+    const session=readSession(); if(!session)return;
     const avatar=document.getElementById('portalSidebarAvatar');
     const name=document.getElementById('portalSidebarName');
     const role=document.getElementById('portalSidebarRole');
-    if(avatar){
-      avatar.innerHTML=session.photo?`<img src="${session.photo}" alt="Foto de ${session.name||'Usuário'}">`:`<span>${initials(session.name)}</span>`;
-    }
+    if(avatar) avatar.innerHTML=session.photo?`<img src="${session.photo}" alt="Foto de ${session.name||'Usuário'}">`:`<span>${initials(session.name)}</span>`;
     if(name) name.textContent=session.name||'Usuário';
     if(role) role.textContent=`${session.perfil||'Usuário'} · ${session.permissao||'visualizar'}`;
   }
-  function goPortal(){ window.location.href='../index.html'; }
+  function goPortal(){window.location.replace('../index.html?portal=1');}
   document.addEventListener('DOMContentLoaded',function(){
     renderPortalProfile();
     const brand=document.querySelector('.brand');
     const gov=document.querySelector('.gov');
-    if(brand){brand.style.cursor='pointer';brand.title='Voltar ao portal TRANCELIM';brand.addEventListener('click',goPortal);}
-    if(gov){gov.style.cursor='pointer';gov.title='Voltar ao portal TRANCELIM';gov.addEventListener('click',goPortal);}
+    [brand,gov].forEach(el=>{if(el){el.style.cursor='pointer';el.title='Voltar ao portal TRANCELIM';el.addEventListener('click',goPortal);}});
   });
 })();
 </script>

@@ -85,3 +85,10 @@ Depois abra com Ctrl+F5.
 - Prestação de Contas CG atualizada para a versão v166 enviada.
 - Eliminado o piscar da tela de login ao entrar nos módulos e voltar ao portal.
 - Favicon da bandeira TRANCELIM unificado no portal e em todos os módulos.
+
+## v168
+- Sistema de Encerramento Mensal atualizado para a versão v26 enviada.
+- Aplicada a nova regra do Anexo II para os fundos FET, FIMPC e FERDT.
+- Mantidos o login único, o perfil do usuário, o retorno ao portal e o favicon da bandeira TRANCELIM.
+- Mantidas a barra lateral fixa, a remoção da versão visível no menu e os ajustes anteriores do módulo.
+- Prestação de Contas CG v166 e Gestão Patrimonial preservadas sem alterações.

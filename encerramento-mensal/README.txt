@@ -1,4 +1,4 @@
-TRANCILIM - Sistema de Encerramento Mensal v25
+TRANCILIM - Sistema de Encerramento Mensal v26
 
 Base: v23 com padrão visual da Prestação de Contas CG v164.
 
@@ -22,3 +22,8 @@ Principais ajustes desta versão:
 Observação:
 Os dados e modelos são mantidos no armazenamento local do navegador do computador
 em que o sistema for utilizado. Use a opção de exportar backup periodicamente.
+
+
+AJUSTE V26:
+- No Anexo II, quando a UG selecionada for um fundo, o texto identifica o responsável como lotado na UG 590001 – Secretaria do Trabalho-SET e responsável pelo respectivo fundo, com a UG do fundo entre parênteses.
+- A regra foi aplicada à visualização, ao PDF e ao Word.
