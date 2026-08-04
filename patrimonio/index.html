@@ -9025,6 +9025,249 @@ button.delete-btn:hover{
 </style>
     </head>
     <body>${conteudo}
+
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
 </body>
     </html>
   `);
@@ -9917,7 +10160,250 @@ function gerarRelatorioSEFAZ(){
 
 </style>
       </head>
-      <body>${montarRelatorioSEFAZ()}</body>
+      <body>${montarRelatorioSEFAZ()}
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body>
     </html>
   `);
   janela.document.close();
@@ -10225,7 +10711,250 @@ function gerarRelatorioSEFAZ(){
 
 </style>
       </head>
-      <body>${montarRelatorioSEFAZ()}</body>
+      <body>${montarRelatorioSEFAZ()}
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body>
     </html>
   `);
   janela.document.close();
@@ -10443,7 +11172,250 @@ function abrirJanelaRelatorio(titulo, corpo){
     return;
   }
   janela.document.open();
-  janela.document.write("<!doctype html><html><head><meta charset='utf-8'><title>"+titulo+"</title>"+relatorioPrintStyle()+"</head><body>"+corpo+"</body></html>");
+  janela.document.write("<!doctype html><html><head><meta charset='utf-8'><title>"+titulo+"</title>"+relatorioPrintStyle()+"</head><body>"+corpo+"
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>");
   janela.document.close();
   setTimeout(()=>{ try{ janela.print(); }catch(e){} },400);
 }
@@ -11841,7 +12813,250 @@ function depAcumuladaTotalAteMesAnterior(){
           <button class="primary" onclick="window.print()">Salvar/Imprimir PDF</button>
           <button onclick="window.close()">Fechar</button>
         </div>
-      </body>
+      
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body>
       </html>`);
     janela.document.close();
   };
@@ -29884,7 +31099,250 @@ function depAcumuladaTotalAteMesAnterior(){
       <style>
         body{font-family:Arial,sans-serif;color:#082f49;padding:22px}
         .loading{font-size:20px;font-weight:900;color:#075d7d;background:#eef8fb;border:1px solid #d8ebef;border-radius:14px;padding:18px}
-      </style></head><body><div class="loading">${esc125(texto)}</div></body></html>`);
+      </style></head><body><div class="loading">${esc125(texto)}</div>
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>`);
     janela.document.close();
     return janela;
   }
@@ -29903,7 +31361,250 @@ function depAcumuladaTotalAteMesAnterior(){
         <button onclick="window.close()">Fechar</button>
       </div>
       <div class="v125-wrap">${corpo}</div>
-    </body></html>`);
+    
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>`);
     janela.document.close();
     if(autoPrint){
       setTimeout(()=>{try{janela.focus(); janela.print();}catch(e){}}, 900);
@@ -30276,7 +31977,250 @@ function depAcumuladaTotalAteMesAnterior(){
         <button onclick="window.close()">Fechar</button>
       </div>
       <div class="wrap"><div class="resumo">${esc126(texto || "Preparando relatório completo...")}</div></div>
-    </body></html>`);
+    
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>`);
     w.document.close();
     return w;
   }
@@ -30290,7 +32234,250 @@ function depAcumuladaTotalAteMesAnterior(){
         <button onclick="window.close()">Fechar</button>
       </div>
       <div class="wrap">${corpo}</div>
-    </body></html>`);
+    
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>`);
     w.document.close();
     if(imprimir){
       setTimeout(()=>{try{w.focus(); w.print();}catch(e){}}, 1200);
@@ -30866,7 +33053,250 @@ function depAcumuladaTotalAteMesAnterior(){
         <button onclick="window.close()">Fechar</button>
       </div>
       <div class="wrap"><div class="resumo">${esc127(texto || "Preparando relatório completo...")}</div></div>
-    </body></html>`);
+    
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>`);
     w.document.close();
     return w;
   }
@@ -30880,7 +33310,250 @@ function depAcumuladaTotalAteMesAnterior(){
         <button onclick="window.close()">Fechar</button>
       </div>
       <div class="wrap">${corpo}</div>
-    </body></html>`);
+    
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
+</script>
+</body></html>`);
     w.document.close();
   }
 
@@ -32382,6 +35055,249 @@ function depAcumuladaTotalAteMesAnterior(){
   window.renderTudo=function(){renderTudoAnteriorV133();try{window.renderDepreciacao()}catch(e){console.warn('Falha ao renderizar depreciação v133',e)}};
   window.addEventListener('resize',()=>setTimeout(()=>garantirBarraV133(document.querySelector('#depreciacao .table-wrap')),120));
 })();
+</script>
+
+<script data-patrimonio-v135-salvamento-rapido>
+(function(){
+  /* v135: salvamento rápido da edição patrimonial.
+     Evita sincronização completa, regravação sequencial do lote e consultas repetidas de permissão. */
+  let permissaoCacheV135 = null;
+  let permissaoEmAndamentoV135 = null;
+
+  async function confirmarPermissaoRapidaV135(){
+    const agora = Date.now();
+    if(permissaoCacheV135 && agora - permissaoCacheV135.em < 5 * 60 * 1000){
+      return permissaoCacheV135.perfil;
+    }
+    if(permissaoEmAndamentoV135) return permissaoEmAndamentoV135;
+    permissaoEmAndamentoV135 = (async()=>{
+      const perfil = typeof confirmarPermissaoTotal === "function"
+        ? await confirmarPermissaoTotal()
+        : true;
+      permissaoCacheV135 = {perfil, em:Date.now()};
+      return perfil;
+    })();
+    try{return await permissaoEmAndamentoV135;}
+    finally{permissaoEmAndamentoV135 = null;}
+  }
+
+  function normPatV135(v){
+    try{return typeof normalizarTombo === "function" ? normalizarTombo(v) : String(v || "").trim();}
+    catch(e){return String(v || "").trim();}
+  }
+
+  function lerCacheExtV135(){
+    try{return JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};}
+    catch(e){return {};}
+  }
+
+  function salvarCacheExtV135(cache){
+    try{localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache || {}));}catch(e){}
+  }
+
+  async function salvarExtrasRapidoV135(ext){
+    const key = normPatV135(ext.numero_patrimonial);
+    if(!key) return;
+
+    const cache = lerCacheExtV135();
+    const anterior = cache[key] || {};
+    const merged = {
+      ...anterior,
+      notaEmpenho: ext.notaEmpenho ?? anterior.notaEmpenho ?? "",
+      categoriaPrincipal: ext.categoriaPrincipal ?? anterior.categoriaPrincipal ?? "",
+      categoriaSecundaria: ext.categoriaSecundaria ?? anterior.categoriaSecundaria ?? "",
+      depreciavel: ext.depreciavel !== undefined ? ext.depreciavel !== false : anterior.depreciavel !== false,
+      fornecedor: ext.fornecedor ?? anterior.fornecedor ?? "",
+      cnpj: ext.cnpj ?? anterior.cnpj ?? "",
+      codigoItemCatalogo: ext.codigoItemCatalogo ?? anterior.codigoItemCatalogo ?? "",
+      justificativaDivergencia: ext.justificativaDivergencia ?? anterior.justificativaDivergencia ?? ""
+    };
+    cache[key] = merged;
+    salvarCacheExtV135(cache);
+
+    if(!window.supabaseClient) return;
+    const payloadCompleto = {
+      numero_patrimonial:key,
+      nota_empenho:merged.notaEmpenho || null,
+      categoria_principal:merged.categoriaPrincipal || null,
+      categoria_secundaria:merged.categoriaSecundaria || null,
+      depreciavel:merged.depreciavel !== false,
+      fornecedor:merged.fornecedor || null,
+      cnpj:merged.cnpj || null,
+      codigo_item_catalogo:merged.codigoItemCatalogo || null,
+      justificativa_divergencia:merged.justificativaDivergencia || null,
+      atualizado_em:new Date().toISOString()
+    };
+
+    let {error} = await supabaseClient
+      .from("bens_patrimoniais_ext")
+      .upsert(payloadCompleto, {onConflict:"numero_patrimonial"});
+
+    if(error && /codigo_item_catalogo|justificativa_divergencia|schema cache|column/i.test(String(error.message || error))){
+      const payloadLegado = {
+        numero_patrimonial:key,
+        nota_empenho:merged.notaEmpenho || null,
+        categoria_principal:merged.categoriaPrincipal || null,
+        categoria_secundaria:merged.categoriaSecundaria || null,
+        depreciavel:merged.depreciavel !== false,
+        fornecedor:merged.fornecedor || null,
+        cnpj:merged.cnpj || null,
+        atualizado_em:new Date().toISOString()
+      };
+      ({error} = await supabaseClient
+        .from("bens_patrimoniais_ext")
+        .upsert(payloadLegado, {onConflict:"numero_patrimonial"}));
+    }
+    if(error) throw error;
+  }
+
+  function removerCacheTomboAntigoV135(patAnterior, patNovo){
+    if(!patAnterior || patAnterior === patNovo) return;
+    const cache = lerCacheExtV135();
+    const antigo = cache[patAnterior] || {};
+    cache[patNovo] = {...antigo, ...(cache[patNovo] || {})};
+    delete cache[patAnterior];
+    salvarCacheExtV135(cache);
+  }
+
+  function atualizarBemLocalV135(existente, item){
+    const idx = (bens || []).findIndex(b=>
+      (existente?.id && String(b.id) === String(existente.id)) ||
+      String(b.pat) === String(existente?.pat || "")
+    );
+    const local = {...(existente || {}), ...item};
+    if(idx >= 0) bens[idx] = local;
+    else bens.push(local);
+    return local;
+  }
+
+  window.salvarItemManualV124 = async function(){
+    const btn = document.getElementById("btnSalvarItem");
+    const textoOriginal = btn?.textContent || "Salvar alterações";
+    try{
+      if(btn){btn.disabled=true;btn.textContent="Validando...";}
+      await confirmarPermissaoRapidaV135();
+
+      const patDigitado = document.getElementById("cadPat")?.value?.trim() || "";
+      const patAnterior = normPatV135(editandoPatrimonio || "");
+      const patNovo = normPatV135(patDigitado);
+      const desc = document.getElementById("cadDesc")?.value?.trim() || "";
+      const nf = document.getElementById("cadNF")?.value?.trim() || "";
+      const aquisicao = document.getElementById("cadAquisicao")?.value || "";
+      const inicio = document.getElementById("cadInicio")?.value || "";
+      const valor = parseBR124(document.getElementById("cadValor")?.value || "0");
+      const residual = parseBR124(document.getElementById("cadResidual")?.value || "0");
+      const taxa = document.getElementById("cadTaxa")?.value?.trim() || "10%";
+      const ne = document.getElementById("manualNEV124")?.value?.trim() || "";
+      const cp = document.getElementById("manualCatPrincV124")?.value || "";
+      const cs = document.getElementById("manualCatSecV124")?.value || "";
+      const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
+      const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
+      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
+      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
+      const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
+
+      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+        return;
+      }
+
+      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior)) ||
+                         (bens || []).find(b=>String(b.pat)===String(patNovo));
+      if(!existente){
+        alert("O bem que está sendo editado não foi encontrado. Atualize a página e tente novamente.");
+        return;
+      }
+      const conflito = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id || "")!==String(existente.id || ""));
+      if(conflito){
+        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
+        return;
+      }
+
+      const item = {
+        id:existente.id,
+        pat:patNovo,
+        desc,
+        setor:document.getElementById("cadSetor")?.value?.trim() || "",
+        responsavel:document.getElementById("cadResponsavel")?.value?.trim() || "",
+        nf,
+        aquisicao,
+        inicio,
+        valor,
+        residual,
+        taxa,
+        depAcum:Number(existente.depAcum || 0),
+        valorAtual:Number(existente.valorAtual ?? valor),
+        situacao:document.getElementById("cadSituacao")?.value || "Em uso",
+        depreciavel,
+        foto:existente.foto || null,
+        fotoEtiqueta:existente.fotoEtiqueta || null,
+        arquivoNF:existente.arquivoNF || null,
+        termoAssinado:existente.termoAssinado || null
+      };
+
+      if(btn) btn.textContent="Salvando bem...";
+      const itemPrincipal = {...item};
+      const salvo = await window.salvarBemSupabase(itemPrincipal);
+      item.id = salvo.id;
+      item.pat = itemPrincipal.pat || patNovo;
+
+      if(btn) btn.textContent="Salvando dados complementares...";
+      await salvarExtrasRapidoV135({
+        numero_patrimonial:item.pat,
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        depreciavel,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+
+      Object.assign(item, {
+        notaEmpenho:ne,
+        categoriaPrincipal:cp,
+        categoriaSecundaria:cs,
+        fornecedor,
+        cnpj,
+        codigoItemCatalogo,
+        justificativaDivergencia
+      });
+      atualizarBemLocalV135(existente, item);
+
+      const tomboAlterado = !!patAnterior && patAnterior !== item.pat;
+      if(tomboAlterado){
+        removerCacheTomboAntigoV135(patAnterior, item.pat);
+        // A limpeza da chave antiga não bloqueia mais a tela.
+        if(window.supabaseClient){
+          supabaseClient.from("bens_patrimoniais_ext")
+            .delete()
+            .eq("numero_patrimonial", patAnterior)
+            .then(({error})=>{if(error) console.warn("Não removeu complemento antigo:", error);})
+            .catch(e=>console.warn("Não removeu complemento antigo:", e));
+        }
+      }
+
+      // Atualiza somente a memória e a tela; a sincronização completa fica para F5/Atualizar.
+      if(typeof renderTudo === "function") renderTudo();
+      document.getElementById("modalCadastro")?.classList.add("hidden");
+      editandoPatrimonio = null;
+      if(typeof viewById === "function") viewById("bens");
+
+      alert(tomboAlterado
+        ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.`
+        : "Alterações salvas com sucesso.");
+    }catch(e){
+      console.error(e);
+      permissaoCacheV135 = null;
+      alert("Erro ao salvar alterações: " + (e.message || e));
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent=textoOriginal;}
+    }
+  };
+})();
+
 </script>
 </body>
 </html>
