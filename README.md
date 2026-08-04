@@ -86,9 +86,23 @@ Depois abra com Ctrl+F5.
 - Eliminado o piscar da tela de login ao entrar nos módulos e voltar ao portal.
 - Favicon da bandeira TRANCELIM unificado no portal e em todos os módulos.
 
-## v168
+## v169
 - Sistema de Encerramento Mensal atualizado para a versão v26 enviada.
 - Aplicada a nova regra do Anexo II para os fundos FET, FIMPC e FERDT.
 - Mantidos o login único, o perfil do usuário, o retorno ao portal e o favicon da bandeira TRANCELIM.
 - Mantidas a barra lateral fixa, a remoção da versão visível no menu e os ajustes anteriores do módulo.
 - Prestação de Contas CG v166 e Gestão Patrimonial preservadas sem alterações.
+
+
+## v169 - correção da importação de extratos
+- Corrigido erro `key is not defined` no acompanhamento Conta Corrente ↔ Aplicação.
+- A importação de extratos agora possui rollback: se ocorrer erro, os vínculos e conciliações anteriores são restaurados.
+- Reparo automático único reprocessa conciliações existentes sem apagar vínculos manuais.
+
+
+## v170
+- Sistema de Encerramento Mensal atualizado para a versão v28 enviada.
+- O despacho passou a integrar o cadastro do próprio processo.
+- A aba separada de Despachos foi removida conforme a nova versão.
+- Mantidos login único, perfil, foto, retorno ao portal, favicon e barra lateral fixa.
+- Prestação de Contas CG com a correção de extratos da v169 e Gestão Patrimonial preservadas.

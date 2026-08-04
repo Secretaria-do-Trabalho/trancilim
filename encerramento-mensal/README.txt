@@ -1,29 +1,29 @@
-TRANCILIM - Sistema de Encerramento Mensal v26
+TRANCILIM - Sistema de Encerramento Mensal v28
 
-Base: v23 com padrão visual da Prestação de Contas CG v164.
+Base: v27, preservando o padrão visual da Prestação de Contas CG v164.
 
 Principais ajustes desta versão:
-- Nos formulários de Processos e Despachos, o campo Assunto agora é editável e também oferece os modelos salvos no mesmo campo.
-- No primeiro cadastro, o usuário pode digitar livremente um assunto novo; a opção de salvar como modelo já inicia marcada.
-- Ao escolher um assunto salvo, o sistema preenche automaticamente os textos relacionados, sem bloquear a edição.
-- A barra horizontal superior foi limitada à tabela da aba Conferência.
-- Removido o deslocamento horizontal da página inteira.
-- Aba Processos implementada com NUP, UG, competência, assunto, observação,
-  texto de WhatsApp, prazo SEFAZ, situação, data da conclusão e observação final.
-- O campo Colab não foi incluído.
-- Assuntos, observações e mensagens podem ser salvos como modelos reutilizáveis.
-- Ao reutilizar um modelo, competência, mês, ano, NUP e prazo são atualizados.
-- Cálculo automático do 5º dia útil do mês subsequente, considerando segunda a sexta.
-- Aba Despachos implementada com cadastro de destinatário, assunto, texto, UG,
-  competência, data, prazo, NUP e situação.
-- Modelos de despacho ficam armazenados no navegador para uso nos meses seguintes.
-- Download direto do despacho em Word e PDF.
+- A aba separada de Despachos foi retirada do menu.
+- O despacho passou a fazer parte do cadastro do próprio processo.
+- Todo novo processo solicita também os dados do despacho correspondente:
+  destinatário, assunto, texto, data e situação.
+- Na tabela de Processos, o despacho pode ser visualizado e baixado em Word ou PDF.
+- Os modelos de processo agora podem guardar juntos o assunto, a observação,
+  o WhatsApp e os textos do despacho para reutilização nas competências seguintes.
+- Os campos de assunto continuam livres para digitação e também aceitam modelos salvos.
+- O texto explicativo sobre a retirada do campo Colab foi removido da tela.
+- Processos e despachos já existentes são associados automaticamente quando possuem
+  o mesmo NUP ou a mesma combinação de UG, competência e assunto.
 
 Observação:
 Os dados e modelos são mantidos no armazenamento local do navegador do computador
 em que o sistema for utilizado. Use a opção de exportar backup periodicamente.
 
 
-AJUSTE V26:
-- No Anexo II, quando a UG selecionada for um fundo, o texto identifica o responsável como lotado na UG 590001 – Secretaria do Trabalho-SET e responsável pelo respectivo fundo, com a UG do fundo entre parênteses.
-- A regra foi aplicada à visualização, ao PDF e ao Word.
+INTEGRAÇÃO TRANCELIM v170:
+- login único e controle de acesso pelo portal;
+- perfil e foto carregados da sessão;
+- retorno ao portal pela marca/cabeçalho;
+- favicon unificado;
+- barra lateral fixa;
+- versão interna não exibida no menu.

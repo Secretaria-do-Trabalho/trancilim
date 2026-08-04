@@ -11039,7 +11039,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       if(!groups.has(key))groups.set(key,[]);
       groups.get(key).push(item);
     });
-    return [...groups.values()].map(items=>{
+    return [...groups.entries()].map(([key,items])=>{
       const current=items.filter(item=>item.sourceStatementType==='conta_corrente');
       const application=items.filter(item=>item.sourceStatementType==='aplicacao');
       const reference=items[0];
@@ -12122,6 +12122,18 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     button.disabled=true;
     button.textContent='Importando extrato...';
 
+    const clone=value=>JSON.parse(JSON.stringify(value));
+    const backup={
+      bankStatements:clone(state.bankStatements),
+      bankEntries:clone(state.bankEntries),
+      bankLinks:clone(state.bankLinks),
+      bankApplicationTransfers:clone(state.bankApplicationTransfers),
+      documents:clone(state.documents)
+    };
+    let newDocumentId='';
+    let previousDocumentId='';
+    let importedSummary=null;
+
     try{
       const fileName=bankStatementPreview.fileName||selectedBankStatementFile?.name||'extrato';
       const previous=state.bankStatements.find(statement=>
@@ -12145,10 +12157,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           transfer=>transfer.statementId!==previous.id
         );
         state.bankStatements=state.bankStatements.filter(statement=>statement.id!==previous.id);
-
-        if(previous.documentId){
-          try{await deleteFileBlob(previous.documentId)}catch(error){console.warn(error)}
-          state.documents=state.documents.filter(document=>document.id!==previous.documentId);
+        previousDocumentId=previous.documentId||'';
+        if(previousDocumentId){
+          state.documents=state.documents.filter(document=>document.id!==previousDocumentId);
         }
       }
 
@@ -12158,6 +12169,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
       if(selectedBankStatementFile){
         documentId=id();
+        newDocumentId=documentId;
         try{
           hasFile=await saveFileBlob(documentId,selectedBankStatementFile);
         }catch(error){
@@ -12246,28 +12258,52 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           createdAt:new Date().toISOString()
         });
       });
+
       reconcileBankApplicationTransfers(contractId,accountId,competence);
 
       /* O extrato não cria pagamentos. A Relação de Pagamentos é a fonte oficial. */
       if(type==='conta_corrente')autoReconcileBankEntries(statementId);
-      saveState();
+      saveState({render:false});
 
-      clearBankStatementPreview();
-      closeBankStatementImportModal();
-      goPage('extratos');
-      alert(
-        `Extrato importado com ${rows.length} lançamento(s) operacional(is). `+
-        `${applicationTransfers.length} aplicação(ões)/resgate(s) foram guardados no acompanhamento. `+
-        `A conciliação automática foi executada.`
-      );
+      importedSummary={rows:rows.length,transfers:applicationTransfers.length};
     }catch(error){
       console.error(error);
-      alert(`Não foi possível concluir a importação: ${error.message||error}`);
+      state.bankStatements=backup.bankStatements;
+      state.bankEntries=backup.bankEntries;
+      state.bankLinks=backup.bankLinks;
+      state.bankApplicationTransfers=backup.bankApplicationTransfers;
+      state.documents=backup.documents;
+      saveState({render:false});
+      if(newDocumentId){
+        try{await deleteFileBlob(newDocumentId)}catch(cleanupError){console.warn(cleanupError)}
+      }
+      alert(`Não foi possível concluir a importação. Nenhuma conciliação anterior foi apagada. Motivo: ${error.message||error}`);
     }finally{
       bankImportBusy=false;
       button.disabled=false;
       button.textContent='Confirmar importação';
     }
+
+    if(!importedSummary)return;
+
+    if(previousDocumentId){
+      try{await deleteFileBlob(previousDocumentId)}catch(error){console.warn(error)}
+    }
+
+    clearBankStatementPreview();
+    closeBankStatementImportModal();
+    try{
+      goPage('extratos');
+      renderBankStatements();
+    }catch(error){
+      console.error('O extrato foi salvo, mas a atualização visual falhou.',error);
+      schedulePageRender('extratos');
+    }
+    alert(
+      `Extrato importado com ${importedSummary.rows} lançamento(s) operacional(is). `+
+      `${importedSummary.transfers} aplicação(ões)/resgate(s) foram guardados no acompanhamento. `+
+      `A conciliação automática foi executada sem apagar os vínculos anteriores.`
+    );
   }
 
   window.runBankReconciliation=function(){
@@ -16510,6 +16546,18 @@ Total bruto: ${money(a.proventos)}`)}
     if(contract.coordenadoria===undefined)contract.coordenadoria='';
   });
   if(!Array.isArray(state.accountabilityPlans))state.accountabilityPlans=[];
+
+  const BANK_RECONCILIATION_REPAIR_KEY='prestacao_contas_cg_v167_reparo_conciliacao';
+  if(!localStorage.getItem(BANK_RECONCILIATION_REPAIR_KEY)){
+    try{
+      autoReconcileBankEntries();
+      reconcileBankApplicationTransfers();
+      saveState({render:false});
+      localStorage.setItem(BANK_RECONCILIATION_REPAIR_KEY,'1');
+    }catch(error){
+      console.warn('Não foi possível executar o reparo automático da conciliação.',error);
+    }
+  }
 
   activePageName='dashboard';
   refreshAll();
