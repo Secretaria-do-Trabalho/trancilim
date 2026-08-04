@@ -37,7 +37,7 @@ Integração TRANCELIM v175: referência persistente, julho/2026 como padrão e 
 v32 integrado: SEM, navegação padronizada, despacho Montserrat Normal 11 e cópia corrigida.
 
 
-v33 integrado ao TRANCELIM v177:
+v34 integrado ao TRANCELIM v178:
 - cópia somente da área útil do despacho;
 - NUP sincronizado nos campos do processo;
 - processos incluídos no percentual por UG;

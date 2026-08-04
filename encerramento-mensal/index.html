@@ -412,14 +412,22 @@ function annexCompletionForUg(ugId,ref){
  const anexo1Total=1,anexo1Done=state.snapshots.some(s=>s.ugId===ugId&&s.ref===ref)?1:0;
  const anexo2Total=1,anexo2Done=state.anexo2Completed[key]?1:0;
  const anexo3Total=accounts.length,anexo3Done=accounts.filter(a=>anexo3DocumentReady(ugId,ref,a)).length;
- return {anexo1Total,anexo1Done,anexo2Total,anexo2Done,anexo3Total,anexo3Done,total:anexo1Total+anexo2Total+anexo3Total,done:anexo1Done+anexo2Done+anexo3Done};
+ const annexTotal=anexo1Total+anexo2Total+anexo3Total,annexDone=anexo1Done+anexo2Done+anexo3Done;
+ return {anexo1Total,anexo1Done,anexo2Total,anexo2Done,anexo3Total,anexo3Done,annexTotal,annexDone};
 }
-function processCompletionForUg(ugId,ref){const list=(Array.isArray(state.processes)?state.processes:[]).filter(p=>p.ugId===ugId&&p.ref===ref),processTotal=list.length,processDone=list.filter(p=>p.status==='Concluído').length,processOpen=processTotal-processDone;return{processTotal,processDone,processOpen,total:processTotal,done:processDone}}
+function processCompletionForUg(ugId,ref){
+ const list=(Array.isArray(state.processes)?state.processes:[]).filter(p=>p.ugId===ugId&&p.ref===ref);
+ const processTotal=list.length;
+ /* Um processo aberto/cadastrado com NUP já representa um documento produzido para a UG. */
+ const processDone=list.filter(p=>String(p.nup||'').trim()).length;
+ const processOpen=list.filter(p=>p.status!=='Concluído').length;
+ return{processTotal,processDone,processOpen};
+}
 function percentValue(done,total){return total?Number((done/total*100).toFixed(2)):0}
 function percentLabel(value){return Number(value||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'}
 function completionForUg(ugId,ref){const store=(state.conferenceDocs||{})[`${ugId}|${ref}`]||{reports:{}};let conferenceDone=0,ok=0,warn=0,error=0;for(const def of DASHBOARD_REPORTS){const e=(store.reports||{})[def.id]||{};let status='pending';if(e.manualOk)status='ok';else if(!e.pdf)status='pending';else if(def.needsExcel&&!e.excel)status='pending';else{const checks=[...(e.pdf?.checks||[]),...(e.excel?.checks||[])];if(!checks.length)status='pending';else status=worstStatus(checks.map(x=>x.status))}if(status!=='pending')conferenceDone++;if(status==='ok')ok++;else if(status==='warn')warn++;else if(status==='error')error++;}
- const annex=annexCompletionForUg(ugId,ref),processes=processCompletionForUg(ugId,ref),conferenceTotal=DASHBOARD_REPORTS.length,total=conferenceTotal+annex.total+processes.total,done=conferenceDone+annex.done+processes.done,pending=total-done,percent=percentValue(done,total),okPercent=percentValue(ok+annex.done+processes.done,total);
- return {total,done,pending,ok:ok+annex.done+processes.done,warn,error,percent,okPercent,conferenceTotal,conferenceDone,...annex,...processes};
+ const annex=annexCompletionForUg(ugId,ref),processes=processCompletionForUg(ugId,ref),conferenceTotal=DASHBOARD_REPORTS.length,total=conferenceTotal+annex.annexTotal+processes.processTotal,done=conferenceDone+annex.annexDone+processes.processDone,pending=total-done,percent=percentValue(done,total),okPercent=percentValue(ok+annex.annexDone+processes.processDone,total);
+ return {total,done,pending,ok:ok+annex.annexDone+processes.processDone,warn,error,percent,okPercent,conferenceTotal,conferenceDone,...annex,...processes};
 }
 function progressBadgeHtml(m){if(m.pending>0)return `<span class="progress-status pending">${m.pending} pendência(s) restante(s)</span>`;if(m.warn||m.error)return `<span class="progress-status warn">Concluído com atenção</span>`;return '<span class="progress-status">Concluído sem pendências</span>'}
 window.openConferenceForUg=function(ugId){const sel=document.getElementById('conference-ug');if(sel)sel.value=ugId;goPage('conference');if(window.renderConference)window.renderConference();}
