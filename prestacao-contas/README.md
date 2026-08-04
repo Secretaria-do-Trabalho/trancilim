@@ -1,35 +1,29 @@
-# Sistema de Prestação de Contas CG — v161
+# Sistema de Prestação de Contas CG — v165
 
-## Rol de Responsáveis
+## Pagamentos e extratos zerados
 
-### Barra de rolagem superior
+Ao abrir a v165 pela primeira vez, o sistema apaga somente:
 
-A tabela de responsáveis possui agora uma barra de rolagem horizontal acima do
-cabeçalho. A barra superior e a barra inferior permanecem sincronizadas.
+- pagamentos cadastrados e importados;
+- relatórios mensais de pagamentos;
+- comprovantes vinculados aos pagamentos;
+- extratos bancários;
+- lançamentos bancários;
+- vínculos da conciliação;
+- transferências entre conta corrente e aplicação geradas pelos extratos;
+- pendências do módulo de pagamentos.
 
-### Copiar responsável
+Permanecem preservados contratos, contas bancárias cadastradas, responsáveis, pessoal, cronogramas e os demais módulos.
 
-Foi acrescentada a ação **Copiar**.
+## Selecionar débito pelo pagamento
 
-Ao copiar:
+Na Relação de Pagamentos, cada pagamento possui a ação **Selecionar débito**. A janela mostra somente débitos:
 
-- o cadastro original não é alterado;
-- os dados pessoais são preenchidos automaticamente;
-- categoria, representação, endereços e observações são mantidos;
-- períodos de gestão são copiados;
-- atos são copiados;
-- publicações anexadas aos atos são duplicadas e vinculadas ao novo contrato;
-- o campo Contrato fica vazio para selecionar o novo vínculo.
+- do mesmo contrato;
+- da mesma competência;
+- ainda não conciliados ou parcialmente conciliados;
+- com saldo disponível.
 
-Depois, basta selecionar o outro Contrato de Gestão, fazer os ajustes
-necessários e clicar em **Salvar responsável**.
+Também foi incluído no cadastro manual de pagamento o campo **Débito do extrato bancário**. Ao selecionar um débito, o sistema pode preencher documento, data de compensação e valor, e cria o vínculo ao salvar.
 
-
-## Importação e conciliação v161
-
-- Relação de Pagamentos é a fonte oficial dos pagamentos.
-- Extrato de conta corrente não cria pagamentos automaticamente.
-- A conciliação usa documento, data de compensação e valor.
-- Um débito pode ser conciliado com várias linhas que tenham o mesmo documento e totalizem seu valor.
-- Débitos estornados por Pix rejeitado são separados dos débitos efetivos.
-- Extratos de aplicação/CDB ficam anexados, sem integrar a conciliação de despesas.
+Um pagamento pode continuar ligado a mais de um débito, e um débito pode ser distribuído entre vários pagamentos, respeitando os saldos disponíveis.

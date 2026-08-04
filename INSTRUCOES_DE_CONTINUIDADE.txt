@@ -1,0 +1,35 @@
+PACOTE SEPARADO — SISTEMA DE PRESTAÇÃO DE CONTAS CG — BASE v165
+
+FINALIDADE
+Este pacote serve como base exclusiva para continuar as edições do Sistema de Prestação de Contas CG em uma nova conversa, sem carregar toda a conversa principal do TRANCELIM.
+
+CONTEÚDO
+- prestacao-contas/index.html: sistema completo do módulo na versão v165.
+- prestacao-contas/README.md: informações do módulo.
+- assets/david-profile.png: imagem usada pelo perfil integrado.
+- assets/favicon-trancilim.png: ícone usado pelo módulo.
+- PROMPT_PARA_NOVA_ABA.txt: texto para copiar e colar na nova conversa.
+- INSTRUCOES_DE_CONTINUIDADE.txt: este documento.
+
+COMO ABRIR A NOVA CONVERSA
+1. Crie uma nova conversa dentro do projeto TRANCELIM.
+2. Envie o arquivo SISTEMA_PRESTACAO_CONTAS_CG_v165_BASE_SEPARADA.zip.
+3. Abra o arquivo PROMPT_PARA_NOVA_ABA.txt.
+4. Copie todo o texto e envie na nova conversa.
+5. Depois, faça os pedidos de alteração somente do módulo de Prestação de Contas CG.
+
+COMO VERSIONAR
+Cada entrega deve usar a numeração seguinte à v165:
+- v165, v166, v167 etc.
+Exemplo:
+UPLOAD_GitHub_sistema_prestacao_contas_CG_v165_ajuste_conciliacao.zip
+
+COMO INTEGRAR DEPOIS
+Quando uma versão do módulo for aprovada:
+1. leve o ZIP do módulo aprovado para a conversa principal do TRANCELIM;
+2. informe qual é a última versão completa integrada do TRANCELIM;
+3. peça para substituir somente a pasta /prestacao-contas/;
+4. gere uma nova versão completa numerada para publicação no GitHub.
+
+IMPORTANTE
+Este pacote é uma base de desenvolvimento do módulo. Ele conserva referências à sessão e aos arquivos do portal principal. Ao testar fora do pacote completo, algumas funções de acesso podem depender da sessão do TRANCELIM.

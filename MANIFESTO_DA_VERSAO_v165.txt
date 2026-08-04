@@ -1,0 +1,15 @@
+VERSÃO: v165
+BASE: SISTEMA_PRESTACAO_CONTAS_CG_v164_BASE_SEPARADA.zip
+MÓDULO: Sistema de Prestação de Contas CG
+
+ALTERAÇÕES:
+- limpeza única dos dados das abas Relação de Pagamentos e Extratos e Conciliação;
+- preservação dos contratos, contas bancárias cadastradas, responsáveis, pessoal e demais módulos;
+- novo campo opcional no cadastro manual do pagamento para selecionar débito disponível do extrato;
+- nova ação "Selecionar débito" em cada pagamento da Relação de Pagamentos;
+- possibilidade de vincular, gerenciar e remover débitos diretamente pelo pagamento;
+- exibição somente de débitos não conciliados ou parcialmente conciliados, respeitando contrato e competência;
+- preenchimento assistido do documento, data de compensação e valor pago ao selecionar o débito.
+
+OBSERVAÇÃO:
+A limpeza ocorre uma única vez no navegador ao abrir a v165. Depois disso, novos pagamentos e extratos permanecem normalmente.

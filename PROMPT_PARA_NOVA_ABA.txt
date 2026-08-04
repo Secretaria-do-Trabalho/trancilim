@@ -1,0 +1,47 @@
+ESTOU TRATANDO SOMENTE DO SISTEMA DE PRESTAÇÃO DE CONTAS CG DO TRANCELIM.
+
+Arquivo-base obrigatório:
+SISTEMA_PRESTACAO_CONTAS_CG_v165_BASE_SEPARADA.zip
+
+Contexto:
+Este arquivo foi extraído da versão integrada UPLOAD_GITHUB_TRANCELIM_v165.zip e representa a última versão válida do módulo de Prestação de Contas CG. A nova conversa deve trabalhar somente neste módulo, porque a conversa principal ficou muito pesada.
+
+Regras obrigatórias:
+1. Use sempre esta v165 como base inicial.
+2. Altere somente a pasta /prestacao-contas/ e, apenas se realmente necessário, os arquivos auxiliares incluídos no pacote.
+3. Não alterar a tela de login, o portal inicial, o Sistema de Gestão Patrimonial, a logo geral ou as permissões globais do TRANCELIM.
+4. Não remover nem desfazer funções que já existem na v165.
+5. Preservar a integração com o portal: sessão, perfil, foto, permissões e retorno à tela inicial.
+6. Preservar os dados salvos pelo sistema e evitar rotinas que limpem informações sem autorização expressa.
+7. Cada nova alteração deve gerar uma versão numerada do módulo, por exemplo:
+   UPLOAD_GitHub_sistema_prestacao_contas_CG_v165_nome_da_alteracao.zip
+8. O ZIP do módulo deve manter a pasta /prestacao-contas/ na raiz e incluir os arquivos necessários para análise e teste.
+9. Antes de gerar a versão, revisar se o HTML, CSS e JavaScript continuam funcionando e se não houve duplicação de estilos, funções ou tags.
+10. Quando a versão do módulo estiver aprovada, ela será levada de volta à conversa principal para integração no pacote completo do TRANCELIM.
+
+Estado funcional que deve ser preservado na v165:
+- perfil e foto corretamente encaixados na barra lateral;
+- acesso pelo portal sem novo login;
+- Acompanhamento da Prestação de Contas independente dos filtros gerais do dashboard;
+- filtros internos da aba de acompanhamento funcionando;
+- conciliação bancária entre pagamentos e débitos;
+- lista de vínculo mostrando somente pagamentos ainda disponíveis;
+- pagamentos parcialmente vinculados permanecem disponíveis pelo saldo restante;
+- vários pagamentos podem compor um único débito bancário;
+- um pagamento pode ser vinculado a mais de um débito;
+- INSS, IRRF/IRPJ, PIS, FGTS, ISS, COFINS e CSLL podem ser conciliados em agrupamento;
+- vínculos bancários aparecem também na Relação de Pagamentos;
+- conciliação entre conta corrente e aplicação para resgates e aplicações;
+- contas bancárias físicas sem duplicação indevida por tipo de extrato;
+- competência atual automática, sem retornar para novembro de 2025.
+
+Fluxo de trabalho nesta nova conversa:
+A) Eu envio o ZIP base.
+B) Explico uma alteração por vez e envio prints/documentos quando necessário.
+C) Você modifica somente o módulo de Prestação de Contas CG.
+D) Você gera um ZIP numerado somente do módulo.
+E) Eu testo.
+F) Depois da aprovação, integro a versão na conversa principal do TRANCELIM.
+
+Primeira resposta esperada:
+“Recebi a base v165 do Sistema de Prestação de Contas CG. Vou trabalhar somente neste módulo, preservar as funções existentes e gerar versões numeradas do módulo para posterior integração no TRANCELIM completo.”
