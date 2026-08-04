@@ -1,4 +1,4 @@
-# TRANCELIM v174
+# TRANCELIM v175
 
 - Prestação de Contas CG atualizada para a versão integrada v171.
 - Aba Execução da Receita e Despesa corrigida para buscar saldo anterior e totais consolidados da Relação de Pagamentos.
@@ -130,3 +130,10 @@ Depois abra com Ctrl+F5.
 - Créditos já vinculados a outro pagamento não aparecem novamente na lista.
 - Ao salvar o pagamento, o crédito selecionado passa a constar no extrato como **RESSARCIMENTO VINCULADO**, com identificação do pagamento.
 - Ao remover o vínculo ou mudar a classificação do crédito, o extrato e o pagamento são atualizados de forma consistente.
+
+
+## v175
+- Encerramento Mensal v31 integrado.
+- Referência selecionada permanece após F5; padrão inicial julho/2026.
+- Percentual por UG ponderado por documento, incluindo Anexos I, II e III.
+- Links internos sem index.html visível.

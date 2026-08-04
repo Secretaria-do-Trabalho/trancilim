@@ -2,6 +2,7 @@
 
 <html lang="pt-BR">
 <head>
+<script data-trancelim-clean-url>(function(){if(/\/index\.html$/i.test(location.pathname)){history.replaceState(null,'',location.pathname.replace(/index\.html$/i,'')+location.search+location.hash);}})();</script>
 <script data-trancilim-module-guard>
 (function(){
   const SESSION_KEY = 'trancilim_portal_session_v2';
@@ -9,10 +10,10 @@
     const session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || 'null');
     const allowed = session && Array.isArray(session.modules) && session.modules.includes('prestacao-contas');
     if (!allowed) {
-      window.location.replace('../index.html?acesso=negado');
+      window.location.replace('../?acesso=negado');
     }
   } catch (error) {
-    window.location.replace('../index.html?acesso=negado');
+    window.location.replace('../?acesso=negado');
   }
 })();
 </script>
@@ -17411,7 +17412,7 @@ Total bruto: ${money(a.proventos)}`)}
     modal.addEventListener('click',event=>{ if(event.target===modal) closeProfileModal(); });
     document.getElementById('portalProfileClose')?.addEventListener('click',closeProfileModal);
     document.getElementById('portalProfileRemovePhoto')?.addEventListener('click',()=>{ savePhoto(''); renderSidebarProfile(); fillProfileModal(); });
-    document.getElementById('portalProfileLogout')?.addEventListener('click',()=>{ sessionStorage.removeItem(SESSION_KEY); window.location.href='../index.html'; });
+    document.getElementById('portalProfileLogout')?.addEventListener('click',()=>{ sessionStorage.removeItem(SESSION_KEY); window.location.href='../'; });
     document.getElementById('portalProfilePhotoInput')?.addEventListener('change',event=>{
       const file=event.target.files?.[0];
       if(!file) return;
@@ -17450,8 +17451,8 @@ Total bruto: ${money(a.proventos)}`)}
   document.addEventListener('DOMContentLoaded',()=>{
     renderSidebarProfile();
     document.getElementById('portalProfileCard')?.addEventListener('click',openProfileModal);
-    document.querySelector('.side-brand')?.addEventListener('click',()=>{ window.location.href='../index.html'; });
-    document.querySelector('.institution')?.addEventListener('click',()=>{ window.location.href='../index.html'; });
+    document.querySelector('.side-brand')?.addEventListener('click',()=>{ window.location.href='../'; });
+    document.querySelector('.institution')?.addEventListener('click',()=>{ window.location.href='../'; });
   });
 })();
 </script>
