@@ -9024,7 +9024,8 @@ button.delete-btn:hover{
 
 </style>
     </head>
-    <body>${conteudo}</body>
+    <body>${conteudo}
+</body>
     </html>
   `);
   janela.document.close();
@@ -31782,6 +31783,410 @@ function depAcumuladaTotalAteMesAnterior(){
 
 <script data-patrimonio-v130-ajustes-edicao>
 /* v130: nomenclatura "Início da requisição" e edição completa de todos os campos do bem. */
+</script>
+
+<script data-patrimonio-v132-ocr-of>
+(function(){
+  // v132 - OCR automático para PDFs/imagens digitalizados e leitura reforçada da Ordem de Fornecimento.
+  // O OCR só é acionado quando o PDF não possui texto utilizável.
+
+  let pdfLoaderV132 = null;
+  let ocrLoaderV132 = null;
+
+  function textoLimpoV132(v){
+    return String(v || "")
+      .replace(/\u00a0/g, " ")
+      .replace(/[ \t]+/g, " ")
+      .replace(/ *\n */g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function semAcentoV132(v){
+    return String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function parseValorV132(v){
+    const s=String(v || "").replace(/R\$/gi, "").replace(/\s/g, "").replace(/[^0-9,.-]/g, "");
+    if(!s) return 0;
+    if(s.includes(",")) return Number(s.replace(/\./g, "").replace(",", ".")) || 0;
+    const pontos=(s.match(/\./g)||[]).length;
+    if(pontos>1) return Number(s.replace(/\./g, "")) || 0;
+    return Number(s) || 0;
+  }
+
+  function fmtV132(n){
+    return Number(n || 0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function isoDataV132(v){
+    const m=String(v || "").match(/(\d{2})\s*[\/.\-_]\s*(\d{2})\s*[\/.\-_]\s*(\d{2,4})/);
+    if(!m) return "";
+    const ano=m[3].length===2 ? "20"+m[3] : m[3];
+    return `${ano}-${m[2]}-${m[1]}`;
+  }
+
+  function formatarCnpjV132(v){
+    const d=String(v || "").replace(/\D/g, "").slice(0,14);
+    if(d.length!==14) return String(v || "").trim();
+    return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+  }
+
+  function formatarNFV132(v){
+    const d=String(v || "").replace(/\D/g, "");
+    if(!d) return "";
+    const n=d.slice(-9).padStart(9,"0");
+    return n.replace(/^(\d{3})(\d{3})(\d{3})$/, "$1.$2.$3");
+  }
+
+  function setStatusV132(id, texto, aviso=false){
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.textContent=texto;
+    el.classList.toggle("warn", !!aviso);
+  }
+
+  function carregarScriptV132(src, teste){
+    if(teste()) return Promise.resolve(true);
+    return new Promise((resolve,reject)=>{
+      const existente=[...document.scripts].find(s=>s.src===src);
+      if(existente){
+        const timer=setInterval(()=>{if(teste()){clearInterval(timer);resolve(true);}},100);
+        setTimeout(()=>{clearInterval(timer);teste()?resolve(true):reject(new Error("Biblioteca não carregada."));},15000);
+        return;
+      }
+      const s=document.createElement("script");
+      s.src=src;
+      s.async=true;
+      s.onload=()=>resolve(true);
+      s.onerror=()=>reject(new Error("Não foi possível carregar a biblioteca de leitura."));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function garantirPdfV132(){
+    if(window.pdfjsLib) return true;
+    if(!pdfLoaderV132){
+      pdfLoaderV132=carregarScriptV132(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+        ()=>!!window.pdfjsLib
+      ).then(()=>{
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        return true;
+      });
+    }
+    return pdfLoaderV132;
+  }
+
+  async function garantirOcrV132(){
+    if(window.Tesseract) return true;
+    if(!ocrLoaderV132){
+      ocrLoaderV132=carregarScriptV132(
+        "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js",
+        ()=>!!window.Tesseract
+      );
+    }
+    return ocrLoaderV132;
+  }
+
+  function textoPdfUtilV132(texto){
+    const t=semAcentoV132(texto).replace(/[^A-Za-z0-9]/g, "");
+    return t.length>=120;
+  }
+
+  async function extrairTextoPdfV132(file, msgId){
+    await garantirPdfV132();
+    const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+    const partes=[];
+    for(let p=1;p<=pdf.numPages;p++){
+      const page=await pdf.getPage(p);
+      const tc=await page.getTextContent();
+      let linha="", pagina="";
+      for(const item of tc.items){
+        linha += (linha ? " " : "") + String(item.str || "");
+        if(item.hasEOL){pagina += linha.trim()+"\n";linha="";}
+      }
+      if(linha.trim()) pagina += linha.trim();
+      partes.push(pagina);
+    }
+    const texto=textoLimpoV132(partes.join("\n"));
+    if(textoPdfUtilV132(texto)) return {texto,ocr:false,paginas:pdf.numPages};
+
+    await garantirOcrV132();
+    const ocr=[];
+    const limite=Math.min(pdf.numPages, 6);
+    for(let p=1;p<=limite;p++){
+      setStatusV132(msgId,`Documento digitalizado: aplicando OCR na página ${p}/${limite}...`);
+      const page=await pdf.getPage(p);
+      const viewport=page.getViewport({scale:2.35});
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.ceil(viewport.width);
+      canvas.height=Math.ceil(viewport.height);
+      const ctx=canvas.getContext("2d", {willReadFrequently:true});
+      await page.render({canvasContext:ctx,viewport}).promise;
+      const result=await window.Tesseract.recognize(canvas,"por",{
+        logger:m=>{
+          if(m.status==="recognizing text" && Number.isFinite(m.progress)){
+            setStatusV132(msgId,`OCR página ${p}/${limite}: ${Math.round(m.progress*100)}%`);
+          }
+        }
+      });
+      ocr.push(result?.data?.text || "");
+      canvas.width=1;canvas.height=1;
+    }
+    return {texto:textoLimpoV132(ocr.join("\n")),ocr:true,paginas:limite};
+  }
+
+  async function extrairTextoImagemV132(file,msgId){
+    await garantirOcrV132();
+    setStatusV132(msgId,"Imagem digitalizada: aplicando OCR...");
+    const result=await window.Tesseract.recognize(file,"por",{
+      logger:m=>{
+        if(m.status==="recognizing text" && Number.isFinite(m.progress)){
+          setStatusV132(msgId,`OCR da imagem: ${Math.round(m.progress*100)}%`);
+        }
+      }
+    });
+    return {texto:textoLimpoV132(result?.data?.text || ""),ocr:true,paginas:1};
+  }
+
+  async function extrairDocumentoV132(inputId,msgId){
+    const file=document.getElementById(inputId)?.files?.[0];
+    if(!file) throw new Error("Arquivo não anexado.");
+    const nome=String(file.name || "").toLowerCase();
+    if(file.type==="application/pdf" || nome.endsWith(".pdf")) return extrairTextoPdfV132(file,msgId);
+    if(/^image\//.test(file.type || "") || /\.(png|jpe?g|webp|bmp|tiff?)$/i.test(nome)) return extrairTextoImagemV132(file,msgId);
+    if(/^text\//.test(file.type || "")) return {texto:await file.text(),ocr:false,paginas:1};
+    throw new Error("Formato não suportado. Use PDF, JPG ou PNG.");
+  }
+
+  function parseNFV132(texto){
+    const raw=textoLimpoV132(texto);
+    const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
+    const topo=flat.split(/DESTINAT[ÁA]RIO|REMETENTE/i)[0] || flat.slice(0,2500);
+
+    let m=flat.match(/(?:NF-?e\s*)?(?:N[º°o.]|NÚMERO)\s*[:.-]?\s*([0-9.\s]{5,15})/i) ||
+          flat.match(/(?:FATURA\s*=\s*|Nº\s*)(\d{4,9})\b/i);
+    const numero=m ? formatarNFV132(m[1]) : "";
+
+    m=flat.match(/DATA\s+(?:DA\s+)?EMISS[ÃA]O[\s\S]{0,140}?(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i) ||
+      flat.match(/EMISS[ÃA]O[\s\S]{0,80}?(\d{2}\/\d{2}\/\d{4})/i);
+    const data=m ? isoDataV132(m[1]) : "";
+
+    let total=0;
+    const segTotal=flat.match(/VALOR\s+TOTAL\s+DA\s+NOTA([\s\S]{0,180}?)(?:TRANSPORTADOR|DADOS\s+DOS\s+PRODUTOS|$)/i);
+    if(segTotal){
+      const vals=[...segTotal[1].matchAll(/([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})/g)].map(x=>parseValorV132(x[1])).filter(x=>x>0);
+      if(vals.length) total=vals[vals.length-1];
+    }
+    if(!total){
+      m=flat.match(/VALOR\s+(?:ORIGINAL|L[IÍ]QUIDO)\s*=\s*([0-9.]+[,]\d{2})/i);
+      total=m ? parseValorV132(m[1]) : 0;
+    }
+
+    let fornecedor="";
+    m=topo.match(/([A-ZÀ-Ü0-9][A-ZÀ-Ü0-9 .&'\-/]{3,}?(?:LTDA|EIRELI|S\/A|S\.A\.|ME|EPP))\b/i);
+    if(m) fornecedor=textoLimpoV132(m[1]).replace(/^(?:IDENTIFICAÇÃO DO EMITENTE|EMITENTE)\s*/i,"").replace(/^[A-Z]\s+(?=[A-ZÀ-Ü])/i,"");
+
+    const cnpjs=[...topo.matchAll(/(?:CNPJ\s*[-:]?\s*)?((?:\d{2}[.\s]?\d{3}[.\s]?\d{3}[\/\s]?\d{4}[-\s]?\d{2})|(?:\d{14}))/gi)];
+    const cnpj=cnpjs.length ? formatarCnpjV132(cnpjs[0][1]) : "";
+
+    return {numero,data,total,fornecedor,cnpj,itens:[]};
+  }
+
+  function limparDescricaoOFV132(v){
+    let d=textoLimpoV132(v).replace(/\n/g," ");
+    d=d.replace(/^\s*(?:ITEM\s*)?\d+\s+/i,"");
+    d=d.replace(/^\s*\d{2,}\s+\d{1,}\s+/i,"");
+    d=d.replace(/\s+(?:QTDE|QUANTIDADE|PREÇO|VALOR\s+UNIT[ÁA]RIO|VALOR\s+TOTAL).*$/i,"");
+    d=d.replace(/\s+OBS(?:ERVA[CÇ][ÕO]ES?)?\s*:.*$/i,"");
+    d=d.replace(/\s+MARCA\s*:.*$/i,"");
+    const ateUnidade=d.match(/^([\s\S]*?\bUNIDADE\b)/i);
+    if(ateUnidade) d=ateUnidade[1];
+    return d.replace(/\s+/g," ").replace(/^[-–—:;,.\s]+|[-–—:;,\s]+$/g,"").trim();
+  }
+
+  function moedasLinhaV132(v){
+    return [...String(v || "").matchAll(/\b\d{1,3}(?:\.\d{3})*(?:,\d{2,4})\b/g)].map(m=>({txt:m[0],index:m.index}));
+  }
+
+  function parseBlocoItemOFV132(bloco){
+    let s=textoLimpoV132(bloco).replace(/\n/g," ").replace(/\s+/g," ").trim();
+    if(!s || /TOTAL\s+DA\s+ORDEM|SUBTOTAL|VALOR\s+GLOBAL|VALOR\s+TOTAL\s+GERAL/i.test(s)) return null;
+    const valores=moedasLinhaV132(s);
+    if(valores.length<2) return null;
+    const vuTok=valores[valores.length-2], vtTok=valores[valores.length-1];
+    const valorUnit=parseValorV132(vuTok.txt), valorTotal=parseValorV132(vtTok.txt);
+    if(!(valorUnit>0) || !(valorTotal>0)) return null;
+
+    let prefix=s.slice(0,vuTok.index).trim();
+    let codCat="",codItem="";
+    let cm=prefix.match(/^\s*(\d{2,})\s+(\d{1,})\s+/);
+    if(cm){codCat=cm[1];codItem=cm[2];prefix=prefix.slice(cm[0].length);}
+    else{
+      cm=prefix.match(/^\s*(\d{2,})\s+/);
+      if(cm){codItem=cm[1];prefix=prefix.slice(cm[0].length);}
+    }
+
+    let qtd=0;
+    const qm=prefix.match(/(?:(\bUN(?:D|IDADE)?\b|\bP[CÇ]\b|\bPAR\b)\s*)?(\d+(?:[.,]\d{1,4})?)\s*$/i);
+    if(qm){
+      qtd=parseValorV132(qm[2]);
+      prefix=prefix.slice(0,qm.index).trim();
+      if(qm[1] && /UN/i.test(qm[1])) prefix=(prefix+" UNIDADE").trim();
+    }
+    if(!(qtd>0)){
+      const calculada=valorTotal/valorUnit;
+      if(calculada>=0.5 && calculada<=100000 && Math.abs(calculada-Math.round(calculada))<0.08) qtd=Math.round(calculada);
+    }
+    if(!(qtd>0)) qtd=1;
+
+    const desc=limparDescricaoOFV132(prefix);
+    if(desc.length<4) return null;
+    return {codCat,codItem,codigoItemCatalogo:codItem||codCat,desc,qtd:Math.round(qtd)||1,valorUnit,valorTotal,origem:"OF"};
+  }
+
+  function extrairItensOFV132(raw){
+    const linhas=String(raw || "").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    let inicio=linhas.findIndex(l=>/DESCRI[CÇ][ÃA]O.*(?:QTDE|QUANTIDADE)|(?:QTDE|QUANTIDADE).*DESCRI[CÇ][ÃA]O/i.test(semAcentoV132(l)));
+    if(inicio<0) inicio=linhas.findIndex(l=>/ITEM|C[ÓO]DIGO.*DESCRI[CÇ][ÃA]O/i.test(l));
+    if(inicio<0) inicio=0;
+    const itens=[];
+    let acumulado="";
+    for(let i=inicio+1;i<linhas.length;i++){
+      const l=linhas[i];
+      if(/TOTAL\s+DA\s+ORDEM|ASSINATURA|OBSERVA[CÇ][ÕO]ES|DADOS\s+BANC[ÁA]RIOS/i.test(l)){
+        const ultimo=parseBlocoItemOFV132(acumulado);if(ultimo) itens.push(ultimo);break;
+      }
+      acumulado += (acumulado ? " " : "") + l;
+      if(moedasLinhaV132(acumulado).length>=2){
+        const item=parseBlocoItemOFV132(acumulado);
+        if(item){itens.push(item);acumulado="";}
+      }
+    }
+    if(acumulado){const item=parseBlocoItemOFV132(acumulado);if(item) itens.push(item);}
+
+    if(!itens.length){
+      const flat=textoLimpoV132(raw).replace(/\n/g," ");
+      const re=/(?:^|\s)(\d{2,})\s+(\d{1,})\s+(.{5,}?)\s+(\d+(?:[.,]\d{1,4})?)\s+(\d{1,3}(?:\.\d{3})*,\d{2,4})\s+(\d{1,3}(?:\.\d{3})*,\d{2})(?=\s+\d{2,}\s+\d{1,}|\s+TOTAL\s+DA\s+ORDEM|$)/gi;
+      let m;
+      while((m=re.exec(flat))){
+        const item=parseBlocoItemOFV132(`${m[1]} ${m[2]} ${m[3]} ${m[4]} ${m[5]} ${m[6]}`);
+        if(item) itens.push(item);
+      }
+    }
+
+    const vistos=new Set();
+    return itens.filter(i=>{
+      const k=[i.codigoItemCatalogo,semAcentoV132(i.desc).toLowerCase(),i.qtd,i.valorUnit,i.valorTotal].join("|");
+      if(vistos.has(k)) return false;vistos.add(k);return true;
+    });
+  }
+
+  function parseOFV132(texto){
+    const raw=textoLimpoV132(texto);
+    const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
+    let m=flat.match(/ORDEM\s+DE\s+FORNECIMENTO(?:\s+N[º°o.]?)?\s*[:.-]?\s*([A-Z0-9./-]{2,25})/i) ||
+          flat.match(/\bOF\s*N[º°o.]?\s*[:.-]?\s*([A-Z0-9./-]{2,25})/i);
+    const numero=m ? m[1].replace(/[;,:]+$/g,"") : "";
+
+    m=flat.match(/FORNECEDOR\s*[:.-]\s*(.+?)\s+(?:CNPJ|CPF)\s*[:.-]?\s*([0-9.\/-]{11,18})/i);
+    let fornecedor=m ? textoLimpoV132(m[1]) : "";
+    let cnpj=m ? formatarCnpjV132(m[2]) : "";
+    if(!cnpj){const c=flat.match(/CNPJ\s*[:.-]?\s*([0-9.\/-]{14,18})/i);if(c) cnpj=formatarCnpjV132(c[1]);}
+    if(!fornecedor){const f=flat.match(/(?:RAZ[ÃA]O\s+SOCIAL|NOME\s+DO\s+FORNECEDOR)\s*[:.-]\s*(.+?)(?=\s+CNPJ|\s+ENDERE[CÇ]O)/i);if(f) fornecedor=textoLimpoV132(f[1]);}
+
+    m=flat.match(/(?:TOTAL\s+DA\s+ORDEM|VALOR\s+(?:TOTAL|GLOBAL)(?:\s+DA\s+OF)?)\s*[:.-]?\s*(?:R\$\s*)?([0-9.]+,\d{2})/i);
+    const total=m ? parseValorV132(m[1]) : 0;
+    m=flat.match(/DATA\s+(?:DE\s+)?EMISS[ÃA]O\s*[:.-]?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i);
+    const data=m ? isoDataV132(m[1]) : "";
+    m=flat.match(/(?:EMPENHO|NOTA\s+DE\s+EMPENHO)(?:\s+N[º°o.]?)?\s*[:.-]?\s*(20\d{2}\s*NE\s*\d+)/i);
+    const empenho=m ? m[1].replace(/\s/g,"").toUpperCase() : "";
+    const itens=extrairItensOFV132(raw);
+    return {numero,fornecedor,cnpj,total,data,empenho,itens};
+  }
+
+  function aplicarItensComCodigosV132(itens){
+    if(typeof window.aplicarItensV100==="function") window.aplicarItensV100(itens);
+    const aplicar=()=>{
+      const rows=[...document.querySelectorAll("#itensBodyV100 tr")];
+      rows.forEach((tr,i)=>{
+        const item=itens[i] || {};
+        const codigo=item.codigoItemCatalogo || item.codItem || item.codCat || "";
+        tr.dataset.codCatalogo=codigo;
+        let inp=tr.querySelector(".itemCodCatalogoV128");
+        if(!inp && tr.children.length){
+          const td=document.createElement("td");
+          td.className="v128-td-codigo";
+          td.innerHTML=`<input class="itemCodCatalogoV128 v128-codigo-input" placeholder="Código do item">`;
+          tr.insertBefore(td,tr.children[1]||null);
+          inp=td.querySelector("input");
+        }
+        if(inp && codigo) inp.value=codigo;
+      });
+      if(typeof window.gerarBensV100==="function") window.gerarBensV100(true);
+      if(typeof window.compararDocs==="function") window.compararDocs();
+    };
+    setTimeout(aplicar,50);
+    setTimeout(aplicar,350);
+  }
+
+  const lerNFAnteriorV132=window.lerNFV100;
+  window.lerNFV100=async function(){
+    try{
+      setStatusV132("msgNFV100","Lendo Nota Fiscal...");
+      const extraido=await extrairDocumentoV132("arqNFV100","msgNFV100");
+      const nf=parseNFV132(extraido.texto);
+      if(nf.numero) document.getElementById("nfNumeroV100").value=nf.numero;
+      if(nf.data) document.getElementById("nfDataV100").value=nf.data;
+      if(nf.total) document.getElementById("nfValorV100").value=fmtV132(nf.total);
+      if(nf.fornecedor) document.getElementById("fornecedorV100").value=nf.fornecedor;
+      if(nf.cnpj) document.getElementById("cnpjV100").value=nf.cnpj;
+      if(nf.itens?.length) aplicarItensComCodigosV132(nf.itens);
+      const modo=extraido.ocr?"OCR aplicado":"texto do PDF";
+      setStatusV132("msgNFV100",`NF preenchida (${modo}): ${nf.numero||"número não identificado"} • ${nf.data||"data não identificada"} • ${nf.total?"R$ "+fmtV132(nf.total):"valor não identificado"}.${!nf.itens?.length?" Os itens continuarão sendo priorizados pela Ordem de Fornecimento.":""}`,!nf.numero||!nf.total);
+      if(typeof window.compararDocs==="function") window.compararDocs();
+    }catch(e){
+      console.error("Leitura OCR NF v132:",e);
+      if(typeof lerNFAnteriorV132==="function"){
+        try{return await lerNFAnteriorV132();}catch(_e){}
+      }
+      setStatusV132("msgNFV100","Não foi possível ler a NF: "+(e.message||e),true);
+      alert("Não foi possível ler a Nota Fiscal. "+(e.message||e));
+    }
+  };
+
+  const lerOFAnteriorV132=window.lerOFV100;
+  window.lerOFV100=async function(){
+    try{
+      setStatusV132("msgOFV100","Lendo Ordem de Fornecimento...");
+      const extraido=await extrairDocumentoV132("arqOFV100","msgOFV100");
+      const of=parseOFV132(extraido.texto);
+      if(of.numero) document.getElementById("ofNumeroV100").value=of.numero;
+      if(of.data) document.getElementById("ofDataV100").value=of.data;
+      if(of.total) document.getElementById("ofValorV100").value=fmtV132(of.total);
+      if(of.fornecedor) document.getElementById("fornecedorV100").value=of.fornecedor;
+      if(of.cnpj) document.getElementById("cnpjV100").value=of.cnpj;
+      if(of.empenho) document.getElementById("ofEmpenhoV100").value=of.empenho;
+      if(of.itens?.length) aplicarItensComCodigosV132(of.itens);
+      const modo=extraido.ocr?"OCR aplicado":"texto do PDF";
+      setStatusV132("msgOFV100",`OF preenchida (${modo}): ${of.numero||"número não identificado"} • ${of.data||"data não identificada"} • ${of.total?"R$ "+fmtV132(of.total):"valor não identificado"} • ${of.itens.length} item(ns) levado(s) para “Itens diferentes da aquisição”.`,!of.itens.length);
+      if(typeof window.compararDocs==="function") window.compararDocs();
+    }catch(e){
+      console.error("Leitura OCR OF v132:",e);
+      if(typeof lerOFAnteriorV132==="function"){
+        try{return await lerOFAnteriorV132();}catch(_e){}
+      }
+      setStatusV132("msgOFV100","Não foi possível ler a OF: "+(e.message||e),true);
+      alert("Não foi possível ler a Ordem de Fornecimento. "+(e.message||e));
+    }
+  };
+
+  window.extrairDocumentoOCRV132=extrairDocumentoV132;
+  window.parseOFV132=parseOFV132;
+  window.parseNFV132=parseNFV132;
+})();
+
 </script>
 </body>
 </html>

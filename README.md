@@ -163,3 +163,9 @@ Depois abra com Ctrl+F5.
 
 
 Atualização v180: Sistema de Gestão Patrimonial integrado na versão v128, preservando login único, perfil, foto, favicon e navegação do portal.
+
+
+## v183 - Patrimônio v132
+- OCR automático em Nota Fiscal e Ordem de Fornecimento digitalizadas.
+- Itens, quantidades, valores e código de item da OF são levados para “Itens diferentes da aquisição”.
+- OCR é usado apenas quando o PDF não possui texto pesquisável.
