@@ -19,7 +19,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=167">
-<title>Sistema de Prestação de Contas CG — v166</title>
+<title>Sistema de Prestação de Contas CG — v169</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1906,12 +1906,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     .integrated-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end}.integrated-form .span-2{grid-column:span 2}.integrated-form .span-3{grid-column:span 3}.integrated-form .span-4{grid-column:1/-1}
     .compact-register-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}.compact-register{display:grid;grid-template-columns:1.05fr .95fr .9fr .8fr .8fr 1.15fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid #d5e1e5;border-radius:12px;background:#fff;font-size:10px}.compact-register small{display:block;color:#718391;font-size:8px;font-weight:900;text-transform:uppercase;margin-bottom:2px}.compact-register strong{color:#0b2f4a}.compact-register-empty{padding:17px;text-align:center;color:#718391;background:#f8fbfc;border:1px dashed #cbd9df;border-radius:12px}
     .allocation-panel{margin-top:15px;padding:14px;border:1px solid #c8ded5;border-radius:14px;background:#f2f9f6}.allocation-panel h3{margin:0 0 4px;color:#0b2f4a;font-size:16px}.allocation-panel p{margin:0 0 12px;color:#6d8190;font-size:10px}.allocation-grid{display:grid;grid-template-columns:1.3fr .8fr .8fr .8fr .8fr .8fr 1.1fr auto;gap:8px;align-items:end}.allocation-list{display:flex;flex-direction:column;gap:7px;margin-top:11px}.allocation-row{display:grid;grid-template-columns:1.25fr .8fr .8fr .8fr .8fr .9fr 1.1fr auto;gap:8px;align-items:center;padding:9px 10px;background:#fff;border:1px solid #d5e1dd;border-radius:10px;font-size:9px}.allocation-row small{display:block;color:#718391;font-size:7px;text-transform:uppercase;font-weight:900}.allocation-balance{display:flex;justify-content:flex-end;gap:15px;flex-wrap:wrap;margin-top:10px;padding:9px 11px;border-radius:10px;background:#eaf4f0;color:#365866;font-size:10px}
-    .financial-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.financial-side{border:1px solid #d4e1e5;border-radius:14px;background:#fff;overflow:hidden}.financial-side h3{margin:0;padding:12px 14px;background:#eef5f7;color:#0b2f4a;font-size:15px}.financial-line{display:grid;grid-template-columns:1fr 120px 120px 105px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid #e3eaed;font-size:10px}.financial-line input{padding:7px 8px;font-size:10px}.financial-line .system-value{text-align:right;font-weight:800;color:#0b2f4a}.comparison-ok{color:#167347;font-weight:900}.comparison-warn{color:#8a5700;font-weight:900}.comparison-error{color:#b42318;font-weight:900}.financial-total{background:#f4f8f9;font-weight:900}
+    .financial-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.financial-side{border:1px solid #d4e1e5;border-radius:14px;background:#fff;overflow:hidden}.financial-side h3{margin:0;padding:12px 14px;background:#eef5f7;color:#0b2f4a;font-size:15px}.financial-column-head,.financial-line{display:grid;grid-template-columns:1fr 120px 120px 105px;gap:8px;align-items:center}.financial-column-head{padding:7px 12px;background:#f8fbfc;border-top:1px solid #e3eaed;color:#60788a;font-size:9px;font-weight:900;text-transform:uppercase}.financial-column-head span:not(:first-child){text-align:center}.financial-line{padding:8px 12px;border-top:1px solid #e3eaed;font-size:10px}.financial-line input{padding:7px 8px;font-size:10px}.financial-line .system-value{text-align:right;font-weight:800;color:#0b2f4a}.financial-detail{background:#fbfdfd;color:#526b7c}.financial-detail>span:first-child{padding-left:18px}.financial-detail .system-value{font-weight:700}.financial-detail-note{text-align:center;color:#708696;font-size:9px;font-weight:800}.comparison-ok{color:#167347;font-weight:900}.comparison-warn{color:#8a5700;font-weight:900}.comparison-error{color:#b42318;font-weight:900}.financial-total{background:#f4f8f9;font-weight:900}
     .program-section{margin-top:16px;border:1px solid #d5e1e5;border-radius:15px;background:#fff;overflow:hidden}.program-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#eef6f3}.program-section-head h3{margin:0;color:#0b2f4a;font-size:16px}.program-section-body{padding:13px}.program-table-scroll{overflow:auto;max-height:390px}.program-table-scroll table{min-width:1180px}.program-table-scroll th,.program-table-scroll td{font-size:9px;padding:7px 6px}
     .execution-card{border:1px solid #d5e1e5;border-radius:13px;background:#fff;overflow:hidden;margin-top:12px}.execution-card h3{margin:0;padding:11px 13px;background:#eef5f7;color:#0b2f4a;font-size:15px}.execution-row{display:grid;grid-template-columns:1.4fr .85fr .85fr .75fr 1.15fr;gap:9px;align-items:center;padding:9px 12px;border-top:1px solid #e2e9ec;font-size:10px}.execution-row input{padding:7px 8px;font-size:10px}.execution-progress{height:8px;background:#e5ecef;border-radius:999px;overflow:hidden;margin-top:4px}.execution-progress span{display:block;height:100%;background:#1aad59}
     .status-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:5px 8px;font-size:8px;font-weight:900;text-align:center}.status-pill.ok{background:#e5f6eb;color:#177347}.status-pill.warn{background:#fff4e5;color:#8a5700}.status-pill.error{background:#fde9e7;color:#b42318}.status-pill.info{background:#e9f3f8;color:#17658f}.status-pill.gray{background:#edf2f5;color:#566f7d}
     @media(max-width:1250px){.module-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.integrated-form{grid-template-columns:repeat(2,minmax(0,1fr))}.allocation-grid,.allocation-row{grid-template-columns:repeat(4,minmax(0,1fr))}.financial-grid{grid-template-columns:1fr}}
-    @media(max-width:720px){.module-summary-grid{grid-template-columns:1fr 1fr}.integrated-form,.allocation-grid,.allocation-row{grid-template-columns:1fr}.integrated-form .span-2,.integrated-form .span-3,.integrated-form .span-4{grid-column:auto}.financial-line,.execution-row{grid-template-columns:1fr}}
+    @media(max-width:720px){.module-summary-grid{grid-template-columns:1fr 1fr}.integrated-form,.allocation-grid,.allocation-row{grid-template-columns:1fr}.integrated-form .span-2,.integrated-form .span-3,.integrated-form .span-4{grid-column:auto}.financial-line,.execution-row{grid-template-columns:1fr}.financial-column-head{display:none}}
 
   
     /* paginação das tabelas */
@@ -4078,11 +4078,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </section>
 <section class="page" id="page-execucao-financeira">
 <div class="page-head"><div><h2>Demonstrativo de Execução da Receita e Despesa</h2><p>Conferência mensal por conta bancária usando extratos, pagamentos, transferências, ressarcimentos e rendimentos.</p></div></div>
-<div class="card"><div class="integrated-form"><div><label>Contrato *</label><select id="ferContract" onchange="financialExecutionContractChanged()"><option value="">Selecione</option></select></div><div><label>Conta bancária *</label><select id="ferAccount" onchange="renderFinancialExecution()"><option value="">Selecione</option></select></div><div><label>Competência *</label><input id="ferCompetence" onchange="renderFinancialExecution()" type="month"/></div><div><label>Demonstrativo da OS</label><input accept=".pdf" id="ferFile" type="file"/></div></div><div class="actions" style="margin-top:13px"><button class="btn btn-secondary" onclick="readFinancialExecutionPdf()">Ler PDF da OS</button><button class="btn btn-primary" onclick="saveFinancialExecutionReport()">Salvar conferência</button></div><div id="ferStatus" style="margin-top:12px"></div></div>
-<div class="financial-grid"><div class="financial-side"><h3>Receitas</h3>
+<div class="card"><div class="integrated-form"><div><label>Contrato *</label><select id="ferContract" onchange="financialExecutionContractChanged()"><option value="">Selecione</option></select></div><div><label>Conta bancária *</label><select id="ferAccount" onchange="financialExecutionAccountChanged()"><option value="">Selecione</option></select></div><div><label>Relação de pagamentos *</label><select id="ferAccountKind" onchange="renderFinancialExecution()"><option value="GESTAO">Conta principal de gestão</option><option value="PROVISAO">Conta de provisão</option></select></div><div><label>Competência *</label><input id="ferCompetence" onchange="financialExecutionCompetenceChanged()" type="month"/></div><div><label>Demonstrativo da OS</label><input accept=".pdf" id="ferFile" type="file"/></div></div><div class="actions" style="margin-top:13px"><button class="btn btn-secondary" onclick="readFinancialExecutionPdf()">Ler PDF da OS</button><button class="btn btn-primary" onclick="saveFinancialExecutionReport()">Salvar conferência</button></div><div id="ferStatus" style="margin-top:12px"></div></div>
+<div class="financial-grid"><div class="financial-side"><h3>Receitas</h3><div class="financial-column-head"><span>Item</span><span>Sistema</span><span>Demonstrativo da OS</span><span>Comparação</span></div>
 <div class="financial-line"><span>1. Parcela recebida no período</span><span class="system-value" id="ferSysParcel">R$ 0,00</span><input id="ferOsParcel"/><span id="ferCmpParcel">—</span></div><div class="financial-line"><span>2. Recursos de outros contratos</span><span class="system-value" id="ferSysOtherContracts">R$ 0,00</span><input id="ferOsOtherContracts"/><span id="ferCmpOtherContracts">—</span></div><div class="financial-line"><span>3. Saldo do período anterior</span><span class="system-value" id="ferSysOpening">R$ 0,00</span><input id="ferOsOpening"/><span id="ferCmpOpening">—</span></div><div class="financial-line"><span>4. Receita de rendimentos</span><span class="system-value" id="ferSysIncome">R$ 0,00</span><input id="ferOsIncome"/><span id="ferCmpIncome">—</span></div><div class="financial-line"><span>5. Outros recebimentos / ressarcimentos</span><span class="system-value" id="ferSysOtherReceipts">R$ 0,00</span><input id="ferOsOtherReceipts"/><span id="ferCmpOtherReceipts">—</span></div><div class="financial-line financial-total"><span>Total de receita</span><span class="system-value" id="ferSysRevenueTotal">R$ 0,00</span><input id="ferOsRevenueTotal"/><span id="ferCmpRevenueTotal">—</span></div>
-</div><div class="financial-side"><h3>Despesas e saldos</h3>
-<div class="financial-line"><span>1. Despesas do valor recebido</span><span class="system-value" id="ferSysExpenseContract">R$ 0,00</span><input id="ferOsExpenseContract"/><span id="ferCmpExpenseContract">—</span></div><div class="financial-line"><span>2. Despesas com recursos de outros contratos</span><span class="system-value" id="ferSysExpenseBorrowed">R$ 0,00</span><input id="ferOsExpenseBorrowed"/><span id="ferCmpExpenseBorrowed">—</span></div><div class="financial-line"><span>3. Despesas com receita de rendimentos</span><span class="system-value" id="ferSysExpenseIncome">R$ 0,00</span><input id="ferOsExpenseIncome"/><span id="ferCmpExpenseIncome">—</span></div><div class="financial-line"><span>4. Despesas de outras receitas</span><span class="system-value" id="ferSysExpenseOther">R$ 0,00</span><input id="ferOsExpenseOther"/><span id="ferCmpExpenseOther">—</span></div><div class="financial-line"><span>5. Transferências para outros contratos</span><span class="system-value" id="ferSysTransfersOut">R$ 0,00</span><input id="ferOsTransfersOut"/><span id="ferCmpTransfersOut">—</span></div><div class="financial-line"><span>Saldo do contrato</span><span class="system-value" id="ferSysContractBalance">R$ 0,00</span><input id="ferOsContractBalance"/><span id="ferCmpContractBalance">—</span></div><div class="financial-line"><span>Saldo de rendimentos</span><span class="system-value" id="ferSysIncomeBalance">R$ 0,00</span><input id="ferOsIncomeBalance"/><span id="ferCmpIncomeBalance">—</span></div><div class="financial-line financial-total"><span>Total de despesas + saldos</span><span class="system-value" id="ferSysExpenseTotal">R$ 0,00</span><input id="ferOsExpenseTotal"/><span id="ferCmpExpenseTotal">—</span></div>
+</div><div class="financial-side"><h3>Despesas e saldos</h3><div class="financial-column-head"><span>Item</span><span>Sistema</span><span>Demonstrativo da OS</span><span>Comparação</span></div>
+<div class="financial-line"><span>1. Despesas do valor recebido</span><span class="system-value" id="ferSysExpenseContract">R$ 0,00</span><input id="ferOsExpenseContract"/><span id="ferCmpExpenseContract">—</span></div><div class="financial-line financial-detail"><span>↳ Pessoal</span><span class="system-value" id="ferSysExpensePersonal">R$ 0,00</span><span class="financial-detail-note">Detalhamento do sistema</span><span>—</span></div><div class="financial-line financial-detail"><span>↳ Custeio</span><span class="system-value" id="ferSysExpenseCusteio">R$ 0,00</span><span class="financial-detail-note">Detalhamento do sistema</span><span>—</span></div><div class="financial-line financial-detail"><span>↳ Despesas da OS</span><span class="system-value" id="ferSysExpenseOs">R$ 0,00</span><span class="financial-detail-note">Detalhamento do sistema</span><span>—</span></div><div class="financial-line"><span>2. Despesas com recursos de outros contratos</span><span class="system-value" id="ferSysExpenseBorrowed">R$ 0,00</span><input id="ferOsExpenseBorrowed"/><span id="ferCmpExpenseBorrowed">—</span></div><div class="financial-line"><span>3. Despesas com receita de rendimentos</span><span class="system-value" id="ferSysExpenseIncome">R$ 0,00</span><input id="ferOsExpenseIncome"/><span id="ferCmpExpenseIncome">—</span></div><div class="financial-line"><span>4. Despesas de outras receitas</span><span class="system-value" id="ferSysExpenseOther">R$ 0,00</span><input id="ferOsExpenseOther"/><span id="ferCmpExpenseOther">—</span></div><div class="financial-line"><span>5. Transferências para outros contratos</span><span class="system-value" id="ferSysTransfersOut">R$ 0,00</span><input id="ferOsTransfersOut"/><span id="ferCmpTransfersOut">—</span></div><div class="financial-line"><span>Saldo do contrato</span><span class="system-value" id="ferSysContractBalance">R$ 0,00</span><input id="ferOsContractBalance"/><span id="ferCmpContractBalance">—</span></div><div class="financial-line"><span>Saldo de rendimentos</span><span class="system-value" id="ferSysIncomeBalance">R$ 0,00</span><input id="ferOsIncomeBalance"/><span id="ferCmpIncomeBalance">—</span></div><div class="financial-line financial-total"><span>Total de despesas + saldos</span><span class="system-value" id="ferSysExpenseTotal">R$ 0,00</span><input id="ferOsExpenseTotal"/><span id="ferCmpExpenseTotal">—</span></div>
 </div></div><div class="card" style="margin-top:14px"><div id="financialExecutionInternalNotes"></div><h3 style="color:#0b2f4a">Conferências salvas</h3><div class="compact-register-list" id="financialExecutionList"></div></div>
 </section>
 <section class="page" id="page-editais"><div class="page-head"><div><h2>Editais e Cotações</h2><p>Cadastro dos procedimentos de seleção, propostas, atas e cotações.</p></div></div><div class="card"><div class="integrated-form"><div><label>Contrato *</label><select id="prContract"><option value="">Selecione</option></select></div><div><label>Credor / fornecedor *</label><input id="prCreditor"/></div><div><label>CPF/CNPJ</label><input id="prDocument"/></div><div><label>Tipo</label><select id="prType"><option value="EDITAL">Edital</option><option value="COTACAO">Cotação</option><option value="PROPOSTA">Proposta</option><option value="ATA">Ata de Registro de Preços</option><option value="OUTRO">Outro</option></select></div><div class="span-2"><label>Nº Edital/Cotação *</label><input id="prNumber"/></div><div><label>Data *</label><input id="prDate" type="date"/></div><div><label>Arquivo</label><input accept=".pdf,.png,.jpg,.jpeg" id="prFile" type="file"/></div></div><div class="actions" style="margin-top:13px"><button class="btn btn-primary" onclick="saveProcurement()">Salvar</button><button class="btn btn-outline" onclick="clearProcurementForm()">Limpar</button></div></div><div class="card"><div class="filters"><div><label>Contrato</label><select id="prFilterContract" onchange="renderProcurements()"><option value="">Todos</option></select></div><div><label>Tipo</label><select id="prFilterType" onchange="renderProcurements()"><option value="">Todos</option><option value="EDITAL">Edital</option><option value="COTACAO">Cotação</option><option value="PROPOSTA">Proposta</option><option value="ATA">Ata</option><option value="OUTRO">Outro</option></select></div><div><label>Buscar</label><input id="prSearch" oninput="renderProcurements()"/></div></div><div class="table-wrap"><table><thead><tr><th>SACC/SCC</th><th>Contrato</th><th>Credor</th><th>CPF/CNPJ</th><th>Tipo</th><th>Número</th><th>Data</th><th>Arquivo</th><th>Ações</th></tr></thead><tbody id="procurementBody"></tbody></table></div></div></section>
@@ -5025,7 +5025,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="validation-item"><small>Total de Pessoal</small><strong id="paymentPreviewPersonalTotal">R$ 0,00</strong></div>
 <div class="validation-item"><small>Linhas de Custeio</small><strong id="paymentPreviewCusteioCount">0</strong></div>
 <div class="validation-item"><small>Total de Custeio</small><strong id="paymentPreviewCusteioTotal">R$ 0,00</strong></div>
-<div class="validation-item"><small>Resultado do mês</small><strong id="paymentPreviewPaidTotal">R$ 0,00</strong></div>
+<div class="validation-item"><small>Resultado do mês</small><strong id="paymentPreviewPaidTotal">R$ 0,00</strong></div><div class="validation-item"><small>Saldo do período anterior</small><input id="paymentPreviewOpeningBalance" onchange="editPaymentPreviewOpening(this.value)" placeholder="R$ 0,00"/></div>
 </div>
 <div id="paymentPreviewWarning"></div>
 <div aria-label="Rolagem horizontal superior" class="payment-top-scroll" id="paymentPreviewTopScroll">
@@ -12797,20 +12797,530 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
 
   /* Demonstrativo de execução financeira */
-  const FINANCIAL_FIELDS=[['Parcel','parcel'],['OtherContracts','otherContracts'],['Opening','opening'],['Income','income'],['OtherReceipts','otherReceipts'],['RevenueTotal','revenueTotal'],['ExpenseContract','expenseContract'],['ExpenseBorrowed','expenseBorrowed'],['ExpenseIncome','expenseIncome'],['ExpenseOther','expenseOther'],['TransfersOut','transfersOut'],['ContractBalance','contractBalance'],['IncomeBalance','incomeBalance'],['ExpenseTotal','expenseTotal']];
-  function refreshFinancialExecutionSelectors(){const select=document.getElementById('ferContract');if(!select)return;const current=select.value;select.innerHTML='<option value="">Selecione</option>'+state.contracts.map(contract=>`<option value="${contract.id}">${safe(contractShortLabel(contract))}</option>`).join('');if(state.contracts.some(contract=>contract.id===current))select.value=current}
-  window.financialExecutionContractChanged=function(){const contract=contractById(document.getElementById('ferContract').value),select=document.getElementById('ferAccount');select.innerHTML='<option value="">Selecione</option>'+(contract?.bankAccounts||[]).map(account=>`<option value="${account.id}">${safe(bankAccountLabel(account))}</option>`).join('');if((contract?.bankAccounts||[]).length===1)select.value=contract.bankAccounts[0].id;renderFinancialExecution()}
-  function financialSelection(){return{contractId:document.getElementById('ferContract')?.value||'',accountId:document.getElementById('ferAccount')?.value||'',competence:document.getElementById('ferCompetence')?.value||''}}
-  function financialExecutionSystemValues(){const{contractId,accountId,competence}=financialSelection();if(!contractId||!accountId||!competence)return null;const statements=state.bankStatements.filter(item=>item.contractId===contractId&&item.accountId===accountId&&item.competence===competence),entries=state.bankEntries.filter(item=>item.contractId===contractId&&item.accountId===accountId&&item.competence===competence);const opening=statements.reduce((sum,item)=>sum+Number(item.openingBalance||0),0),closing=statements.reduce((sum,item)=>sum+Number(item.closingBalance||0),0),category=(name,movement='CREDITO')=>entries.filter(item=>item.movementType===movement&&item.financialCategory===name).reduce((sum,item)=>sum+bankEntryAmount(item),0);const linkedIds=new Set(entries.filter(item=>item.movementType==='DEBITO').map(item=>item.id)),paymentIds=new Set(state.bankLinks.filter(link=>linkedIds.has(link.entryId)).map(link=>link.paymentId)),payments=state.payments.filter(payment=>payment.contractId===contractId&&payment.competence===competence&&(paymentIds.has(payment.id)||payment.source==='extrato'));const expenseBySource=source=>payments.filter(payment=>(payment.fundingSource||'CONTRATO')===source).reduce((sum,payment)=>sum+Number(payment.documentValue||0),0);const outgoing=state.resourceTransfers.filter(item=>item.originContractId===contractId&&item.originAccountId===accountId&&item.transferDate?.slice(0,7)===competence).reduce((sum,item)=>sum+Number(item.amount||0),0),incoming=state.resourceTransfers.filter(item=>item.destinationContractId===contractId&&(!item.destinationAccountId||item.destinationAccountId===accountId)&&item.transferDate?.slice(0,7)===competence).reduce((sum,item)=>sum+Number(item.amount||0),0);const applicationAccounts=(contractById(contractId)?.bankAccounts||[]).filter(account=>account.type==='aplicacao'),income=state.bankEntries.filter(item=>item.contractId===contractId&&applicationAccounts.some(account=>account.id===item.accountId)&&item.competence===competence&&item.movementType==='CREDITO'&&item.financialCategory==='RENDIMENTO').reduce((sum,item)=>sum+Number(item.credit||0),0);const parcel=category('PARCELA_ESTADO'),otherContracts=Math.max(incoming,category('RECURSO_OUTRO_CONTRATO')),otherReceipts=category('RESSARCIMENTO')+category('OUTRO_RECEBIMENTO'),expenseContract=expenseBySource('CONTRATO'),expenseBorrowed=expenseBySource('RECURSO_OUTRO_CONTRATO'),expenseIncome=expenseBySource('RENDIMENTO'),expenseOther=expenseBySource('OUTRA_RECEITA'),revenueTotal=parcel+otherContracts+opening+income+otherReceipts,contractBalance=Math.max(0,closing-income+expenseIncome),incomeBalance=Math.max(0,income-expenseIncome),expenseTotal=expenseContract+expenseBorrowed+expenseIncome+expenseOther+outgoing+contractBalance+incomeBalance,reimbursementsPending=payments.reduce((sum,payment)=>sum+(payment.reimbursements||[]).reduce((subtotal,item)=>{const credit=bankEntryById(item.creditEntryId),returned=credit?Number(credit.credit||0):Number(item.returnedAmount||0);return subtotal+Math.max(0,Number(item.amount||0)-returned)},0),0);return{parcel,otherContracts,opening,income,otherReceipts,revenueTotal,expenseContract,expenseBorrowed,expenseIncome,expenseOther,transfersOut:outgoing,contractBalance,incomeBalance,expenseTotal,closing,reimbursementsPending,paymentsCount:payments.length,unclassifiedCredits:entries.filter(item=>item.movementType==='CREDITO'&&!item.financialCategory).length}}
-  function financialOsValues(){const values={};FINANCIAL_FIELDS.forEach(([suffix,key])=>values[key]=numBR(document.getElementById(`ferOs${suffix}`)?.value||''));return values}
-  function fillFinancialOsValues(values={}){FINANCIAL_FIELDS.forEach(([suffix,key])=>setMoneyField(`ferOs${suffix}`,values[key]||0))}
-  function renderFinancialComparison(values){FINANCIAL_FIELDS.forEach(([suffix,key])=>{const system=document.getElementById(`ferSys${suffix}`),comparison=document.getElementById(`ferCmp${suffix}`);if(system)system.textContent=money(values?.[key]||0);if(comparison){const status=differenceStatus(values?.[key]||0,numBR(document.getElementById(`ferOs${suffix}`)?.value||''));comparison.className=status.className;comparison.textContent=status.label}})}
-  function renderFinancialExecution(){refreshFinancialExecutionSelectors();const values=financialExecutionSystemValues();renderFinancialComparison(values||{});const notes=document.getElementById('financialExecutionInternalNotes');if(notes)notes.innerHTML=values?`<div class="notice ${values.unclassifiedCredits||values.reimbursementsPending?'warn':'ok'}">Pagamentos considerados: <strong>${values.paymentsCount}</strong> • Créditos sem classificação: <strong>${values.unclassifiedCredits}</strong> • Ressarcimentos a receber: <strong>${money(values.reimbursementsPending)}</strong> • Saldo final do extrato: <strong>${money(values.closing)}</strong>.</div>`:'<div class="notice warn">Selecione contrato, conta e competência.</div>';renderFinancialExecutionList()}
-  FINANCIAL_FIELDS.forEach(([suffix])=>document.getElementById(`ferOs${suffix}`)?.addEventListener('input',renderFinancialExecution));
-  window.readFinancialExecutionPdf=async function(){const file=document.getElementById('ferFile').files[0];if(!file){alert('Selecione o PDF.');return}document.getElementById('ferStatus').innerHTML='<div class="notice info">Lendo o demonstrativo...</div>';try{const lines=await extractLines(file),text=lines.join(' '),amounts=[...text.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2})/g)].map(match=>numBR(match[1])),known={};if(amounts.length>=6){const last=amounts.slice(-12);known.opening=last[0]||0;known.income=last[1]||0;known.revenueTotal=last[2]||0;known.expenseContract=last[3]||0;known.contractBalance=last[last.length-2]||0;known.incomeBalance=last[last.length-1]||0;known.expenseTotal=known.revenueTotal}financialExecutionPdfDraft={file,values:known};fillFinancialOsValues(known);document.getElementById('ferStatus').innerHTML='<div class="notice warn">PDF lido. Confira os valores sugeridos antes de salvar.</div>';renderFinancialExecution()}catch(error){document.getElementById('ferStatus').innerHTML=`<div class="notice error">${safe(error.message||String(error))}</div>`}}
-  window.saveFinancialExecutionReport=async function(){const selection=financialSelection(),systemValues=financialExecutionSystemValues();if(!selection.contractId||!selection.accountId||!selection.competence||!systemValues){alert('Selecione contrato, conta e competência.');return}const existing=state.financialReports.find(item=>item.contractId===selection.contractId&&item.accountId===selection.accountId&&item.competence===selection.competence),report={id:existing?.id||id(),...selection,osValues:financialOsValues(),systemValues,documentId:existing?.documentId||'',createdAt:existing?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()},file=financialExecutionPdfDraft?.file||document.getElementById('ferFile').files[0];if(file){if(report.documentId){try{await deleteFileBlob(report.documentId)}catch(error){}state.documents=state.documents.filter(document=>document.id!==report.documentId)}const contract=contractById(selection.contractId);report.documentId=await saveModuleFile(file,{folder:'demonstrativos_financeiros',categoria:'demonstrativo',tipo:'demonstrativo_receita_despesa',financialReportId:report.id,contractId:contract.id,ug:contract.ug,sacc:contract.sacc,contrato:contract.contrato,competencia:selection.competence})}const index=state.financialReports.findIndex(item=>item.id===report.id);if(index>=0)state.financialReports[index]=report;else state.financialReports.push(report);financialExecutionPdfDraft=null;saveState();renderFinancialExecution()}
-  function financialReportHasDivergence(report){return FINANCIAL_FIELDS.some(([,key])=>Math.abs(Number(report.systemValues?.[key]||0)-Number(report.osValues?.[key]||0))>.02)}
-  function renderFinancialExecutionList(){const box=document.getElementById('financialExecutionList');if(!box)return;box.innerHTML=state.financialReports.slice().sort((a,b)=>(b.competence||'').localeCompare(a.competence||'')).map(report=>{const contract=contractById(report.contractId),account=bankAccountById(report.contractId,report.accountId),divergent=financialReportHasDivergence(report);return`<div class="compact-register"><div><small>Contrato</small><strong>${safe(contractShortLabel(contract))}</strong></div><div><small>Conta</small>${safe(bankAccountLabel(account))}</div><div><small>Competência</small>${safe(competenceLabel(report.competence))}</div><div><small>Receita sistema</small>${money(report.systemValues?.revenueTotal)}</div><div><small>Receita OS</small>${money(report.osValues?.revenueTotal)}</div><div><small>Situação</small><span class="status-pill ${divergent?'error':'ok'}">${divergent?'DIVERGENTE':'CONFERIDO'}</span></div><div>${report.documentId?`<button class="link-btn" onclick="openStoredDocument('${report.documentId}',false)">Abrir PDF</button>`:'—'}</div></div>`}).join('')||'<div class="compact-register-empty">Nenhuma conferência salva.</div>'}
+  const FINANCIAL_FIELDS=[
+    ['Parcel','parcel'],
+    ['OtherContracts','otherContracts'],
+    ['Opening','opening'],
+    ['Income','income'],
+    ['OtherReceipts','otherReceipts'],
+    ['RevenueTotal','revenueTotal'],
+    ['ExpenseContract','expenseContract'],
+    ['ExpenseBorrowed','expenseBorrowed'],
+    ['ExpenseIncome','expenseIncome'],
+    ['ExpenseOther','expenseOther'],
+    ['TransfersOut','transfersOut'],
+    ['ContractBalance','contractBalance'],
+    ['IncomeBalance','incomeBalance'],
+    ['ExpenseTotal','expenseTotal']
+  ];
+
+  function refreshFinancialExecutionSelectors(){
+    const contractSelect=document.getElementById('ferContract');
+    if(!contractSelect)return;
+    const selected=contractSelect.value;
+    contractSelect.innerHTML='<option value="">Selecione</option>'+state.contracts.map(contract=>
+      `<option value="${contract.id}">${safe(contractShortLabel(contract))}</option>`
+    ).join('');
+    if(state.contracts.some(contract=>contract.id===selected))contractSelect.value=selected;
+    if(!document.getElementById('ferCompetence').value){
+      const now=new Date();
+      document.getElementById('ferCompetence').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    }
+  }
+
+  function financialReportKinds(contractId,competence){
+    return [...new Set(state.paymentReports
+      .filter(report=>report.contractId===contractId&&report.competence===competence)
+      .map(report=>paymentAccountKind(report.bankAccountKind)))];
+  }
+
+  const financialOpeningReadInProgress=new Set();
+
+  function financialOpeningFromLines(lines){
+    const line=(lines||[]).find(value=>{
+      const normalized=normalizeForChecklist(value);
+      return normalized.includes('SALDO DO PERIODO ANTERIOR')||
+        normalized.includes('SALDO ANTERIOR')||
+        normalized.includes('SALDO INICIAL');
+    });
+    if(!line)return null;
+    const compact=String(line).replace(/\s+/g,'');
+    const values=(compact.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[]).map(value=>numBR(value));
+    return values.length?values[values.length-1]:null;
+  }
+
+  async function ensureFinancialPaymentReportOpening(contractId,competence,accountKind){
+    const report=state.paymentReports
+      .filter(item=>
+        item.contractId===contractId&&
+        item.competence===competence&&
+        paymentAccountKind(item.bankAccountKind)===accountKind&&
+        (item.openingBalance===null||item.openingBalance===undefined)&&
+        item.documentId
+      )
+      .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''))[0];
+    if(!report||financialOpeningReadInProgress.has(report.id))return;
+    financialOpeningReadInProgress.add(report.id);
+    try{
+      const blob=await getFileBlob(report.documentId);
+      if(!blob)return;
+      const lines=await extractLines(blob);
+      const openingBalance=financialOpeningFromLines(lines);
+      if(openingBalance===null)return;
+      report.openingBalance=openingBalance;
+      saveState();
+    }catch(error){
+      console.warn('Não foi possível recuperar o saldo anterior da Relação de Pagamentos:',error);
+    }
+  }
+
+  function financialAccountKindGuess(contractId,accountId,competence){
+    const account=bankAccountById(contractId,accountId);
+    const explicit=String(account?.bankAccountKind||account?.accountKind||'').toUpperCase();
+    if(['GESTAO','PROVISAO'].includes(explicit))return explicit;
+
+    const accountDescription=normalizeForChecklist(
+      `${account?.purpose||''} ${account?.typeLabel||''} ${account?.description||''}`
+    );
+    if(accountDescription.includes('PROVISAO'))return 'PROVISAO';
+
+    const entryIds=new Set(state.bankEntries
+      .filter(entry=>entry.contractId===contractId&&entry.accountId===accountId&&entry.competence===competence)
+      .map(entry=>entry.id));
+    const linkedPaymentKinds=state.bankLinks
+      .filter(link=>entryIds.has(link.entryId))
+      .map(link=>state.payments.find(payment=>payment.id===link.paymentId))
+      .filter(Boolean)
+      .map(payment=>paymentAccountKind(payment.bankAccountKind));
+    if(linkedPaymentKinds.length){
+      const counts=linkedPaymentKinds.reduce((result,kind)=>{
+        result[kind]=(result[kind]||0)+1;
+        return result;
+      },{});
+      return (counts.PROVISAO||0)>(counts.GESTAO||0)?'PROVISAO':'GESTAO';
+    }
+
+    const reportKinds=financialReportKinds(contractId,competence);
+    return reportKinds.length===1?reportKinds[0]:'GESTAO';
+  }
+
+  window.financialExecutionContractChanged=function(){
+    const contract=contractById(document.getElementById('ferContract').value);
+    const select=document.getElementById('ferAccount');
+    select.innerHTML='<option value="">Selecione</option>'+(contract?.bankAccounts||[]).map(account=>
+      `<option value="${account.id}">${safe(bankAccountLabel(account))}</option>`
+    ).join('');
+    if((contract?.bankAccounts||[]).length===1)select.value=contract.bankAccounts[0].id;
+    financialExecutionAccountChanged();
+  }
+
+  window.financialExecutionAccountChanged=function(){
+    const selection=financialSelection();
+    const kindSelect=document.getElementById('ferAccountKind');
+    if(kindSelect&&selection.contractId&&selection.accountId){
+      kindSelect.value=financialAccountKindGuess(
+        selection.contractId,
+        selection.accountId,
+        selection.competence
+      );
+    }
+    renderFinancialExecution();
+  }
+
+  window.financialExecutionCompetenceChanged=function(){
+    financialExecutionAccountChanged();
+  }
+
+  function financialSelection(){
+    return{
+      contractId:document.getElementById('ferContract')?.value||'',
+      accountId:document.getElementById('ferAccount')?.value||'',
+      accountKind:paymentAccountKind(document.getElementById('ferAccountKind')?.value),
+      competence:document.getElementById('ferCompetence')?.value||''
+    };
+  }
+
+  function financialPaymentGroup(payment){
+    const program=programForContract(payment.contractId);
+    const planItem=(program?.financialItems||[]).find(item=>item.id===payment.planItemId);
+    const planGroup=normalizeForChecklist(planItem?.group||'');
+    const expenseType=normalizeForChecklist(payment.expenseType||'');
+    const expenseText=normalizeForChecklist(
+      `${payment.sourceExpenseType||''} ${payment.expenseNature||''}`
+    );
+
+    if(
+      planGroup.includes('DESPESAS OS')||
+      expenseType.includes('DESPESAS OS')||
+      expenseText.includes('DESPESAS OPERACIONAIS DA OS')||
+      expenseText.includes('DESPESA OPERACIONAL DA OS')
+    )return 'DESPESAS_OS';
+    if(expenseType==='PESSOAL'||planGroup==='PESSOAL')return 'PESSOAL';
+    return 'CUSTEIO';
+  }
+
+  function financialPaymentAmount(payment){
+    const paid=Number(payment.paidValue);
+    return Number.isFinite(paid)&&paid>0?paid:Number(payment.documentValue||0);
+  }
+
+  function financialApplicationIncome(contractId,accountId,competence){
+    const yields=state.bankApplicationTransfers.filter(item=>
+      item.contractId===contractId&&
+      (item.currentAccountId===accountId||item.applicationAccountId===accountId)&&
+      item.competence===competence&&
+      item.transferDirection==='RENDIMENTO'&&
+      item.sourceSide==='APLICACAO'
+    );
+    const unique=new Map();
+    yields.forEach(item=>{
+      const key=[item.statementId,item.date,item.documentNumber,Number(item.amount||0).toFixed(2)].join('|');
+      if(!unique.has(key))unique.set(key,item);
+    });
+    return [...unique.values()].reduce((sum,item)=>sum+Number(item.amount||0),0);
+  }
+
+  function financialExecutionSystemValues(){
+    const{contractId,accountId,accountKind,competence}=financialSelection();
+    if(!contractId||!accountId||!competence)return null;
+
+    const statements=state.bankStatements.filter(item=>
+      item.contractId===contractId&&item.accountId===accountId&&item.competence===competence
+    );
+    const entries=state.bankEntries.filter(item=>
+      item.contractId===contractId&&item.accountId===accountId&&item.competence===competence
+    );
+    const credits=entries.filter(item=>item.movementType==='CREDITO'&&!item.reversalEntryId);
+    const category=name=>credits
+      .filter(item=>item.financialCategory===name)
+      .reduce((sum,item)=>sum+bankEntryAmount(item),0);
+
+    const paymentReport=state.paymentReports
+      .filter(report=>
+        report.contractId===contractId&&
+        report.competence===competence&&
+        paymentAccountKind(report.bankAccountKind)===accountKind&&
+        report.openingBalance!==null&&report.openingBalance!==undefined
+      )
+      .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''))[0];
+    const statementOpening=statements
+      .filter(item=>item.openingBalance!==null&&item.openingBalance!==undefined)
+      .reduce((sum,item)=>sum+Number(item.openingBalance||0),0);
+    const opening=paymentReport?Number(paymentReport.openingBalance||0):statementOpening;
+    const openingSource=paymentReport?'Relação de Pagamentos':'Extratos bancários';
+
+    const currentClosing=statements
+      .filter(item=>item.type==='conta_corrente'&&item.closingBalance!==null&&item.closingBalance!==undefined)
+      .reduce((sum,item)=>sum+Number(item.closingBalance||0),0);
+    const applicationClosing=statements
+      .filter(item=>item.type==='aplicacao'&&item.closingBalance!==null&&item.closingBalance!==undefined)
+      .reduce((sum,item)=>sum+Number(item.closingBalance||0),0);
+    const bankClosing=currentClosing+applicationClosing;
+    const hasBankClosing=statements.some(item=>item.closingBalance!==null&&item.closingBalance!==undefined);
+
+    const payments=state.payments.filter(payment=>
+      payment.contractId===contractId&&
+      payment.competence===competence&&
+      paymentAccountKind(payment.bankAccountKind)===accountKind&&
+      payment.source!=='extrato'
+    );
+    const expenseBySource=source=>payments
+      .filter(payment=>(payment.fundingSource||'CONTRATO')===source)
+      .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
+    const contractPayments=payments.filter(payment=>(payment.fundingSource||'CONTRATO')==='CONTRATO');
+    const expensePersonal=contractPayments
+      .filter(payment=>financialPaymentGroup(payment)==='PESSOAL')
+      .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
+    const expenseOs=contractPayments
+      .filter(payment=>financialPaymentGroup(payment)==='DESPESAS_OS')
+      .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
+    const expenseCusteio=contractPayments
+      .filter(payment=>financialPaymentGroup(payment)==='CUSTEIO')
+      .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
+
+    const outgoing=state.resourceTransfers.filter(item=>
+      item.originContractId===contractId&&
+      item.originAccountId===accountId&&
+      item.transferDate?.slice(0,7)===competence
+    ).reduce((sum,item)=>sum+Number(item.amount||0),0);
+    const incoming=state.resourceTransfers.filter(item=>
+      item.destinationContractId===contractId&&
+      (!item.destinationAccountId||item.destinationAccountId===accountId)&&
+      item.transferDate?.slice(0,7)===competence
+    ).reduce((sum,item)=>sum+Number(item.amount||0),0);
+
+    const parcel=category('PARCELA_ESTADO');
+    const otherContracts=Math.max(incoming,category('RECURSO_OUTRO_CONTRATO'));
+    const income=financialApplicationIncome(contractId,accountId,competence);
+    const otherReceipts=credits.filter(item=>
+      !['PARCELA_ESTADO','RECURSO_OUTRO_CONTRATO','RENDIMENTO','TRANSFERENCIA_OUTRO_CONTRATO','IGNORAR']
+        .includes(item.financialCategory||'')
+    ).reduce((sum,item)=>sum+bankEntryAmount(item),0);
+
+    const expenseContract=expenseBySource('CONTRATO');
+    const expenseBorrowed=expenseBySource('RECURSO_OUTRO_CONTRATO');
+    const expenseIncome=expenseBySource('RENDIMENTO');
+    const expenseOther=expenseBySource('OUTRA_RECEITA');
+    const revenueTotal=parcel+otherContracts+opening+income+otherReceipts;
+    const incomeBalance=Math.max(0,income-expenseIncome);
+    const expensesBeforeBalances=expenseContract+expenseBorrowed+expenseIncome+expenseOther+outgoing;
+    const contractBalance=Math.max(0,revenueTotal-expensesBeforeBalances-incomeBalance);
+    const expenseTotal=expensesBeforeBalances+contractBalance+incomeBalance;
+    const calculatedClosing=contractBalance+incomeBalance;
+    const closingDifference=hasBankClosing?calculatedClosing-bankClosing:null;
+
+    const reimbursementsPending=payments.reduce((sum,payment)=>
+      sum+(payment.reimbursements||[]).reduce((subtotal,item)=>{
+        const credit=bankEntryById(item.creditEntryId);
+        const returned=credit?Number(credit.credit||0):Number(item.returnedAmount||0);
+        return subtotal+Math.max(0,Number(item.amount||0)-returned);
+      },0),0);
+    const unclassifiedCredits=credits.filter(item=>!item.financialCategory).length;
+
+    return{
+      parcel,otherContracts,opening,income,otherReceipts,revenueTotal,
+      expenseContract,expensePersonal,expenseCusteio,expenseOs,
+      expenseBorrowed,expenseIncome,expenseOther,transfersOut:outgoing,
+      contractBalance,incomeBalance,expenseTotal,
+      bankClosing,calculatedClosing,closingDifference,hasBankClosing,
+      openingSource,reimbursementsPending,paymentsCount:payments.length,
+      unclassifiedCredits,accountKind
+    };
+  }
+
+  function financialOsValues(){
+    const values={};
+    FINANCIAL_FIELDS.forEach(([suffix,key])=>
+      values[key]=numBR(document.getElementById(`ferOs${suffix}`)?.value||'')
+    );
+    return values;
+  }
+
+  function fillFinancialOsValues(values={}){
+    FINANCIAL_FIELDS.forEach(([suffix,key])=>
+      setMoneyField(`ferOs${suffix}`,values[key]||0)
+    );
+  }
+
+  function renderFinancialComparison(values){
+    FINANCIAL_FIELDS.forEach(([suffix,key])=>{
+      const system=document.getElementById(`ferSys${suffix}`);
+      const comparison=document.getElementById(`ferCmp${suffix}`);
+      if(system)system.textContent=money(values?.[key]||0);
+      if(comparison){
+        const status=differenceStatus(
+          values?.[key]||0,
+          numBR(document.getElementById(`ferOs${suffix}`)?.value||'')
+        );
+        comparison.className=status.className;
+        comparison.textContent=status.label;
+      }
+    });
+    const details={
+      ferSysExpensePersonal:values?.expensePersonal||0,
+      ferSysExpenseCusteio:values?.expenseCusteio||0,
+      ferSysExpenseOs:values?.expenseOs||0
+    };
+    Object.entries(details).forEach(([elementId,value])=>{
+      const element=document.getElementById(elementId);
+      if(element)element.textContent=money(value);
+    });
+  }
+
+  function renderFinancialExecution(){
+    refreshFinancialExecutionSelectors();
+    const values=financialExecutionSystemValues();
+    renderFinancialComparison(values||{});
+    if(values){
+      const selection=financialSelection();
+      ensureFinancialPaymentReportOpening(selection.contractId,selection.competence,selection.accountKind);
+    }
+    const notes=document.getElementById('financialExecutionInternalNotes');
+    if(notes){
+      if(!values){
+        notes.innerHTML='<div class="notice warn">Selecione contrato, conta, tipo da relação de pagamentos e competência.</div>';
+      }else{
+        const closingText=values.hasBankClosing
+          ? `Saldo calculado: <strong>${money(values.calculatedClosing)}</strong> • Saldo final dos extratos: <strong>${money(values.bankClosing)}</strong> • Diferença: <strong>${money(values.closingDifference)}</strong>.`
+          : `Saldo calculado após as movimentações: <strong>${money(values.calculatedClosing)}</strong>. O saldo final completo dos extratos ainda não está disponível.`;
+        notes.innerHTML=`<div class="notice ${values.unclassifiedCredits||values.reimbursementsPending||Math.abs(values.closingDifference||0)>.02?'warn':'ok'}">
+          Relação usada: <strong>${safe(paymentAccountKindLabel(values.accountKind))}</strong> •
+          Pagamentos considerados: <strong>${values.paymentsCount}</strong> •
+          Saldo anterior obtido de: <strong>${safe(values.openingSource)}</strong> •
+          Créditos sem classificação incluídos em outros recebimentos: <strong>${values.unclassifiedCredits}</strong> •
+          Ressarcimentos a receber: <strong>${money(values.reimbursementsPending)}</strong>.<br>
+          ${closingText}
+        </div>`;
+      }
+    }
+    renderFinancialExecutionList();
+  }
+
+  FINANCIAL_FIELDS.forEach(([suffix])=>
+    document.getElementById(`ferOs${suffix}`)?.addEventListener('input',renderFinancialExecution)
+  );
+
+  function financialPdfAmount(items,startX,endX){
+    const text=items
+      .filter(item=>item.x>=startX&&item.x<endX)
+      .sort((a,b)=>a.x-b.x)
+      .map(item=>item.text)
+      .join('');
+    const values=(text.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[]).map(value=>numBR(value));
+    return values.length?values[values.length-1]:null;
+  }
+
+  async function extractFinancialExecutionPdf(file){
+    const pdfjs=await getPdfJs();
+    const data=await file.arrayBuffer();
+    const pdf=await pdfjs.getDocument({data}).promise;
+    const values={};
+    const found=new Set();
+
+    for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+      const page=await pdf.getPage(pageNumber);
+      const viewport=page.getViewport({scale:1});
+      const content=await page.getTextContent();
+      const items=content.items.map(item=>({
+        text:String(item.str||'').replace(/\u00a0/g,' ').trim(),
+        x:Number(item.transform[4]||0),
+        y:Number(item.transform[5]||0)
+      })).filter(item=>item.text);
+      const groups=[];
+      items.forEach(item=>{
+        let group=groups.find(candidate=>Math.abs(candidate.y-item.y)<=1.8);
+        if(!group){group={y:item.y,items:[]};groups.push(group)}
+        group.items.push(item);
+      });
+      groups.sort((a,b)=>b.y-a.y);
+      const middle=viewport.width*.52;
+      let balanceSection='';
+
+      const assign=(key,amount,hasLabel=true)=>{
+        if(!hasLabel)return;
+        values[key]=amount===null?0:Number(amount||0);
+        found.add(key);
+      };
+
+      groups.forEach(group=>{
+        const ordered=group.items.slice().sort((a,b)=>a.x-b.x);
+        const line=ordered.map(item=>item.text).join(' ').replace(/\s+/g,' ').trim();
+        const normalized=normalizeForChecklist(line);
+        const leftAmount=financialPdfAmount(ordered,0,middle);
+        const rightAmount=financialPdfAmount(ordered,middle,viewport.width+1);
+
+        if(normalized.includes('A DO CONTRATO'))balanceSection='CONTRATO';
+        if(normalized.includes('B DE RENDIMENTOS'))balanceSection='RENDIMENTO';
+
+        if(normalized.includes('PARCELA RECEBIDA NO PERIODO'))assign('parcel',leftAmount);
+        if(normalized.includes('RECURSO DE OUTROS CONTRATOS'))assign('otherContracts',leftAmount);
+        if(normalized.includes('SALDO DO PERIODO ANTERIOR'))assign('opening',leftAmount);
+        if(normalized.includes('RECEITA DE RENDIMENTOS'))assign('income',leftAmount);
+        if(normalized.includes('OUTROS RECEBIMENTOS'))assign('otherReceipts',leftAmount);
+
+        if(normalized.includes('DESPESAS DO VALOR RECEBIDO'))assign('expenseContract',rightAmount);
+        if(normalized.includes('DESPESAS C RECURSO OUTROS CONTRATOS')||normalized.includes('DESPESAS COM RECURSO OUTROS CONTRATOS'))assign('expenseBorrowed',rightAmount);
+        if(normalized.includes('DESPESAS COM RECEITA DE RENDIMENTOS'))assign('expenseIncome',rightAmount);
+        if(normalized.includes('DESPESA DE OUTRAS RECEITAS')||normalized.includes('DESPESAS DE OUTRAS RECEITAS'))assign('expenseOther',rightAmount);
+        if(normalized.includes('TRANSFERENCIAS PARA OUTROS CONTRATOS'))assign('transfersOut',rightAmount);
+
+        if(normalized.includes('A SER GASTO NA PROXIMA PARCELA')){
+          if(balanceSection==='CONTRATO')assign('contractBalance',rightAmount);
+          if(balanceSection==='RENDIMENTO')assign('incomeBalance',rightAmount);
+        }
+        if(normalized.includes('TOTAL DE RECEITA'))assign('revenueTotal',leftAmount);
+        if(normalized.includes('TOTAL DAS DESPESAS'))assign('expenseTotal',rightAmount);
+      });
+    }
+
+    return{values,found:[...found],pageCount:pdf.numPages};
+  }
+
+  window.readFinancialExecutionPdf=async function(){
+    const file=document.getElementById('ferFile').files[0];
+    if(!file){alert('Selecione o PDF.');return}
+    document.getElementById('ferStatus').innerHTML='<div class="notice info">Lendo o demonstrativo...</div>';
+    try{
+      const parsed=await extractFinancialExecutionPdf(file);
+      financialExecutionPdfDraft={file,values:parsed.values};
+      fillFinancialOsValues(parsed.values);
+      document.getElementById('ferStatus').innerHTML=`<div class="notice ${parsed.found.length>=10?'ok':'warn'}">
+        PDF lido: ${parsed.found.length} campo(s) identificado(s). Confira os valores antes de salvar.
+      </div>`;
+      renderFinancialExecution();
+    }catch(error){
+      document.getElementById('ferStatus').innerHTML=`<div class="notice error">${safe(error.message||String(error))}</div>`;
+    }
+  }
+
+  window.saveFinancialExecutionReport=async function(){
+    const selection=financialSelection();
+    const systemValues=financialExecutionSystemValues();
+    if(!selection.contractId||!selection.accountId||!selection.competence||!systemValues){
+      alert('Selecione contrato, conta, relação de pagamentos e competência.');
+      return;
+    }
+    const existing=state.financialReports.find(item=>
+      item.contractId===selection.contractId&&
+      item.accountId===selection.accountId&&
+      paymentAccountKind(item.accountKind)===selection.accountKind&&
+      item.competence===selection.competence
+    );
+    const report={
+      id:existing?.id||id(),...selection,
+      osValues:financialOsValues(),systemValues,
+      documentId:existing?.documentId||'',
+      createdAt:existing?.createdAt||new Date().toISOString(),
+      updatedAt:new Date().toISOString()
+    };
+    const file=financialExecutionPdfDraft?.file||document.getElementById('ferFile').files[0];
+    if(file){
+      if(report.documentId){
+        try{await deleteFileBlob(report.documentId)}catch(error){}
+        state.documents=state.documents.filter(document=>document.id!==report.documentId);
+      }
+      const contract=contractById(selection.contractId);
+      report.documentId=await saveModuleFile(file,{
+        folder:'demonstrativos_financeiros',categoria:'demonstrativo',
+        tipo:'demonstrativo_receita_despesa',financialReportId:report.id,
+        contractId:contract.id,ug:contract.ug,sacc:contract.sacc,
+        contrato:contract.contrato,competencia:selection.competence,
+        bankAccountKind:selection.accountKind
+      });
+    }
+    const index=state.financialReports.findIndex(item=>item.id===report.id);
+    if(index>=0)state.financialReports[index]=report;else state.financialReports.push(report);
+    financialExecutionPdfDraft=null;
+    saveState();
+    renderFinancialExecution();
+  }
+
+  function financialReportHasDivergence(report){
+    return FINANCIAL_FIELDS.some(([,key])=>
+      Math.abs(Number(report.systemValues?.[key]||0)-Number(report.osValues?.[key]||0))>.02
+    );
+  }
+
+  function renderFinancialExecutionList(){
+    const box=document.getElementById('financialExecutionList');
+    if(!box)return;
+    box.innerHTML=state.financialReports.slice()
+      .sort((a,b)=>(b.competence||'').localeCompare(a.competence||''))
+      .map(report=>{
+        const contract=contractById(report.contractId);
+        const account=bankAccountById(report.contractId,report.accountId);
+        const divergent=financialReportHasDivergence(report);
+        return `<div class="compact-register">
+          <div><small>Contrato</small><strong>${safe(contractShortLabel(contract))}</strong></div>
+          <div><small>Conta</small>${safe(bankAccountLabel(account))}<br><small>${safe(paymentAccountKindLabel(report.accountKind))}</small></div>
+          <div><small>Competência</small>${safe(competenceLabel(report.competence))}</div>
+          <div><small>Receita sistema</small>${money(report.systemValues?.revenueTotal)}</div>
+          <div><small>Receita OS</small>${money(report.osValues?.revenueTotal)}</div>
+          <div><small>Situação</small><span class="status-pill ${divergent?'error':'ok'}">${divergent?'DIVERGENTE':'CONFERIDO'}</span></div>
+          <div>${report.documentId?`<button class="link-btn" onclick="openStoredDocument('${report.documentId}',false)">Abrir PDF</button>`:'—'}</div>
+        </div>`;
+      }).join('')||'<div class="compact-register-empty">Nenhuma conferência salva.</div>';
+  }
 
   /* Programa de Trabalho */
   function emptyWorkProgramDraft(){return{physicalGoals:[],financialItems:[],indicators:[],disbursements:[]}}
@@ -14026,6 +14536,17 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     });
 
     const text=fullText.join('\n');
+    const openingBalanceLine=fullText.find(line=>{
+      const normalized=normalizeForChecklist(line);
+      return normalized.includes('SALDO DO PERIODO ANTERIOR')||
+        normalized.includes('SALDO ANTERIOR')||
+        normalized.includes('SALDO INICIAL');
+    })||'';
+    const openingBalanceValues=(openingBalanceLine.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[])
+      .map(value=>numBR(value));
+    const openingBalance=openingBalanceValues.length
+      ? openingBalanceValues[openingBalanceValues.length-1]
+      : null;
     const headerContract=(text.match(/CONTRATO DE GESTÃO\s*N[º°]?\s*(\d{2}\/\d{4})/i)||[])[1]||
       uniqueRows[0]?.contractFromPdf||'';
 
@@ -14052,6 +14573,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       competence,
       pageCount:pdf.numPages,
       pdfTotals,
+      openingBalance,
       personalCount:personalRows.length,
       custeioCount:custeioRows.length,
       personalDocumentTotal:personalRows.reduce((sum,row)=>sum+Number(row.documentValue||0),0),
@@ -14212,6 +14734,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     document.getElementById('paymentPreviewCusteioCount').textContent=paymentPreview.custeioCount;
     document.getElementById('paymentPreviewCusteioTotal').textContent=money(paymentPreview.custeioPaidTotal);
     document.getElementById('paymentPreviewPaidTotal').textContent=money(paymentPreview.totalPaid);
+    const openingInput=document.getElementById('paymentPreviewOpeningBalance');
+    if(openingInput){
+      openingInput.value=paymentPreview.openingBalance===null||paymentPreview.openingBalance===undefined
+        ? ''
+        : Number(paymentPreview.openingBalance||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    }
 
     const checkCards=totalCheck.checks.map(check=>{
       const cssClass=check.missing?'warn':check.different?'error':'ok';
@@ -14300,6 +14828,11 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     paymentPreview.rows[index][field]=['documentValue','paidValue'].includes(field)?numBR(value):value;
     recalculatePaymentPreview();
     renderPaymentPreview();
+  }
+
+  window.editPaymentPreviewOpening=function(value){
+    if(!paymentPreview)return;
+    paymentPreview.openingBalance=String(value||'').trim()===''?null:numBR(value);
   }
 
   window.removePaymentPreviewRow=function(index){
@@ -14527,6 +15060,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         custeioPaidTotal:paymentPreview.custeioPaidTotal,
         totalDocument:paymentPreview.totalDocument,
         totalPaid:paymentPreview.totalPaid,
+        openingBalance:paymentPreview.openingBalance,
         createdAt:new Date().toISOString()
       };
 
@@ -16426,7 +16960,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   window.openBankEntryPending=function(entryId){goPage('extratos');setTimeout(()=>openBankLinkModal(entryId),0)}
   window.openResourceTransferPending=function(transferId){goPage('transferencias');setTimeout(()=>editResourceTransfer(transferId),0)}
-  window.openFinancialReportPending=function(reportId){const report=state.financialReports.find(item=>item.id===reportId);if(!report)return;goPage('execucao-financeira');setTimeout(()=>{document.getElementById('ferContract').value=report.contractId;financialExecutionContractChanged();document.getElementById('ferAccount').value=report.accountId;document.getElementById('ferCompetence').value=report.competence;fillFinancialOsValues(report.osValues);renderFinancialExecution()},0)}
+  window.openFinancialReportPending=function(reportId){const report=state.financialReports.find(item=>item.id===reportId);if(!report)return;goPage('execucao-financeira');setTimeout(()=>{document.getElementById('ferContract').value=report.contractId;financialExecutionContractChanged();document.getElementById('ferAccount').value=report.accountId;document.getElementById('ferAccountKind').value=paymentAccountKind(report.accountKind);document.getElementById('ferCompetence').value=report.competence;fillFinancialOsValues(report.osValues);renderFinancialExecution()},0)}
 
   window.resolveIssue=function(issueId){
     const issue=state.issues.find(item=>item.id===issueId);

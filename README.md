@@ -1,4 +1,6 @@
-# TRANCELIM v171
+# TRANCELIM v172
+
+Prestação de Contas CG atualizada para a versão integrada v169: correção do Demonstrativo de Execução da Receita e Despesa, preservando a conciliação bancária restaurada e todos os vínculos válidos.
 
 Atualização da conciliação bancária da Prestação de Contas CG, preservando vínculos válidos e reprocessando apenas pendências.
 
@@ -110,3 +112,11 @@ Depois abra com Ctrl+F5.
 - A aba separada de Despachos foi removida conforme a nova versão.
 - Mantidos login único, perfil, foto, retorno ao portal, favicon e barra lateral fixa.
 - Prestação de Contas CG com a correção de extratos da v169 e Gestão Patrimonial preservadas.
+
+
+## v172
+- Prestação de Contas CG atualizada com a correção do Demonstrativo de Execução da Receita e Despesa da v167.
+- Preservadas as correções de conciliação bancária da v168.
+- O botão Atualizar conciliação não apaga vínculos válidos e reprocessa somente pendências.
+- Nenhum dado de pagamentos, extratos ou conciliações é apagado.
+- Encerramento Mensal v28, Patrimônio e portal preservados.

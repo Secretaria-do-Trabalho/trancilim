@@ -1,4 +1,26 @@
-# Sistema de Prestação de Contas CG — v166
+# Sistema de Prestação de Contas CG — v169
+
+Integração da correção do Demonstrativo de Execução da Receita e Despesa da v167 com a conciliação bancária restaurada da v168.
+
+## Demonstrativo de Execução da Receita e Despesa
+
+- A coluna **Sistema** passou a usar as fontes corretas de cada item:
+  - parcela recebida: créditos classificados como repasse da SET;
+  - recursos de outros contratos: créditos classificados ou transferências recebidas de outro contrato;
+  - saldo do período anterior: valor lido da Relação de Pagamentos, com recuperação automática do PDF já armazenado e fallback para os extratos;
+  - receita de rendimentos: rendimentos identificados no extrato de aplicação;
+  - outros recebimentos e ressarcimentos: demais créditos do extrato, sem considerar estornos vinculados como nova receita;
+  - despesas: valores pagos da Relação de Pagamentos da conta selecionada.
+- Foi incluída a seleção entre **Conta principal de gestão** e **Conta de provisão** dentro do demonstrativo.
+- As despesas do valor recebido passaram a exibir o detalhamento interno em **Pessoal**, **Custeio** e **Despesas da OS**.
+- O saldo do contrato passou a ser calculado depois de todas as receitas, despesas, transferências e rendimentos da competência.
+- O sistema compara o saldo calculado com o saldo final disponível nos extratos e mostra eventual diferença.
+- A leitura do PDF do Demonstrativo da OS foi corrigida para preencher cada linha pelo respectivo rótulo, inclusive valores zerados e os saldos do contrato e de rendimentos.
+- A importação da Relação de Pagamentos passou a identificar e guardar o **Saldo do período anterior**, permitindo também a correção manual desse valor na prévia.
+
+---
+
+## Histórico da v166
 
 ## Conciliação editável entre Conta Corrente e Aplicação
 
@@ -65,3 +87,12 @@ necessários e clicar em **Salvar responsável**.
 - Um débito pode ser conciliado com várias linhas que tenham o mesmo documento e totalizem seu valor.
 - Débitos estornados por Pix rejeitado são separados dos débitos efetivos.
 - Extratos de aplicação/CDB ficam anexados, sem integrar a conciliação de despesas.
+
+## Conciliação bancária preservada nesta integração
+
+- O botão **Atualizar conciliação** preserva vínculos automáticos e manuais válidos.
+- Somente lançamentos pendentes são reprocessados.
+- A conciliação usa contrato, documento, valor e datas, aceitando diferença de até três dias.
+- Pagamentos agrupados, tributos pagos juntos, pagamentos divididos em vários débitos e estornos permanecem suportados.
+- A importação de extratos mantém rollback: em caso de erro, extratos e vínculos anteriores são restaurados.
+- Não existe rotina de limpeza de pagamentos, extratos ou conciliações nesta versão.

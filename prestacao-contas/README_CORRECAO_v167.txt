@@ -1,10 +1,6 @@
-SISTEMA DE PRESTAÇÃO DE CONTAS CG - CORREÇÃO v167
+SISTEMA DE PRESTAÇÃO DE CONTAS CG - INTEGRAÇÃO v169
 
-Correções:
-- erro key is not defined ao salvar/importar extrato;
-- restauração automática do estado anterior quando a importação falhar;
-- preservação dos vínculos e conciliações já existentes;
-- reparo automático único das conciliações na primeira abertura;
-- correção da exibição do acompanhamento Conta Corrente ↔ Aplicação.
-
-Base integrada no TRANCELIM completo v169.
+- Demonstrativo de Execução da Receita e Despesa atualizado com a correção da v167.
+- Conciliação bancária restaurada da v168 preservada.
+- Nenhum dado é zerado nesta versão.
+- Base integrada no TRANCELIM completo v172.
