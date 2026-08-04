@@ -1,0 +1,7 @@
+TRANCELIM v188
+
+- Encerramento Mensal atualizado com o arquivo v32 percentual contabilizado enviado pelo usuário.
+- Integração do portal, perfil, navegação, favicon e competência persistente preservados.
+- Patrimônio restaurado mantido e acrescido de seleção por checkbox e exclusão em lote.
+- A exclusão também limpa os dados complementares do tombo para permitir novo cadastro.
+- Nenhuma rotina automática de limpeza total da base foi adicionada.

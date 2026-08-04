@@ -4864,6 +4864,14 @@ button.doc-link-v106:hover,
   font-weight:950;
 }
 
+
+/* v137 — seleção e exclusão de bens no Cadastro de Bens */
+#btnExcluirSelecionadosV137{background:#fff1f0!important;border-color:#e2a6a2!important;color:#a92823!important;font-weight:800}
+#btnExcluirSelecionadosV137:disabled{opacity:.48;cursor:not-allowed}
+#btnLimparSelecaoV137{font-weight:700}
+.pat-select-col-v137{width:46px!important;min-width:46px!important;max-width:46px!important;text-align:center!important;padding-left:8px!important;padding-right:8px!important}
+.pat-select-v137{width:18px;height:18px;accent-color:#b92e29;cursor:pointer}
+#selecaoResumoV137{display:inline-flex;align-items:center;padding:8px 11px;border-radius:999px;background:#eef6f5;color:#255e62;font-size:12px;font-weight:800;white-space:nowrap}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -32381,6 +32389,231 @@ function depAcumuladaTotalAteMesAnterior(){
   const renderTudoAnteriorV133=window.renderTudo;
   window.renderTudo=function(){renderTudoAnteriorV133();try{window.renderDepreciacao()}catch(e){console.warn('Falha ao renderizar depreciação v133',e)}};
   window.addEventListener('resize',()=>setTimeout(()=>garantirBarraV133(document.querySelector('#depreciacao .table-wrap')),120));
+})();
+</script>
+
+<script data-patrimonio-v137-exclusao-selecionada>
+(function(){
+  const selecionados = window.__bensSelecionadosV137 || new Set();
+  window.__bensSelecionadosV137 = selecionados;
+
+  function texto(v){ return String(v ?? '').trim(); }
+  function chaveBem(b){ return b?.id ? `id:${b.id}` : `pat:${texto(b?.pat)}`; }
+  function escaparAtributo(v){ return texto(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function todosBens(){ return Array.isArray(window.bens) ? window.bens : (typeof bens !== 'undefined' && Array.isArray(bens) ? bens : []); }
+  function localizarPorPat(pat){ return todosBens().find(b=>texto(b.pat)===texto(pat)); }
+
+  function garantirBotoes(){
+    const filtros = document.querySelector('#bens .filters.bens-filters');
+    if(!filtros) return;
+    if(!document.getElementById('selecaoResumoV137')){
+      const resumo=document.createElement('span');
+      resumo.id='selecaoResumoV137';
+      resumo.textContent='Nenhum bem selecionado';
+      filtros.appendChild(resumo);
+    }
+    if(!document.getElementById('btnLimparSelecaoV137')){
+      const limpar=document.createElement('button');
+      limpar.id='btnLimparSelecaoV137';
+      limpar.type='button';
+      limpar.className='secondary';
+      limpar.textContent='Limpar seleção';
+      limpar.onclick=()=>{ selecionados.clear(); atualizarTabelaSelecao(); };
+      filtros.appendChild(limpar);
+    }
+    if(!document.getElementById('btnExcluirSelecionadosV137')){
+      const excluir=document.createElement('button');
+      excluir.id='btnExcluirSelecionadosV137';
+      excluir.type='button';
+      excluir.setAttribute('data-edit-action','');
+      excluir.textContent='Excluir selecionados';
+      excluir.onclick=()=>{
+        if(typeof podeEditar==='function' && !podeEditar()){
+          if(typeof avisarSemPermissao==='function') avisarSemPermissao();
+          return;
+        }
+        window.excluirBensSelecionadosV137();
+      };
+      filtros.appendChild(excluir);
+    }
+  }
+
+  function atualizarControles(){
+    const qtd=selecionados.size;
+    const resumo=document.getElementById('selecaoResumoV137');
+    const btn=document.getElementById('btnExcluirSelecionadosV137');
+    const limpar=document.getElementById('btnLimparSelecaoV137');
+    if(resumo) resumo.textContent=qtd ? `${qtd} bem${qtd===1?'':'s'} selecionado${qtd===1?'':'s'}` : 'Nenhum bem selecionado';
+    if(btn){ btn.disabled=!qtd; btn.textContent=qtd ? `Excluir selecionados (${qtd})` : 'Excluir selecionados'; }
+    if(limpar) limpar.disabled=!qtd;
+
+    const checks=[...document.querySelectorAll('#tabelaBens .pat-select-v137')];
+    const master=document.getElementById('selecionarPaginaV137');
+    if(master){
+      const marcados=checks.filter(c=>c.checked).length;
+      master.checked=checks.length>0 && marcados===checks.length;
+      master.indeterminate=marcados>0 && marcados<checks.length;
+    }
+  }
+
+  function adicionarSelecaoNaTabela(){
+    garantirBotoes();
+    const tbody=document.getElementById('tabelaBens');
+    const table=tbody?.closest('table');
+    if(!tbody || !table) return;
+
+    const colgroup=table.querySelector('colgroup');
+    if(colgroup && !colgroup.querySelector('.pat-select-col-v137')){
+      const col=document.createElement('col');
+      col.className='pat-select-col-v137';
+      colgroup.insertBefore(col,colgroup.firstChild);
+    }
+
+    const head=table.querySelector('thead tr');
+    if(head && !head.querySelector('#selecionarPaginaV137')){
+      const th=document.createElement('th');
+      th.className='pat-select-col-v137';
+      th.title='Selecionar todos os bens visíveis nesta página';
+      th.innerHTML='<input id="selecionarPaginaV137" class="pat-select-v137" type="checkbox" aria-label="Selecionar todos desta página">';
+      head.insertBefore(th,head.firstChild);
+      th.querySelector('input').addEventListener('change',e=>{
+        document.querySelectorAll('#tabelaBens .pat-select-v137').forEach(c=>{
+          c.checked=e.target.checked;
+          const key=c.dataset.key;
+          if(e.target.checked) selecionados.add(key); else selecionados.delete(key);
+        });
+        atualizarControles();
+      });
+    }
+
+    [...tbody.querySelectorAll('tr')].forEach(tr=>{
+      if(tr.querySelector('.pat-select-v137')) return;
+      if(tr.querySelector('.empty')){
+        const td=tr.querySelector('td');
+        if(td) td.colSpan=Math.max(Number(td.colSpan||12),13);
+        return;
+      }
+      // A renderização estável coloca o número patrimonial na segunda coluna antes desta seleção.
+      const pat=tr.querySelector('td:nth-child(2) strong')?.textContent?.trim();
+      const b=localizarPorPat(pat);
+      if(!b) return;
+      const key=chaveBem(b);
+      const td=document.createElement('td');
+      td.className='pat-select-col-v137';
+      td.innerHTML=`<input class="pat-select-v137" type="checkbox" data-key="${escaparAtributo(key)}" aria-label="Selecionar bem ${escaparAtributo(b.pat)}">`;
+      const check=td.querySelector('input');
+      check.checked=selecionados.has(key);
+      check.addEventListener('change',()=>{
+        if(check.checked) selecionados.add(key); else selecionados.delete(key);
+        atualizarControles();
+      });
+      tr.insertBefore(td,tr.firstChild);
+    });
+    atualizarControles();
+  }
+
+  function atualizarTabelaSelecao(){
+    document.querySelectorAll('#tabelaBens .pat-select-v137').forEach(c=>c.checked=selecionados.has(c.dataset.key));
+    atualizarControles();
+  }
+
+  async function apagarEmLotes(queryField, values){
+    if(!values.length) return;
+    for(let i=0;i<values.length;i+=100){
+      const lote=values.slice(i,i+100);
+      const {error}=await supabaseClient.from('bens_patrimoniais').delete().in(queryField,lote);
+      if(error) throw error;
+    }
+  }
+
+  async function verificarExclusao(ids,patsSemId){
+    for(let i=0;i<ids.length;i+=100){
+      const {data,error}=await supabaseClient.from('bens_patrimoniais').select('id').in('id',ids.slice(i,i+100));
+      if(error) throw error;
+      if(data?.length) throw new Error('Alguns bens ainda permanecem na base após a exclusão. Verifique a permissão DELETE do Supabase.');
+    }
+    for(let i=0;i<patsSemId.length;i+=100){
+      const {data,error}=await supabaseClient.from('bens_patrimoniais').select('numero_patrimonial').in('numero_patrimonial',patsSemId.slice(i,i+100));
+      if(error) throw error;
+      if(data?.length) throw new Error('Alguns tombos ainda permanecem na base após a exclusão. Verifique a permissão DELETE do Supabase.');
+    }
+  }
+
+  function limparCaches(pats){
+    try{
+      const cache=JSON.parse(localStorage.getItem('bensExtSGP_v95')||'{}')||{};
+      pats.forEach(p=>delete cache[texto(p)]);
+      localStorage.setItem('bensExtSGP_v95',JSON.stringify(cache));
+      if(typeof window.bensExtCacheV95==='object' && window.bensExtCacheV95){
+        pats.forEach(p=>delete window.bensExtCacheV95[texto(p)]);
+      }
+    }catch(e){ console.warn('Não foi possível limpar o cache complementar dos bens excluídos:',e); }
+  }
+
+  window.excluirBensSelecionadosV137=async function(){
+    const itens=todosBens().filter(b=>selecionados.has(chaveBem(b)));
+    if(!itens.length){ alert('Selecione pelo menos um bem para excluir.'); return; }
+    const amostra=itens.slice(0,5).map(b=>`${b.pat} • ${b.desc||'Sem descrição'}`).join('\n');
+    const restante=itens.length>5?`\n... e mais ${itens.length-5} bem(ns).`:'';
+    if(!confirm(`Excluir definitivamente ${itens.length} bem(ns) selecionado(s)?\n\n${amostra}${restante}\n\nDepois você poderá cadastrá-los novamente.`)) return;
+
+    const btn=document.getElementById('btnExcluirSelecionadosV137');
+    const textoOriginal=btn?.textContent||'Excluir selecionados';
+    try{
+      if(btn){btn.disabled=true;btn.textContent='Excluindo...';}
+      if(typeof confirmarPermissaoTotal==='function') await confirmarPermissaoTotal();
+      if(!window.supabaseClient) throw new Error('Conexão com o Supabase não localizada. Atualize a página e tente novamente.');
+
+      const ids=itens.filter(b=>b.id!==null&&b.id!==undefined&&texto(b.id)).map(b=>b.id);
+      const patsSemId=itens.filter(b=>b.id===null||b.id===undefined||!texto(b.id)).map(b=>texto(b.pat)).filter(Boolean);
+      const pats=itens.map(b=>texto(b.pat)).filter(Boolean);
+
+      await apagarEmLotes('id',ids);
+      await apagarEmLotes('numero_patrimonial',patsSemId);
+      await verificarExclusao(ids,patsSemId);
+
+      // Limpa os dados complementares pelo tombo, para o recadastro começar sem informações antigas.
+      try{
+        for(let i=0;i<pats.length;i+=100){
+          const {error}=await supabaseClient.from('bens_patrimoniais_ext').delete().in('numero_patrimonial',pats.slice(i,i+100));
+          if(error) console.warn('Complementos não removidos da base:',error);
+        }
+      }catch(e){ console.warn('Não foi possível limpar complementos no Supabase:',e); }
+
+      const chaves=new Set(itens.map(chaveBem));
+      const restantes=todosBens().filter(b=>!chaves.has(chaveBem(b)));
+      try{ bens=restantes; }catch(e){ window.bens=restantes; }
+      window.bens=restantes;
+      limparCaches(pats);
+      selecionados.clear();
+      if(typeof salvarLocal==='function') salvarLocal();
+      if(typeof renderTudo==='function') renderTudo();
+      else if(typeof renderTabela==='function') renderTabela();
+      alert(`${itens.length} bem(ns) excluído(s) com sucesso. Agora você pode cadastrar novamente com o tombo correto.`);
+    }catch(e){
+      console.error(e);
+      alert('Erro ao excluir os bens selecionados: '+(e?.message||JSON.stringify(e))+'\n\nNenhum item confirmado como excluído foi retirado apenas da tela.');
+      if(typeof sincronizarDoSupabase==='function'){
+        try{ await sincronizarDoSupabase(false); if(typeof renderTudo==='function') renderTudo(); }catch(syncError){ console.warn(syncError); }
+      }
+    }finally{
+      if(btn){btn.textContent=textoOriginal;}
+      atualizarControles();
+    }
+  };
+
+  const renderAnterior=window.renderTabela;
+  window.renderTabela=function(){
+    if(typeof renderAnterior==='function') renderAnterior();
+    adicionarSelecaoNaTabela();
+  };
+  try{ renderTabela=window.renderTabela; }catch(e){}
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    garantirBotoes();
+    setTimeout(adicionarSelecaoNaTabela,300);
+  });
+  setTimeout(adicionarSelecaoNaTabela,800);
 })();
 </script>
 </body>

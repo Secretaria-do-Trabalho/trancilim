@@ -182,3 +182,5 @@ Atualização v180: Sistema de Gestão Patrimonial integrado na versão v128, pr
 
 
 Atualização v187/v134: correção do salvamento do tombo na edição completa; migração dos dados complementares para o novo número patrimonial; validação de tombo duplicado; retorno à lista de bens após salvar.
+
+Atualização v188: Encerramento Mensal v32 contabilizado e exclusão selecionada no Patrimônio.
