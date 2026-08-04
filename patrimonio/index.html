@@ -31313,13 +31313,16 @@ function depAcumuladaTotalAteMesAnterior(){
     renderIntegratedProfile();
   }
 
-  function goHome(){
-    window.location.href='../';
+  function goPortal(){ window.location.href='../'; }
+  function goSystemHome(){
+    const dashboardButton=Array.from(document.querySelectorAll('.sidebar button')).find(button=>String(button.getAttribute('onclick')||'').includes("view('dashboard'"));
+    if(dashboardButton) dashboardButton.click();
+    else if(typeof view==='function') view('dashboard',null);
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    document.querySelector('.header-title-logo')?.addEventListener('click',goHome);
-    document.querySelector('.side-head')?.addEventListener('click',goHome);
+    document.querySelector('.header-title-logo')?.addEventListener('click',goSystemHome);
+    document.querySelector('.side-head')?.addEventListener('click',goPortal);
     forcePortalSession();
     setTimeout(renderIntegratedProfile,120);
   });

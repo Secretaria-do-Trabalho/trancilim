@@ -17452,7 +17452,7 @@ Total bruto: ${money(a.proventos)}`)}
     renderSidebarProfile();
     document.getElementById('portalProfileCard')?.addEventListener('click',openProfileModal);
     document.querySelector('.side-brand')?.addEventListener('click',()=>{ window.location.href='../'; });
-    document.querySelector('.institution')?.addEventListener('click',()=>{ window.location.href='../'; });
+    document.querySelector('.institution')?.addEventListener('click',()=>{ if(typeof goPage==='function') goPage('dashboard'); else document.querySelector('.nav button[data-page="dashboard"]')?.click(); });
   });
 })();
 </script>

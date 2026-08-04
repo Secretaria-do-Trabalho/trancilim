@@ -32,3 +32,6 @@ Os dados ficam armazenados localmente no navegador. Exporte o backup periodicame
 
 
 Integração TRANCELIM v175: referência persistente, julho/2026 como padrão e anexos no percentual por documento.
+
+
+v32 integrado: SEM, navegação padronizada, despacho Montserrat Normal 11 e cópia corrigida.
