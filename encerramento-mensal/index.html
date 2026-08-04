@@ -179,6 +179,19 @@ input:focus,select:focus,textarea:focus{outline:3px solid rgba(73,183,170,.18);b
 /* ===== Fluxos de Processos e Despachos — v25 ===== */
 html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layout,.conf-layout>div,.card{min-width:0}.content{overflow-x:hidden}
 .conf-table-wrap{overflow-x:auto;scrollbar-width:none}.conf-table-wrap::-webkit-scrollbar{height:0}.conf-table-scroll-top{display:block!important;margin:2px 0 12px;height:16px}
+/* Ajustes v166: barra lateral fixa e correções visuais do Encerramento Mensal */
+@media (min-width:981px){
+  .app{display:block;min-height:100vh}
+  .sidebar{position:fixed!important;left:0;top:0;bottom:0;width:320px;height:100vh;overflow-y:auto;overflow-x:hidden;z-index:30;padding:28px 18px 110px}
+  .main{margin-left:320px;min-width:0}
+  .topbar{top:0;z-index:20}
+  .content{max-width:none;margin:0;padding:28px 26px 45px}
+  .report-layout{grid-template-columns:minmax(280px,300px) minmax(0,1fr);gap:18px}
+  .report-controls{position:sticky;top:108px}
+}
+@media (max-width:980px){
+  .main{margin-left:0}
+}
 .workflow-toolbar{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}.workflow-filters{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;flex:1}.workflow-kpis{margin-bottom:18px}.section-note{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.45}.workflow-table{min-width:1080px}.process-table{min-width:1760px}.workflow-table td{vertical-align:top}.workflow-table .cell-text{max-width:250px;line-height:1.38}.workflow-table .cell-message{max-width:300px;white-space:normal;line-height:1.38}.workflow-table .cell-actions{display:flex;gap:6px;flex-wrap:wrap}.workflow-template-card{margin-top:18px}.template-grid{display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:12px}.template-item{border:1px solid var(--border);border-radius:16px;padding:14px;background:#f9fcfc}.template-item h4{margin:0 0 5px;font-size:14px}.template-item p{margin:0 0 8px;color:var(--muted);font-size:12px;line-height:1.42}.template-item .template-meta{font-size:11px;color:#718796;margin-bottom:10px}.workflow-modal{width:min(920px,calc(100vw - 32px))}.workflow-check{display:flex!important;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid #d7e6e8;border-radius:14px;background:#f6fbfa;font-weight:700!important;line-height:1.4}.workflow-check input{width:18px;height:18px;min-height:0;margin-top:1px}.workflow-preview{font-family:"Times New Roman",serif;color:#111;line-height:1.55;background:#fff;border:1px solid #dfe7e9;border-radius:12px;padding:32px;white-space:pre-wrap}.workflow-preview h2{text-align:center;margin:0 0 26px}.workflow-preview .preview-subject{margin:18px 0}.workflow-preview .preview-sign{text-align:center;margin-top:54px;font-weight:bold}.copy-button{white-space:nowrap}.deadline-ok{font-weight:800;color:#087a38}.deadline-late{font-weight:800;color:#c3342f}
 @media(max-width:1150px){.workflow-filters{grid-template-columns:repeat(2,minmax(180px,1fr))}.template-grid{grid-template-columns:1fr}}
 @media(max-width:720px){.workflow-toolbar{align-items:stretch;flex-direction:column}.workflow-filters{grid-template-columns:1fr}}
@@ -191,7 +204,7 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 <body>
 <div class="app">
 <aside class="sidebar">
- <div class="brand"><div class="brandmark">EM</div><div><h1>Sistema de<br>Encerramento Mensal</h1><p>COAFI · 2026 · v25</p></div></div>
+ <div class="brand"><div class="brandmark">EM</div><div><h1>Sistema de<br>Encerramento Mensal</h1><p>COAFI · 2026</p></div></div>
  <div class="user-card" id="portalProfileCard" title="Perfil do usuário"><div class="avatar" id="portalSidebarAvatar"><span>U</span></div><div><strong id="portalSidebarName">Usuário</strong><small id="portalSidebarRole">Perfil de acesso</small></div></div>
  <nav class="nav"><button class="active" data-page="dashboard"><b class="nav-icon">▦</b><span>Visão geral</span></button><button data-page="ugs"><b class="nav-icon">▣</b><span>Unidades Gestoras</span></button><button data-page="report"><b class="nav-icon">▤</b><span>Anexo I</span></button><button data-page="report2"><b class="nav-icon">▧</b><span>Anexo II</span></button><button data-page="report3"><b class="nav-icon">▥</b><span>Anexo III</span></button><button data-page="conference"><b class="nav-icon">✓</b><span>Conferência</span></button><button data-page="dispatches"><b class="nav-icon">✎</b><span>Despachos</span></button><button data-page="processes"><b class="nav-icon">◎</b><span>Processos</span></button><button data-page="results"><b class="nav-icon">★</b><span>Resultados</span></button></nav>
  <div class="status-box">Status da competência<strong>Em elaboração</strong></div>
@@ -311,6 +324,12 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 const STORAGE='trancilim_encerramento_v2';
 const initial={ugs:[{id:'ug-set',code:'590001',acronym:'SET',name:'SECRETARIA DO TRABALHO',owner:'SECRETARIA DO TRABALHO',active:true},{id:'ug-fet',code:'560901',acronym:'FET',name:'FUNDO ESTADUAL DO TRABALHO - FET',owner:'SECRETARIA DO TRABALHO',active:true},{id:'ug-fimpc',code:'561001',acronym:'FIMPC',name:'FIMPC',owner:'SECRETARIA DO TRABALHO',active:true},{id:'ug-ferdt',code:'590101',acronym:'FERDT',name:'FERDT',owner:'SECRETARIA DO TRABALHO',active:true}],accounts:[],responsibles:[],snapshots:[],anexo3Docs:{},anexo3Closed:{}};
 let state=JSON.parse(localStorage.getItem(STORAGE)||'null')||structuredClone(initial),currentUgId=null;state.ugs=state.ugs||[];state.accounts=state.accounts||[];state.responsibles=state.responsibles||[];state.snapshots=state.snapshots||[];state.anexo3Docs=state.anexo3Docs||{};state.anexo3Closed=state.anexo3Closed||{};
+(function ensureDefaultUgLabels(){const versionKey='trancelim_encerramento_ug_defaults_v166';if(localStorage.getItem(versionKey))return;const defaults={
+'ug-set':{code:'590001',acronym:'SET',name:'SECRETARIA DO TRABALHO',owner:'SECRETARIA DO TRABALHO'},
+'ug-fet':{code:'560901',acronym:'FET',name:'FUNDO ESTADUAL DO TRABALHO - FET',owner:'SECRETARIA DO TRABALHO'},
+'ug-fimpc':{code:'561001',acronym:'FIMPC',name:'FIMPC',owner:'SECRETARIA DO TRABALHO'},
+'ug-ferdt':{code:'590101',acronym:'FERDT',name:'FERDT',owner:'SECRETARIA DO TRABALHO'}
+};let changed=false;Object.entries(defaults).forEach(([id,data])=>{const ug=state.ugs.find(x=>x.id===id);if(ug){['code','acronym','name','owner'].forEach(k=>{if(!ug[k]||ug[k]===id||ug[k]==='UNIDADE GESTORA'){ug[k]=data[k];changed=true;}})}else{state.ugs.push({id,active:true,...data});changed=true;}});if(changed)localStorage.setItem(STORAGE,JSON.stringify(state));localStorage.setItem(versionKey,'1');})();
 if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
 const months=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 function uid(p){return p+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}function persist(){localStorage.setItem(STORAGE,JSON.stringify(state))}function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function statusHtml(on){return `<span class="status ${on?'':'off'}"><i class="dot"></i>${on?'Ativa':'Inativa'}</span>`}function formatRef(ref){const [y,m]=ref.split('-');return `${m}/${y}`}function activeInRef(a,ref){if(!a.active)return false;const start=ref+'-01',end=ref+'-31';return(!a.start||a.start<=end)&&(!a.end||a.end>=start)}function makeLine(u,a,type){return{ug:u.code,bank:a.bank,agency:a.agency,operation:a.operation||'',account:a.number,name:a.name,owner:a.owner,type,mark:a.mark}}function linesForUg(ugId,ref){const u=state.ugs.find(x=>x.id===ugId);if(!u)return[];const r=[];state.accounts.filter(a=>a.ugId===ugId&&activeInRef(a,ref)).forEach(a=>{if(a.current)r.push(makeLine(u,a,'Conta Corrente'));if(a.investment)r.push(makeLine(u,a,'Investimento'))});return r}
