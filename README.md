@@ -1,4 +1,4 @@
-# TRANCELIM v176
+# TRANCELIM v177
 
 - Prestação de Contas CG atualizada para a versão integrada v171.
 - Aba Execução da Receita e Despesa corrigida para buscar saldo anterior e totais consolidados da Relação de Pagamentos.
@@ -7,6 +7,14 @@
 - Encerramento Mensal atualizado para a versão 30, com reutilização completa de modelos e competência automática nos textos.
 - Login, portal, Patrimônio, perfil, foto, favicon e navegação preservados.
 - Nenhum dado é apagado por esta atualização.
+
+## Atualização v177 — Encerramento Mensal
+- O botão “Copiar despacho” copia somente o destinatário, o corpo e a assinatura selecionados, sem De, Para, Data, Assunto ou NUP.
+- Alterar o NUP atualiza automaticamente o WhatsApp e os demais campos do modelo que utilizem o NUP.
+- Cada processo da UG na competência vale 1 ponto no percentual: processo aberto fica pendente e processo concluído fica realizado.
+- Percentuais exibidos com duas casas decimais.
+- Foto, nome e dados do perfil restaurados no menu lateral, com painel de perfil e troca de foto.
+- Dados, processos, modelos, anexos e demais módulos preservados.
 
 # TRANCELIM - v164
 
