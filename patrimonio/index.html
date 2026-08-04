@@ -4865,13 +4865,41 @@ button.doc-link-v106:hover,
 }
 
 
-/* v137 — seleção e exclusão de bens no Cadastro de Bens */
-#btnExcluirSelecionadosV137{background:#fff1f0!important;border-color:#e2a6a2!important;color:#a92823!important;font-weight:800}
-#btnExcluirSelecionadosV137:disabled{opacity:.48;cursor:not-allowed}
-#btnLimparSelecaoV137{font-weight:700}
+/* v138 — exclusão selecionada compacta e alinhada */
+#btnExcluirSelecionadosV137{
+  background:#fff1f0!important;
+  border-color:#e2a6a2!important;
+  color:#a92823!important;
+  font-weight:900!important;
+  min-width:190px;
+}
+#btnExcluirSelecionadosV137:not(:disabled){
+  background:#b52520!important;
+  border-color:#b52520!important;
+  color:#fff!important;
+}
+#btnExcluirSelecionadosV137:disabled{opacity:.46;cursor:not-allowed}
+#btnLimparSelecaoV137{font-weight:800;min-width:110px}
 .pat-select-col-v137{width:46px!important;min-width:46px!important;max-width:46px!important;text-align:center!important;padding-left:8px!important;padding-right:8px!important}
 .pat-select-v137{width:18px;height:18px;accent-color:#b92e29;cursor:pointer}
-#selecaoResumoV137{display:inline-flex;align-items:center;padding:8px 11px;border-radius:999px;background:#eef6f5;color:#255e62;font-size:12px;font-weight:800;white-space:nowrap}
+#bens .bens-filters{
+  grid-template-columns:minmax(280px,1fr) 210px 170px repeat(3,minmax(118px,auto)) minmax(190px,auto) minmax(110px,auto)!important;
+  align-items:stretch!important;
+}
+#bens .bens-filters input#busca{min-width:280px!important}
+#bens .bens-filters button{height:100%;min-height:54px}
+@media(max-width:1480px){
+  #bens .bens-filters{grid-template-columns:repeat(4,minmax(150px,1fr))!important}
+  #bens .bens-filters input#busca{min-width:0!important;grid-column:span 2}
+}
+@media(max-width:900px){
+  #bens .bens-filters{grid-template-columns:1fr 1fr!important}
+  #bens .bens-filters input#busca{grid-column:1/-1}
+}
+@media(max-width:620px){
+  #bens .bens-filters{grid-template-columns:1fr!important}
+  #bens .bens-filters input#busca{grid-column:auto}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -5096,7 +5124,6 @@ button.doc-link-v106:hover,
         <button class="secondary" onclick="baixarTemplateExcel()">Baixar Template Excel</button>
         <button data-edit-action onclick="podeEditar()?document.getElementById('arquivoImportacaoExcel').click():avisarSemPermissao()">Importar Template Preenchido</button>
         <button data-edit-action onclick="podeEditar()?document.getElementById('arquivoImportacaoAnexos').click():avisarSemPermissao()">Importar ZIP de Anexos</button>
-        <button class="secondary" onclick="sincronizarDoSupabase(true).then(()=>{renderTudo(); alert('Tabela atualizada com o banco.');}).catch(e=>alert('Erro ao atualizar: '+(e.message||e)))">Atualizar Banco</button>
         
         
         <input id="arquivoImportacaoExcel" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcelBens(event)">
@@ -32392,7 +32419,7 @@ function depAcumuladaTotalAteMesAnterior(){
 })();
 </script>
 
-<script data-patrimonio-v137-exclusao-selecionada>
+<script data-patrimonio-v138-exclusao-selecionada>
 (function(){
   const selecionados = window.__bensSelecionadosV137 || new Set();
   window.__bensSelecionadosV137 = selecionados;
@@ -32402,18 +32429,43 @@ function depAcumuladaTotalAteMesAnterior(){
   function escaparAtributo(v){ return texto(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function todosBens(){ return Array.isArray(window.bens) ? window.bens : (typeof bens !== 'undefined' && Array.isArray(bens) ? bens : []); }
   function localizarPorPat(pat){ return todosBens().find(b=>texto(b.pat)===texto(pat)); }
+  function clienteSupabaseV138(){
+    try{
+      if(typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
+    }catch(e){}
+    return window.supabaseClient || null;
+  }
+
+  function rotuloExcluir(qtd){
+    if(!qtd) return 'Excluir bens selecionados';
+    return qtd===1 ? 'Excluir 1 bem selecionado' : `Excluir ${qtd} bens selecionados`;
+  }
 
   function garantirBotoes(){
     const filtros = document.querySelector('#bens .filters.bens-filters');
     if(!filtros) return;
-    if(!document.getElementById('selecaoResumoV137')){
-      const resumo=document.createElement('span');
-      resumo.id='selecaoResumoV137';
-      resumo.textContent='Nenhum bem selecionado';
-      filtros.appendChild(resumo);
+    document.getElementById('selecaoResumoV137')?.remove();
+
+    let excluir=document.getElementById('btnExcluirSelecionadosV137');
+    if(!excluir){
+      excluir=document.createElement('button');
+      excluir.id='btnExcluirSelecionadosV137';
+      excluir.type='button';
+      excluir.setAttribute('data-edit-action','');
+      excluir.textContent=rotuloExcluir(0);
+      excluir.onclick=()=>{
+        if(typeof podeEditar==='function' && !podeEditar()){
+          if(typeof avisarSemPermissao==='function') avisarSemPermissao();
+          return;
+        }
+        window.excluirBensSelecionadosV138();
+      };
+      filtros.appendChild(excluir);
     }
-    if(!document.getElementById('btnLimparSelecaoV137')){
-      const limpar=document.createElement('button');
+
+    let limpar=document.getElementById('btnLimparSelecaoV137');
+    if(!limpar){
+      limpar=document.createElement('button');
       limpar.id='btnLimparSelecaoV137';
       limpar.type='button';
       limpar.className='secondary';
@@ -32421,30 +32473,13 @@ function depAcumuladaTotalAteMesAnterior(){
       limpar.onclick=()=>{ selecionados.clear(); atualizarTabelaSelecao(); };
       filtros.appendChild(limpar);
     }
-    if(!document.getElementById('btnExcluirSelecionadosV137')){
-      const excluir=document.createElement('button');
-      excluir.id='btnExcluirSelecionadosV137';
-      excluir.type='button';
-      excluir.setAttribute('data-edit-action','');
-      excluir.textContent='Excluir selecionados';
-      excluir.onclick=()=>{
-        if(typeof podeEditar==='function' && !podeEditar()){
-          if(typeof avisarSemPermissao==='function') avisarSemPermissao();
-          return;
-        }
-        window.excluirBensSelecionadosV137();
-      };
-      filtros.appendChild(excluir);
-    }
   }
 
   function atualizarControles(){
     const qtd=selecionados.size;
-    const resumo=document.getElementById('selecaoResumoV137');
     const btn=document.getElementById('btnExcluirSelecionadosV137');
     const limpar=document.getElementById('btnLimparSelecaoV137');
-    if(resumo) resumo.textContent=qtd ? `${qtd} bem${qtd===1?'':'s'} selecionado${qtd===1?'':'s'}` : 'Nenhum bem selecionado';
-    if(btn){ btn.disabled=!qtd; btn.textContent=qtd ? `Excluir selecionados (${qtd})` : 'Excluir selecionados'; }
+    if(btn){ btn.disabled=!qtd; btn.textContent=rotuloExcluir(qtd); }
     if(limpar) limpar.disabled=!qtd;
 
     const checks=[...document.querySelectorAll('#tabelaBens .pat-select-v137')];
@@ -32493,7 +32528,6 @@ function depAcumuladaTotalAteMesAnterior(){
         if(td) td.colSpan=Math.max(Number(td.colSpan||12),13);
         return;
       }
-      // A renderização estável coloca o número patrimonial na segunda coluna antes desta seleção.
       const pat=tr.querySelector('td:nth-child(2) strong')?.textContent?.trim();
       const b=localizarPorPat(pat);
       if(!b) return;
@@ -32517,25 +32551,27 @@ function depAcumuladaTotalAteMesAnterior(){
     atualizarControles();
   }
 
-  async function apagarEmLotes(queryField, values){
-    if(!values.length) return;
-    for(let i=0;i<values.length;i+=100){
-      const lote=values.slice(i,i+100);
-      const {error}=await supabaseClient.from('bens_patrimoniais').delete().in(queryField,lote);
+  async function apagarEmLotes(client, campo, valores){
+    const removidos=[];
+    for(let i=0;i<valores.length;i+=100){
+      const lote=valores.slice(i,i+100);
+      const {data,error}=await client.from('bens_patrimoniais').delete().in(campo,lote).select('id,numero_patrimonial');
       if(error) throw error;
+      if(Array.isArray(data)) removidos.push(...data);
     }
+    return removidos;
   }
 
-  async function verificarExclusao(ids,patsSemId){
+  async function verificarExclusao(client, ids, patsSemId){
     for(let i=0;i<ids.length;i+=100){
-      const {data,error}=await supabaseClient.from('bens_patrimoniais').select('id').in('id',ids.slice(i,i+100));
+      const {data,error}=await client.from('bens_patrimoniais').select('id').in('id',ids.slice(i,i+100));
       if(error) throw error;
-      if(data?.length) throw new Error('Alguns bens ainda permanecem na base após a exclusão. Verifique a permissão DELETE do Supabase.');
+      if(data?.length) throw new Error('Alguns bens continuam no Supabase. Verifique a permissão de exclusão da tabela bens_patrimoniais.');
     }
     for(let i=0;i<patsSemId.length;i+=100){
-      const {data,error}=await supabaseClient.from('bens_patrimoniais').select('numero_patrimonial').in('numero_patrimonial',patsSemId.slice(i,i+100));
+      const {data,error}=await client.from('bens_patrimoniais').select('numero_patrimonial').in('numero_patrimonial',patsSemId.slice(i,i+100));
       if(error) throw error;
-      if(data?.length) throw new Error('Alguns tombos ainda permanecem na base após a exclusão. Verifique a permissão DELETE do Supabase.');
+      if(data?.length) throw new Error('Alguns tombos continuam no Supabase. Verifique a permissão de exclusão da tabela bens_patrimoniais.');
     }
   }
 
@@ -32550,35 +32586,35 @@ function depAcumuladaTotalAteMesAnterior(){
     }catch(e){ console.warn('Não foi possível limpar o cache complementar dos bens excluídos:',e); }
   }
 
-  window.excluirBensSelecionadosV137=async function(){
+  window.excluirBensSelecionadosV138=async function(){
     const itens=todosBens().filter(b=>selecionados.has(chaveBem(b)));
     if(!itens.length){ alert('Selecione pelo menos um bem para excluir.'); return; }
-    const amostra=itens.slice(0,5).map(b=>`${b.pat} • ${b.desc||'Sem descrição'}`).join('\n');
-    const restante=itens.length>5?`\n... e mais ${itens.length-5} bem(ns).`:'';
-    if(!confirm(`Excluir definitivamente ${itens.length} bem(ns) selecionado(s)?\n\n${amostra}${restante}\n\nDepois você poderá cadastrá-los novamente.`)) return;
+    const palavra=itens.length===1?'bem selecionado':'bens selecionados';
+    const amostra=itens.slice(0,6).map(b=>`${b.pat} • ${b.desc||'Sem descrição'}`).join('\n');
+    const restante=itens.length>6?`\n... e mais ${itens.length-6} bem(ns).`:'';
+    if(!confirm(`Excluir definitivamente ${itens.length} ${palavra}?\n\n${amostra}${restante}\n\nDepois você poderá cadastrá-los novamente.`)) return;
 
     const btn=document.getElementById('btnExcluirSelecionadosV137');
-    const textoOriginal=btn?.textContent||'Excluir selecionados';
     try{
       if(btn){btn.disabled=true;btn.textContent='Excluindo...';}
       if(typeof confirmarPermissaoTotal==='function') await confirmarPermissaoTotal();
-      if(!window.supabaseClient) throw new Error('Conexão com o Supabase não localizada. Atualize a página e tente novamente.');
+      const client=clienteSupabaseV138();
+      if(!client) throw new Error('A conexão com o Supabase ainda não foi iniciada. Atualize a página com Ctrl + F5 e entre novamente.');
 
-      const ids=itens.filter(b=>b.id!==null&&b.id!==undefined&&texto(b.id)).map(b=>b.id);
-      const patsSemId=itens.filter(b=>b.id===null||b.id===undefined||!texto(b.id)).map(b=>texto(b.pat)).filter(Boolean);
-      const pats=itens.map(b=>texto(b.pat)).filter(Boolean);
+      const ids=[...new Set(itens.filter(b=>b.id!==null&&b.id!==undefined&&texto(b.id)).map(b=>b.id))];
+      const patsSemId=[...new Set(itens.filter(b=>b.id===null||b.id===undefined||!texto(b.id)).map(b=>texto(b.pat)).filter(Boolean))];
+      const pats=[...new Set(itens.map(b=>texto(b.pat)).filter(Boolean))];
 
-      await apagarEmLotes('id',ids);
-      await apagarEmLotes('numero_patrimonial',patsSemId);
-      await verificarExclusao(ids,patsSemId);
+      await apagarEmLotes(client,'id',ids);
+      await apagarEmLotes(client,'numero_patrimonial',patsSemId);
+      await verificarExclusao(client,ids,patsSemId);
 
-      // Limpa os dados complementares pelo tombo, para o recadastro começar sem informações antigas.
       try{
         for(let i=0;i<pats.length;i+=100){
-          const {error}=await supabaseClient.from('bens_patrimoniais_ext').delete().in('numero_patrimonial',pats.slice(i,i+100));
+          const {error}=await client.from('bens_patrimoniais_ext').delete().in('numero_patrimonial',pats.slice(i,i+100));
           if(error) console.warn('Complementos não removidos da base:',error);
         }
-      }catch(e){ console.warn('Não foi possível limpar complementos no Supabase:',e); }
+      }catch(e){ console.warn('Não foi possível limpar os complementos antigos:',e); }
 
       const chaves=new Set(itens.map(chaveBem));
       const restantes=todosBens().filter(b=>!chaves.has(chaveBem(b)));
@@ -32589,15 +32625,14 @@ function depAcumuladaTotalAteMesAnterior(){
       if(typeof salvarLocal==='function') salvarLocal();
       if(typeof renderTudo==='function') renderTudo();
       else if(typeof renderTabela==='function') renderTabela();
-      alert(`${itens.length} bem(ns) excluído(s) com sucesso. Agora você pode cadastrar novamente com o tombo correto.`);
+      alert(itens.length===1 ? '1 bem excluído com sucesso.' : `${itens.length} bens excluídos com sucesso.`);
     }catch(e){
       console.error(e);
-      alert('Erro ao excluir os bens selecionados: '+(e?.message||JSON.stringify(e))+'\n\nNenhum item confirmado como excluído foi retirado apenas da tela.');
+      alert('Erro ao excluir os bens selecionados: '+(e?.message||JSON.stringify(e)));
       if(typeof sincronizarDoSupabase==='function'){
         try{ await sincronizarDoSupabase(false); if(typeof renderTudo==='function') renderTudo(); }catch(syncError){ console.warn(syncError); }
       }
     }finally{
-      if(btn){btn.textContent=textoOriginal;}
       atualizarControles();
     }
   };
@@ -32611,9 +32646,9 @@ function depAcumuladaTotalAteMesAnterior(){
 
   document.addEventListener('DOMContentLoaded',()=>{
     garantirBotoes();
-    setTimeout(adicionarSelecaoNaTabela,300);
+    setTimeout(adicionarSelecaoNaTabela,250);
   });
-  setTimeout(adicionarSelecaoNaTabela,800);
+  setTimeout(adicionarSelecaoNaTabela,700);
 })();
 </script>
 </body>

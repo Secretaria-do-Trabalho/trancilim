@@ -1,0 +1,7 @@
+TRANCELIM v189
+
+- Patrimônio: removido o botão Atualizar Banco do Cadastro de Bens.
+- Removido o contador separado de itens selecionados.
+- O botão agora mostra Excluir 1 bem selecionado ou Excluir N bens selecionados.
+- Corrigida a localização do cliente Supabase usada pela exclusão múltipla.
+- Mantidos Encerramento Mensal e Prestação de Contas da v188.
