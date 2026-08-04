@@ -3,8 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="./assets/favicon-trancilim.png">
+  <link rel="icon" type="image/png" href="./assets/favicon-trancilim.png?v=167">
   <title>TRANCELIM — Acesso ao Sistema</title>
+  <script>
+    (function(){
+      document.documentElement.classList.add('trancelim-booting');
+      window.setTimeout(function(){document.documentElement.classList.remove('trancelim-booting');},3000);
+    })();
+  </script>
+  <style>html.trancelim-booting body{visibility:hidden!important}</style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <meta name="description" content="Portal integrado de controle e gestão da Coordenadoria Administrativo-Financeira da Secretaria do Trabalho do Ceará.">
   <style>
@@ -781,6 +788,7 @@
       } else {
         notificationBadge.classList.remove('active');
       }
+      requestAnimationFrame(() => document.documentElement.classList.remove('trancelim-booting'));
     }
     function showLogin(message = '') {
       portalScreen.classList.remove('active');
@@ -789,6 +797,7 @@
       loginError.textContent = message;
       notificationButton.classList.remove('active');
       if (notificationTimer) { clearInterval(notificationTimer); notificationTimer = null; }
+      requestAnimationFrame(() => document.documentElement.classList.remove('trancelim-booting'));
       setTimeout(() => loginEmail.focus(), 50);
     }
 
@@ -994,6 +1003,8 @@
         showPortal(profileToSession(profile, session.user));
       } catch (error) { console.error(error); showLogin('Não foi possível carregar seu perfil da base.'); }
     }
+    const cachedPortalSession = readPortalSession();
+    if (cachedPortalSession) showPortal(cachedPortalSession);
     restoreSupabaseSession();
   </script>
 </body>

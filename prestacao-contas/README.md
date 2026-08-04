@@ -1,4 +1,36 @@
-# Sistema de Prestação de Contas CG — v161
+# Sistema de Prestação de Contas CG — v166
+
+## Conciliação editável entre Conta Corrente e Aplicação
+
+- Cada linha do acompanhamento possui a ação **Editar / Conciliar**.
+- O usuário pode corrigir data, movimento e valor dos lançamentos identificados.
+- É possível selecionar um lançamento da conta corrente e vários lançamentos da aplicação, ou o inverso.
+- A conciliação manual somente é confirmada quando os totais dos dois lados coincidem, com tolerância de dois centavos.
+- O vínculo manual permanece preservado ao executar novamente a conciliação automática.
+- A conciliação manual pode ser desfeita, devolvendo os lançamentos à análise automática.
+- Quando a composição envolve contas físicas diferentes, a listagem mostra as contas utilizadas no vínculo.
+
+## Conta principal de gestão e conta de provisão
+
+- Os relatórios e arquivos já existentes são tratados como pertencentes à **Conta principal de gestão**.
+- A importação do Relatório Mensal de Pagamentos da OS passou a oferecer as opções **Conta principal de gestão** e **Conta de provisão**.
+- A classificação é guardada no relatório, nos pagamentos importados e no documento anexado.
+- Relatórios idênticos de gestão e provisão permanecem separados, sem sobrescrever ou mesclar os registros entre as duas contas.
+
+---
+
+
+## Vinculação manual de estornos na aba Extratos
+
+- Débitos podem ser vinculados manualmente aos créditos de estorno ou PIX rejeitado sem sair da aba de Extratos.
+- Créditos de estorno também exibem a ação **Vincular débito**.
+- A seleção considera lançamentos de mesmo valor, conta e competência.
+- Vínculos automáticos incorretos podem ser substituídos por um vínculo manual.
+- O vínculo manual permanece preservado quando a conciliação automática é executada novamente.
+- O sistema impede classificar como estornado um débito que ainda esteja vinculado à Relação de Pagamentos.
+- A coluna de vínculo mostra o débito original ou o crédito de estorno relacionado.
+
+---
 
 ## Rol de Responsáveis
 

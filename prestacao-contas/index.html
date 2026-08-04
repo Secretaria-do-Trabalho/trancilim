@@ -18,8 +18,8 @@
 </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="../assets/favicon-trancilim.png" rel="icon"/>
-<title>Sistema de Prestação de Contas CG — v162</title>
+<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=167">
+<title>Sistema de Prestação de Contas CG — v166</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -771,7 +771,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       color:#075f38
     }
     .payment-import-meta{
-      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px
     }
     .payment-preview-input{min-width:125px;padding:7px 8px}
     .payment-preview-text{min-width:210px}
@@ -1581,7 +1581,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     }
     .bank-table-scroll > div{height:1px}
     #bankEntriesTableWrap table{
-      min-width:1570px;
+      min-width:1605px;
       table-layout:fixed;
     }
     #bankEntriesTableWrap th,
@@ -1608,9 +1608,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     #bankEntriesTableWrap th:nth-child(8),
     #bankEntriesTableWrap td:nth-child(8){width:165px}
     #bankEntriesTableWrap th:nth-child(9),
-    #bankEntriesTableWrap td:nth-child(9){width:240px}
+    #bankEntriesTableWrap td:nth-child(9){width:250px}
     #bankEntriesTableWrap th:nth-child(10),
-    #bankEntriesTableWrap td:nth-child(10){width:105px}
+    #bankEntriesTableWrap td:nth-child(10){width:130px}
 
     .bank-entry-description{
       white-space:normal;
@@ -1648,6 +1648,19 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       color:#8a5700;
       font-size:9px;
       line-height:1.25;
+    }
+    .bank-reversal-link{
+      display:block;
+      margin-bottom:3px;
+      color:#17658f;
+      font-size:9px;
+      line-height:1.25;
+    }
+    .bank-action-stack{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:4px;
     }
 
     .bank-import-grid{
@@ -1806,7 +1819,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     .bank-application-item{
       display:grid;
-      grid-template-columns:90px 1.25fr 110px 135px 135px 105px 175px;
+      grid-template-columns:90px 1.15fr 105px 130px 130px 100px 165px 112px;
       gap:10px;
       align-items:center;
       padding:10px 12px;
@@ -1847,6 +1860,32 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
     .bank-application-tag.apply{background:#f0eafe;color:#6941c6}
     .bank-application-tag.redeem{background:#e5f6eb;color:#177347}
+    .bank-application-actions{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+    .bank-transfer-editor-summary{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:13px
+    }
+    .bank-transfer-editor-summary>div{
+      border:1px solid #d6e0e5;border-radius:11px;background:#f8fbfc;padding:10px 12px
+    }
+    .bank-transfer-editor-summary small{display:block;color:#718391;font-size:8px;font-weight:900;text-transform:uppercase}
+    .bank-transfer-editor-summary strong{display:block;color:#0b2f4a;margin-top:3px}
+    .bank-transfer-editor-columns{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .bank-transfer-editor-panel{border:1px solid #d6e0e5;border-radius:13px;overflow:hidden;background:#fff}
+    .bank-transfer-editor-panel h4{margin:0;padding:11px 13px;background:#eef5f7;color:#0b2f4a;font-size:12px}
+    .bank-transfer-editor-list{display:flex;flex-direction:column;gap:8px;padding:10px;max-height:390px;overflow:auto}
+    .bank-transfer-editor-row{display:grid;grid-template-columns:24px 112px 126px 125px minmax(160px,1fr);gap:7px;align-items:center;border:1px solid #dce6ea;border-radius:10px;padding:8px;background:#fff}
+    .bank-transfer-editor-row input,.bank-transfer-editor-row select{padding:7px 8px;font-size:11px}
+    .bank-transfer-editor-row .history{font-size:10px;color:#536b79;line-height:1.25}
+    .bank-transfer-editor-empty{padding:18px;color:#718391;text-align:center}
+    @media(max-width:980px){
+      .bank-transfer-editor-columns{grid-template-columns:1fr}
+      .bank-transfer-editor-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:620px){
+      .bank-transfer-editor-row{grid-template-columns:24px 1fr}
+      .bank-transfer-editor-row .history{grid-column:1/-1}
+      .bank-transfer-editor-summary{grid-template-columns:1fr}
+    }
 
     @media(max-width:1250px){
       .bank-preview-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -3927,7 +3966,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="payment-toolbar">
 <div>
 <h3 style="margin:0 0 4px;color:#0b2f4a">Acompanhamento Conta Corrente ↔ Aplicação</h3>
-<p class="small">O sistema confere automaticamente os dois lados: saída da conta corrente e entrada na aplicação; ou saída da aplicação e entrada na conta corrente. Diferenças permanecem pendentes até os dois extratos serem importados.</p>
+<p class="small">O sistema confere automaticamente os dois lados e também permite editar e conciliar manualmente. Um lançamento da conta corrente pode ser vinculado a vários lançamentos da aplicação, ou o inverso.</p>
 </div>
 </div>
 <div class="bank-application-list" id="bankApplicationTransfersList"></div>
@@ -3983,6 +4022,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <option value="POSSIVEL">Possível correspondência</option>
 <option value="AGUARDANDO_RELACAO">Aguardando relação de pagamentos</option><option value="NAO_ENCONTRADO">Sem pagamento correspondente</option>
 <option value="DIVERGENTE">Divergente</option>
+<option value="ESTORNADO">Débito estornado / PIX rejeitado</option>
+<option value="ESTORNO">Crédito de estorno</option>
 <option value="CREDITO">Crédito listado</option>
 </select>
 </div>
@@ -4006,7 +4047,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <th class="money">Débito</th>
 <th class="money">Crédito</th>
 <th>Situação</th>
-<th>Pagamento vinculado</th>
+<th>Vínculo / pagamento</th>
 <th>Ações</th>
 </tr>
 </thead>
@@ -4619,6 +4660,74 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div>
 </div>
 </div>
+<div class="modal" id="bankReversalLinkModal">
+<div class="modal-box" style="width:min(900px,100%)">
+<div class="modal-head">
+<div>
+<strong id="bankReversalLinkTitle">Vincular estorno / PIX rejeitado</strong>
+<div class="small">Relacione manualmente o débito e o crédito de devolução sem sair da aba de Extratos.</div>
+</div>
+<button class="close" onclick="closeBankReversalLinkModal()">×</button>
+</div>
+<div class="modal-body">
+<div class="bank-link-summary" id="bankReversalLinkSummary"></div>
+<div class="bank-link-form" style="grid-template-columns:1fr auto">
+<div>
+<label id="bankReversalCandidateLabel">Lançamento correspondente</label>
+<select id="bankReversalCandidate"></select>
+</div>
+<button class="btn btn-primary" onclick="saveManualBankReversalLink()">Salvar vínculo</button>
+</div>
+<div id="bankReversalLinkNotice"></div>
+<h3 style="font-size:15px;color:#0b2f4a;margin:17px 0 9px">Vínculo atual</h3>
+<div class="bank-existing-links" id="bankReversalExistingLink"></div>
+</div>
+<div class="modal-foot">
+<button class="btn btn-outline" onclick="closeBankReversalLinkModal()">Fechar</button>
+</div>
+</div>
+</div>
+<div class="modal" id="bankApplicationReconciliationModal">
+<div class="modal-box" style="width:min(1320px,100%)">
+<div class="modal-head">
+<div>
+<strong>Editar e conciliar Conta Corrente ↔ Aplicação</strong>
+<div class="small">Selecione um ou mais lançamentos de cada lado. É possível conciliar um valor da conta corrente com vários valores da aplicação.</div>
+</div>
+<button class="close" onclick="closeBankApplicationReconciliationModal()">×</button>
+</div>
+<div class="modal-body">
+<div class="modal-summary" id="bankApplicationReconciliationContext"></div>
+<div class="bank-transfer-editor-summary">
+<div><small>Selecionado na conta corrente</small><strong id="bankApplicationManualCurrentTotal">R$ 0,00</strong></div>
+<div><small>Selecionado na aplicação</small><strong id="bankApplicationManualApplicationTotal">R$ 0,00</strong></div>
+<div><small>Diferença</small><strong id="bankApplicationManualDifference">R$ 0,00</strong></div>
+<div><small>Situação</small><strong id="bankApplicationManualStatus">Selecione os lançamentos</strong></div>
+</div>
+<div class="notice info">Os campos de data, movimento e valor podem ser corrigidos antes da conciliação. O histórico permanece visível para conferência.</div>
+<div class="bank-transfer-editor-columns" style="margin-top:12px">
+<div class="bank-transfer-editor-panel">
+<h4>CONTA CORRENTE</h4>
+<div class="bank-transfer-editor-list" id="bankApplicationManualCurrentList"></div>
+</div>
+<div class="bank-transfer-editor-panel">
+<h4>APLICAÇÃO FINANCEIRA</h4>
+<div class="bank-transfer-editor-list" id="bankApplicationManualApplicationList"></div>
+</div>
+</div>
+</div>
+<div class="modal-foot" style="justify-content:space-between;gap:10px;flex-wrap:wrap">
+<div class="actions">
+<button class="btn btn-outline" onclick="saveBankApplicationTransferEdits()">Salvar alterações</button>
+<button class="btn btn-outline hidden" id="removeBankApplicationManualLinkButton" style="color:#b42318" onclick="removeManualBankApplicationReconciliation()">Desfazer conciliação manual</button>
+</div>
+<div class="actions">
+<button class="btn btn-outline" onclick="closeBankApplicationReconciliationModal()">Fechar</button>
+<button class="btn btn-primary" onclick="saveManualBankApplicationReconciliation()">Conciliar selecionados</button>
+</div>
+</div>
+</div>
+</div>
 <div class="modal" id="paymentEditModal">
 <div class="modal-box" style="width:min(1100px,100%)">
 <div class="modal-head">
@@ -4866,7 +4975,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div class="modal-head">
 <div>
 <strong>Importar Relatório Mensal de Pagamentos da OS</strong>
-<div class="small">SACC/SCC, competência e contrato vêm da tela. O PDF fornece a natureza, cheque, datas e valores; o tipo será PESSOAL ou CUSTEIO conforme os subtotais do relatório.</div>
+<div class="small">SACC/SCC, competência, contrato e conta do relatório vêm da tela. O PDF fornece a natureza, cheque, datas e valores; o tipo será PESSOAL ou CUSTEIO conforme os subtotais do relatório.</div>
 </div>
 <button class="close" onclick="closePaymentImportModal()">×</button>
 </div>
@@ -4881,6 +4990,13 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div>
 <label>Competência *</label>
 <input id="payImportCompetence" type="month"/>
+</div>
+<div>
+<label>Conta do relatório *</label>
+<select id="payImportAccountKind">
+<option value="GESTAO">Conta principal de gestão</option>
+<option value="PROVISAO">Conta de provisão</option>
+</select>
 </div>
 <div>
 <label>Relatório mensal em PDF *</label>
@@ -5297,7 +5413,20 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   });
   if(consolidatePhysicalBankAccounts())bankAccountMigrationChanged=true;
   if(bankAccountMigrationChanged){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
-  state.payments.forEach(payment=>{if(!Array.isArray(payment.reimbursements))payment.reimbursements=[];if(!payment.fundingSource)payment.fundingSource='CONTRATO';if(payment.planItemId===undefined)payment.planItemId=''});
+  let paymentAccountKindMigrationChanged=false;
+  state.payments.forEach(payment=>{
+    if(!Array.isArray(payment.reimbursements))payment.reimbursements=[];
+    if(!payment.fundingSource)payment.fundingSource='CONTRATO';
+    if(payment.planItemId===undefined)payment.planItemId='';
+    if(!payment.bankAccountKind){payment.bankAccountKind='GESTAO';paymentAccountKindMigrationChanged=true;}
+  });
+  state.paymentReports.forEach(report=>{
+    if(!report.bankAccountKind){report.bankAccountKind='GESTAO';paymentAccountKindMigrationChanged=true;}
+  });
+  state.documents.forEach(documentRecord=>{
+    if(!documentRecord.bankAccountKind){documentRecord.bankAccountKind='GESTAO';paymentAccountKindMigrationChanged=true;}
+  });
+  if(paymentAccountKindMigrationChanged)localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 
   const PAYMENT_V14_RESET_MARKER='spc_cg_v14_payment_test_reset_done';
   let paymentTestDocumentIdsToDelete=[];
@@ -5405,6 +5534,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   let bankStatementPreview = null;
   let selectedBankStatementFile = null;
   let bankLinkEntryId = null;
+  let bankReversalEntryId = null;
+  let bankApplicationManualContextId = null;
+  let bankApplicationManualDraft = {};
+  let bankApplicationManualSelected = new Set();
   let bankImportBusy = false;
   let editingResourceTransferId=null,editingProcurementId=null,currentWorkProgramId=null;
   let workProgramDraft={physicalGoals:[],financialItems:[],indicators:[],disbursements:[]};
@@ -8408,9 +8541,17 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     return String(p.compensationDate||p.issueDate||p.competence||'').slice(0,4);
   }
 
+  function paymentAccountKind(value){
+    return String(value||'').toUpperCase()==='PROVISAO'?'PROVISAO':'GESTAO';
+  }
+
+  function paymentAccountKindLabel(value){
+    return paymentAccountKind(value)==='PROVISAO'?'Conta de provisão':'Conta principal de gestão';
+  }
+
   function paymentKey(p){
     return [
-      p.contractId||'',p.competence||'',p.process||'',normalizeCheque(p.cheque),
+      p.contractId||'',p.competence||'',paymentAccountKind(p.bankAccountKind),p.process||'',normalizeCheque(p.cheque),
       p.issueDate||'',Number(p.documentValue||0).toFixed(2),
       p.compensationDate||'',Number(p.paidValue||0).toFixed(2),
       (p.expenseType||'').trim().toUpperCase(),
@@ -10312,7 +10453,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   function clearAutomaticBankLinks(targetEntries){
     const targetIds=new Set(targetEntries.map(entry=>entry.id));
     const linkedReversalCreditIds=new Set(
-      targetEntries.map(entry=>entry.reversalEntryId).filter(Boolean)
+      targetEntries
+        .filter(entry=>entry.reversalEntryId&&entry.reversalMode!=='manual')
+        .map(entry=>entry.reversalEntryId)
     );
     state.bankLinks=state.bankLinks.filter(link=>
       !targetIds.has(link.entryId)||link.mode==='manual'
@@ -10320,10 +10463,18 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     targetEntries.forEach(entry=>{
       entry.suggestedPaymentId='';
       entry.suggestedScore=0;
-      entry.reversalEntryId='';
+      if(entry.reversalMode!=='manual'){
+        entry.reversalEntryId='';
+        entry.reversalMode='';
+        entry.reversalLinkedAt='';
+      }
     });
     state.bankEntries.forEach(entry=>{
-      if(linkedReversalCreditIds.has(entry.id))entry.reversalEntryId='';
+      if(linkedReversalCreditIds.has(entry.id)&&entry.reversalMode!=='manual'){
+        entry.reversalEntryId='';
+        entry.reversalMode='';
+        entry.reversalLinkedAt='';
+      }
     });
     invalidateRuntimeCaches();
   }
@@ -10418,7 +10569,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   function reconcileExactSinglePayments(entries){
     entries.forEach(entry=>{
-      if(bankEntryLinks(entry.id).length)return;
+      if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const amount=bankEntryAmount(entry);
       const entryDoc=bankDigits(entry.documentNumber);
       const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
@@ -10440,7 +10591,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   function reconcileGroupedPaymentsByDocument(entries){
     entries.forEach(entry=>{
-      if(bankEntryLinks(entry.id).length)return;
+      if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const entryDoc=bankDigits(entry.documentNumber);
       if(!entryDoc)return;
       const candidates=unreconciledPaymentRows(entry,1).filter(payment=>
@@ -10456,7 +10607,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   function reconcileUniqueValueAndDate(entries){
     entries.forEach(entry=>{
-      if(bankEntryLinks(entry.id).length)return;
+      if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const amount=bankEntryAmount(entry);
       const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
         const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
@@ -10493,12 +10644,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const availableDebits=entries.filter(entry=>
       bankEntryLinks(entry.id).length===0&&!entry.reversalEntryId
     );
-    const rejectedCredits=state.bankEntries.filter(entry=>{
-      if(entry.movementType!=='CREDITO'||entry.reversalEntryId)return false;
-      const text=normalizeForChecklist(`${entry.history||''} ${entry.party||''}`);
-      return text.includes('REJEITADO')||text.includes('ESTORNO')||
-        text.includes('DEVOLVIDO')||text.includes('NAO EFETUADO');
-    });
+    const rejectedCredits=state.bankEntries.filter(entry=>
+      isLikelyBankReversalCredit(entry)&&!entry.reversalEntryId
+    );
     rejectedCredits.forEach(credit=>{
       const amount=bankEntryAmount(credit);
       const candidates=availableDebits.filter(debit=>
@@ -10512,8 +10660,13 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         Math.abs(Number(b.sourceRow||0)-Number(credit.sourceRow||0)));
       const debit=candidates[0];
       if(debit){
+        const linkedAt=new Date().toISOString();
         debit.reversalEntryId=credit.id;
+        debit.reversalMode='automatico';
+        debit.reversalLinkedAt=linkedAt;
         credit.reversalEntryId=debit.id;
+        credit.reversalMode='automatico';
+        credit.reversalLinkedAt=linkedAt;
       }
     });
   }
@@ -10803,16 +10956,24 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   function bankTransferDateKey(value){return String(value||'').slice(0,10)}
 
-  function markBankTransferMatch(currentRows,applicationRows,direction){
-    const matchId=id();
+  function applyBankTransferMatch(items,direction,matchId,mode='automatic'){
+    const currentRows=items.filter(item=>item.sourceStatementType==='conta_corrente');
+    const applicationRows=items.filter(item=>item.sourceStatementType==='aplicacao');
     const currentTotal=currentRows.reduce((sum,item)=>sum+Number(item.amount||0),0);
     const applicationTotal=applicationRows.reduce((sum,item)=>sum+Number(item.amount||0),0);
-    [...currentRows,...applicationRows].forEach(item=>{
+    const status=currentRows.length&&applicationRows.length&&Math.abs(currentTotal-applicationTotal)<=0.02
+      ?'CONCILIADO':'DIVERGENTE';
+    items.forEach(item=>{
       item.reconciliationId=matchId;
       item.reconciledDirection=direction;
-      item.status=Math.abs(currentTotal-applicationTotal)<=0.02?'CONCILIADO':'DIVERGENTE';
+      item.reconciliationMode=mode;
+      item.status=status;
       item.counterpartAmount=item.sourceStatementType==='conta_corrente'?applicationTotal:currentTotal;
     });
+  }
+
+  function markBankTransferMatch(currentRows,applicationRows,direction){
+    applyBankTransferMatch([...currentRows,...applicationRows],direction,id(),'automatic');
   }
 
   function reconcileBankApplicationTransfers(contractId='',accountId='',competence=''){
@@ -10822,10 +10983,22 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       (!competence||item.competence===competence)
     );
     rows.forEach(item=>{
-      item.reconciliationId='';item.counterpartAmount=0;item.reconciledDirection='';
+      item.reconciliationId='';item.counterpartAmount=0;item.reconciledDirection='';item.reconciliationMode='';
       item.status=item.sourceStatementType==='aplicacao'
         ?'AGUARDANDO_EXTRATO_CONTA_CORRENTE':'AGUARDANDO_EXTRATO_APLICACAO';
     });
+
+    const manualGroups=new Map();
+    rows.filter(item=>item.manualReconciliationId).forEach(item=>{
+      if(!manualGroups.has(item.manualReconciliationId))manualGroups.set(item.manualReconciliationId,[]);
+      manualGroups.get(item.manualReconciliationId).push(item);
+    });
+    manualGroups.forEach((items,manualId)=>{
+      const direction=items.find(item=>item.manualReconciliationDirection)?.manualReconciliationDirection||
+        items.find(item=>item.transferDirection)?.transferDirection||'RESGATE';
+      applyBankTransferMatch(items,direction,manualId,'manual');
+    });
+
     const currentRows=rows.filter(item=>item.sourceStatementType==='conta_corrente');
     const applicationRows=rows.filter(item=>item.sourceStatementType==='aplicacao');
     const tolerance=0.02;
@@ -10871,14 +11044,210 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const application=items.filter(item=>item.sourceStatementType==='aplicacao');
       const reference=items[0];
       return {
-        date:reference.date,contractId:reference.contractId,
-        accountId:reference.currentAccountId||reference.applicationAccountId,
+        id:key,itemIds:items.map(item=>item.id),date:reference.date,contractId:reference.contractId,
+        competence:reference.competence,accountId:reference.currentAccountId||reference.applicationAccountId,
+        accountIds:[...new Set(items.map(item=>item.sourceStatementType==='conta_corrente'?item.currentAccountId:item.applicationAccountId).filter(Boolean))],
         direction:reference.reconciledDirection||reference.transferDirection,
+        mode:items.some(item=>item.reconciliationMode==='manual')?'manual':items.every(item=>item.status==='CONCILIADO')?'automatic':'pending',
         currentAmount:current.reduce((sum,item)=>sum+Number(item.amount||0),0),
         applicationAmount:application.reduce((sum,item)=>sum+Number(item.amount||0),0),
         status:items.some(item=>item.status==='DIVERGENTE')?'DIVERGENTE':items.every(item=>item.status==='CONCILIADO')?'CONCILIADO':reference.status
       };
     }).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  }
+
+  function bankApplicationManualContext(){
+    return state.bankApplicationTransfers.find(item=>item.id===bankApplicationManualContextId)||null;
+  }
+
+  function bankApplicationManualCandidates(){
+    const context=bankApplicationManualContext();
+    if(!context)return [];
+    return state.bankApplicationTransfers
+      .filter(item=>item.contractId===context.contractId&&item.competence===context.competence)
+      .sort((a,b)=>(a.date||'').localeCompare(b.date||'')||Number(a.amount||0)-Number(b.amount||0));
+  }
+
+  function bankApplicationManualDraftItem(itemId){
+    return bankApplicationManualDraft[itemId]||null;
+  }
+
+  function bankApplicationManualSelectedTotals(){
+    const selected=bankApplicationManualCandidates().filter(item=>bankApplicationManualSelected.has(item.id));
+    return {
+      current:selected.filter(item=>item.sourceStatementType==='conta_corrente').reduce((sum,item)=>sum+Number(bankApplicationManualDraftItem(item.id)?.amount||0),0),
+      application:selected.filter(item=>item.sourceStatementType==='aplicacao').reduce((sum,item)=>sum+Number(bankApplicationManualDraftItem(item.id)?.amount||0),0),
+      currentCount:selected.filter(item=>item.sourceStatementType==='conta_corrente').length,
+      applicationCount:selected.filter(item=>item.sourceStatementType==='aplicacao').length
+    };
+  }
+
+  function updateBankApplicationManualTotals(){
+    const totals=bankApplicationManualSelectedTotals();
+    const difference=Math.abs(totals.current-totals.application);
+    const currentBox=document.getElementById('bankApplicationManualCurrentTotal');
+    const applicationBox=document.getElementById('bankApplicationManualApplicationTotal');
+    const differenceBox=document.getElementById('bankApplicationManualDifference');
+    const statusBox=document.getElementById('bankApplicationManualStatus');
+    if(currentBox)currentBox.textContent=money(totals.current);
+    if(applicationBox)applicationBox.textContent=money(totals.application);
+    if(differenceBox)differenceBox.textContent=money(difference);
+    if(statusBox){
+      if(!totals.currentCount||!totals.applicationCount)statusBox.textContent='Selecione os dois lados';
+      else if(difference<=0.02)statusBox.textContent='PRONTO PARA CONCILIAR';
+      else statusBox.textContent='VALORES DIVERGENTES';
+    }
+  }
+
+  function bankApplicationManualRowHtml(item){
+    const draft=bankApplicationManualDraftItem(item.id)||item;
+    const checked=bankApplicationManualSelected.has(item.id)?'checked':'';
+    return `<div class="bank-transfer-editor-row">
+      <input type="checkbox" ${checked} onchange="toggleBankApplicationManualSelection('${item.id}',this.checked)" aria-label="Selecionar lançamento">
+      <input type="date" value="${safe(draft.date||'')}" onchange="updateBankApplicationTransferDraft('${item.id}','date',this.value)">
+      <select onchange="updateBankApplicationTransferDraft('${item.id}','transferDirection',this.value)">
+        <option value="RESGATE" ${draft.transferDirection==='RESGATE'?'selected':''}>Resgate</option>
+        <option value="APLICACAO" ${draft.transferDirection==='APLICACAO'?'selected':''}>Aplicação</option>
+        <option value="RENDIMENTO" ${draft.transferDirection==='RENDIMENTO'?'selected':''}>Rendimento</option>
+      </select>
+      <input value="${safe(money(draft.amount||0))}" onchange="updateBankApplicationTransferDraft('${item.id}','amount',this.value)">
+      <div class="history"><strong>${safe(item.documentNumber||'Sem documento')}</strong><br>${safe(item.history||item.party||'Sem histórico')}</div>
+    </div>`;
+  }
+
+  function renderBankApplicationManualEditor(){
+    const context=bankApplicationManualContext();
+    if(!context)return;
+    const candidates=bankApplicationManualCandidates();
+    const contract=state.contracts.find(item=>item.id===context.contractId);
+    const contextBox=document.getElementById('bankApplicationReconciliationContext');
+    if(contextBox)contextBox.innerHTML=`<strong>${safe(bankContractLabel(contract)||'Contrato')}</strong> • Competência ${safe(competenceLabel(context.competence)||context.competence||'—')} • marque os lançamentos que formam a mesma movimentação.`;
+    const current=candidates.filter(item=>item.sourceStatementType==='conta_corrente');
+    const application=candidates.filter(item=>item.sourceStatementType==='aplicacao');
+    document.getElementById('bankApplicationManualCurrentList').innerHTML=current.map(bankApplicationManualRowHtml).join('')||'<div class="bank-transfer-editor-empty">Nenhum lançamento de conta corrente nesta competência.</div>';
+    document.getElementById('bankApplicationManualApplicationList').innerHTML=application.map(bankApplicationManualRowHtml).join('')||'<div class="bank-transfer-editor-empty">Nenhum lançamento de aplicação nesta competência.</div>';
+    const removeButton=document.getElementById('removeBankApplicationManualLinkButton');
+    if(removeButton)removeButton.classList.toggle('hidden',!context.manualReconciliationId);
+    updateBankApplicationManualTotals();
+  }
+
+  window.openBankApplicationReconciliationModal=function(transferId){
+    reconcileBankApplicationTransfers();
+    const context=state.bankApplicationTransfers.find(item=>item.id===transferId);
+    if(!context)return;
+    bankApplicationManualContextId=context.id;
+    const candidates=state.bankApplicationTransfers.filter(item=>item.contractId===context.contractId&&item.competence===context.competence);
+    bankApplicationManualDraft={};
+    candidates.forEach(item=>{
+      bankApplicationManualDraft[item.id]={
+        date:item.date||'',
+        transferDirection:item.transferDirection||'RESGATE',
+        amount:Number(item.amount||0)
+      };
+    });
+    const groupId=context.manualReconciliationId||context.reconciliationId||'';
+    bankApplicationManualSelected=new Set(
+      groupId?candidates.filter(item=>(item.manualReconciliationId||item.reconciliationId)===groupId).map(item=>item.id):[context.id]
+    );
+    renderBankApplicationManualEditor();
+    document.getElementById('bankApplicationReconciliationModal').classList.add('open');
+  }
+
+  window.closeBankApplicationReconciliationModal=function(){
+    document.getElementById('bankApplicationReconciliationModal').classList.remove('open');
+    bankApplicationManualContextId=null;
+    bankApplicationManualDraft={};
+    bankApplicationManualSelected=new Set();
+  }
+
+  window.toggleBankApplicationManualSelection=function(itemId,checked){
+    if(checked)bankApplicationManualSelected.add(itemId);
+    else bankApplicationManualSelected.delete(itemId);
+    updateBankApplicationManualTotals();
+  }
+
+  window.updateBankApplicationTransferDraft=function(itemId,field,value){
+    const draft=bankApplicationManualDraftItem(itemId);
+    if(!draft)return;
+    draft[field]=field==='amount'?numBR(value):value;
+    updateBankApplicationManualTotals();
+  }
+
+  function applyBankApplicationTransferDrafts(){
+    const candidates=bankApplicationManualCandidates();
+    for(const item of candidates){
+      const draft=bankApplicationManualDraftItem(item.id);
+      if(!draft)continue;
+      if(!draft.date||Number(draft.amount||0)<=0)throw new Error('Todos os lançamentos devem ter data e valor maior que zero.');
+      item.date=draft.date;
+      item.transferDirection=draft.transferDirection||'RESGATE';
+      item.amount=Number(draft.amount||0);
+      item.updatedAt=new Date().toISOString();
+    }
+  }
+
+  window.saveBankApplicationTransferEdits=function(){
+    try{
+      applyBankApplicationTransferDrafts();
+      const context=bankApplicationManualContext();
+      reconcileBankApplicationTransfers(context?.contractId||'', '', context?.competence||'');
+      saveState();
+      renderBankApplicationManualEditor();
+      alert('Alterações dos lançamentos salvas.');
+    }catch(error){alert(error.message||String(error));}
+  }
+
+  window.saveManualBankApplicationReconciliation=function(){
+    try{
+      applyBankApplicationTransferDrafts();
+      const selected=bankApplicationManualCandidates().filter(item=>bankApplicationManualSelected.has(item.id));
+      const current=selected.filter(item=>item.sourceStatementType==='conta_corrente');
+      const application=selected.filter(item=>item.sourceStatementType==='aplicacao');
+      if(!current.length||!application.length)throw new Error('Selecione pelo menos um lançamento da conta corrente e um da aplicação.');
+      const directions=[...new Set(selected.map(item=>item.transferDirection))];
+      if(directions.length!==1)throw new Error('Os lançamentos selecionados precisam estar com o mesmo movimento: Resgate, Aplicação ou Rendimento.');
+      const currentTotal=current.reduce((sum,item)=>sum+Number(item.amount||0),0);
+      const applicationTotal=application.reduce((sum,item)=>sum+Number(item.amount||0),0);
+      const difference=Math.abs(currentTotal-applicationTotal);
+      if(difference>0.02)throw new Error(`Os valores ainda possuem diferença de ${money(difference)}.`);
+
+      const affectedManualIds=new Set(selected.map(item=>item.manualReconciliationId).filter(Boolean));
+      state.bankApplicationTransfers.forEach(item=>{
+        if(affectedManualIds.has(item.manualReconciliationId)){
+          item.manualReconciliationId='';
+          item.manualReconciliationDirection='';
+          item.manualReconciledAt='';
+        }
+      });
+      const manualId=`manual_${id()}`;
+      selected.forEach(item=>{
+        item.manualReconciliationId=manualId;
+        item.manualReconciliationDirection=directions[0];
+        item.manualReconciledAt=new Date().toISOString();
+      });
+      const context=bankApplicationManualContext();
+      reconcileBankApplicationTransfers(context?.contractId||'', '', context?.competence||'');
+      saveState();
+      closeBankApplicationReconciliationModal();
+      alert(`Conciliação manual salva: ${money(currentTotal)} na conta corrente e ${money(applicationTotal)} na aplicação.`);
+    }catch(error){alert(error.message||String(error));}
+  }
+
+  window.removeManualBankApplicationReconciliation=function(){
+    const context=bankApplicationManualContext();
+    const manualId=context?.manualReconciliationId||'';
+    if(!manualId)return;
+    if(!confirm('Desfazer esta conciliação manual? Os lançamentos voltarão para a conciliação automática.'))return;
+    state.bankApplicationTransfers.forEach(item=>{
+      if(item.manualReconciliationId===manualId){
+        item.manualReconciliationId='';
+        item.manualReconciliationDirection='';
+        item.manualReconciledAt='';
+      }
+    });
+    reconcileBankApplicationTransfers(context.contractId,'',context.competence);
+    saveState();
+    closeBankApplicationReconciliationModal();
   }
 
   function renderBankApplicationTransfers(){
@@ -10887,7 +11256,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const rows=bankApplicationReconciliationRows();
     const statusLabels={CONCILIADO:'CONCILIADO',DIVERGENTE:'VALORES DIVERGENTES',AGUARDANDO_EXTRATO_APLICACAO:'AGUARDANDO EXTRATO DA APLICAÇÃO',AGUARDANDO_EXTRATO_CONTA_CORRENTE:'AGUARDANDO EXTRATO DA CONTA CORRENTE'};
     box.innerHTML=rows.map(row=>{
-      const account=bankAccountById(row.contractId,row.accountId);
+      const accountLabels=(row.accountIds||[row.accountId])
+        .map(accountId=>bankAccountLabel(bankAccountById(row.contractId,accountId)))
+        .filter(Boolean);
+      const accountDisplay=[...new Set(accountLabels)].join(' ↔ ');
       const difference=Math.abs(row.currentAmount-row.applicationAmount);
       const label=row.direction==='APLICACAO'?'APLICAÇÃO':row.direction==='RENDIMENTO'?'RENDIMENTO DO RESGATE':'RESGATE';
       const className=row.status==='CONCILIADO'?'bank-status-ok':row.status==='DIVERGENTE'?'bank-status-error':'bank-status-warn';
@@ -10899,12 +11271,13 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         : 'Saída da aplicação';
       return `<div class="bank-application-item">
         <div><small>Data</small><strong>${safe(isoToBr(row.date)||'—')}</strong></div>
-        <div><small>Conta bancária</small>${safe(bankAccountLabel(account)||'—')}</div>
+        <div><small>Conta bancária</small>${safe(accountDisplay||'—')}</div>
         <div><small>Movimento</small><span class="bank-application-tag ${row.direction==='APLICACAO'?'apply':'redeem'}">${safe(label)}</span></div>
         <div><small>${safe(currentSideLabel)}</small><strong>${money(row.currentAmount)}</strong></div>
         <div><small>${safe(applicationSideLabel)}</small><strong>${money(row.applicationAmount)}</strong></div>
         <div><small>Diferença</small><strong>${money(difference)}</strong></div>
-        <div><small>Situação</small><span class="bank-status ${className}">${safe(statusLabels[row.status]||row.status||'PENDENTE')}</span></div>
+        <div><small>Situação</small><span class="bank-status ${className}">${safe(row.status==='CONCILIADO'&&row.mode==='manual'?'CONCILIADO MANUALMENTE':statusLabels[row.status]||row.status||'PENDENTE')}</span></div>
+        <div class="bank-application-actions"><small>Ações</small><button class="link-btn" onclick="openBankApplicationReconciliationModal('${row.itemIds[0]}')">Editar / Conciliar</button></div>
       </div>`;
     }).join('')||'<div class="bank-application-empty">Nenhuma aplicação ou resgate identificado nos extratos selecionados.</div>';
   }
@@ -10935,6 +11308,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           ${money(link.amount)} • ${link.mode==='manual'?'manual':'automático'}
         </span>`;
       }).join('');
+      const reversalEntry=entry.reversalEntryId?bankEntryById(entry.reversalEntryId):null;
+      const reversalHtml=reversalEntry?`<span class="bank-reversal-link">
+        ${entry.movementType==='DEBITO'?'Crédito de estorno':'Débito original'}:
+        ${safe(isoToBr(reversalEntry.date)||'—')} • ${money(bankEntryAmount(reversalEntry))} •
+        ${entry.reversalMode==='manual'?'manual':'automático'}
+      </span>`:'';
 
       const suggestion=entry.suggestedPaymentId
         ? state.payments.find(item=>item.id===entry.suggestedPaymentId)
@@ -10956,7 +11335,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <td class="money">${entry.movementType==='CREDITO'?money(entry.credit):'—'}</td>
         <td><span class="bank-status ${status.className}">${safe(status.label)}</span></td>
         <td>
-          ${linkedHtml||
+          ${linkedHtml||reversalHtml||
             (suggestion
               ? `<span class="bank-suggestion">
                   Sugestão: ${safe(suggestion.process||suggestion.expenseNature)} •
@@ -10965,10 +11344,15 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
               : '—')}
         </td>
         <td>
-          <button class="link-btn" onclick="openBankEntryClassificationModal('${entry.id}')">Classificar</button>
-          ${entry.movementType==='DEBITO'
-            ? `<button class="link-btn" onclick="openBankLinkModal('${entry.id}')">Vincular</button>`
-            : ''}
+          <div class="bank-action-stack">
+            <button class="link-btn" onclick="openBankEntryClassificationModal('${entry.id}')">Classificar</button>
+            ${entry.movementType==='DEBITO'
+              ? `<button class="link-btn" onclick="openBankLinkModal('${entry.id}')">Vincular pagamento</button>
+                 <button class="link-btn" onclick="openBankReversalLinkModal('${entry.id}')">Vincular estorno</button>`
+              : (isLikelyBankReversalCredit(entry)||entry.reversalEntryId
+                ? `<button class="link-btn" onclick="openBankReversalLinkModal('${entry.id}')">Vincular débito</button>`
+                : '')}
+          </div>
         </td>
       </tr>`;
     }).join('')||
@@ -11755,6 +12139,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
             .map(entry=>entry.id)
         );
         state.bankLinks=state.bankLinks.filter(link=>!oldEntryIds.has(link.entryId));
+        clearBankReversalLinksForEntryIds(oldEntryIds);
         state.bankEntries=state.bankEntries.filter(entry=>entry.statementId!==previous.id);
         state.bankApplicationTransfers=state.bankApplicationTransfers.filter(
           transfer=>transfer.statementId!==previous.id
@@ -11887,8 +12272,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 
   window.runBankReconciliation=function(){
     autoReconcileBankEntries();
+    reconcileBankApplicationTransfers();
     saveState();
-    alert('Conciliação automática atualizada.');
+    alert('Conciliação automática atualizada. As conciliações manuais foram preservadas.');
   }
 
   window.deleteBankStatement=async function(statementId){
@@ -11904,6 +12290,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const placeholderPaymentIds=new Set(state.payments.filter(payment=>payment.source==='extrato'&&entryIds.has(payment.bankEntryId)).map(payment=>payment.id));
     state.bankLinks=state.bankLinks.filter(link=>!entryIds.has(link.entryId)&&!placeholderPaymentIds.has(link.paymentId));
     state.payments=state.payments.filter(payment=>!placeholderPaymentIds.has(payment.id));
+    clearBankReversalLinksForEntryIds(entryIds);
     state.bankEntries=state.bankEntries.filter(entry=>entry.statementId!==statementId);
     state.bankApplicationTransfers=state.bankApplicationTransfers.filter(
       transfer=>transfer.statementId!==statementId
@@ -11916,6 +12303,179 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     }
 
     saveState();
+  }
+
+  function isLikelyBankReversalCredit(entry){
+    if(!entry||entry.movementType!=='CREDITO')return false;
+    const text=normalizeForChecklist(`${entry.history||''} ${entry.party||''}`);
+    return text.includes('REJEITADO')||text.includes('ESTORNO')||
+      text.includes('DEVOLVIDO')||text.includes('NAO EFETUADO');
+  }
+
+  function detachBankReversal(entry){
+    if(!entry?.reversalEntryId)return;
+    const counterpart=bankEntryById(entry.reversalEntryId);
+    const counterpartId=entry.reversalEntryId;
+    entry.reversalEntryId='';
+    entry.reversalMode='';
+    entry.reversalLinkedAt='';
+    if(counterpart&&counterpart.reversalEntryId===entry.id){
+      counterpart.reversalEntryId='';
+      counterpart.reversalMode='';
+      counterpart.reversalLinkedAt='';
+    }
+    return counterpartId;
+  }
+
+  function clearBankReversalLinksForEntryIds(entryIds){
+    const ids=entryIds instanceof Set?entryIds:new Set(entryIds||[]);
+    state.bankEntries.forEach(entry=>{
+      if(ids.has(entry.id)||ids.has(entry.reversalEntryId)){
+        entry.reversalEntryId='';
+        entry.reversalMode='';
+        entry.reversalLinkedAt='';
+      }
+    });
+  }
+
+  function bankReversalCandidates(entry){
+    if(!entry)return [];
+    const opposite=entry.movementType==='DEBITO'?'CREDITO':'DEBITO';
+    const currentId=entry.reversalEntryId||'';
+    return state.bankEntries
+      .filter(candidate=>
+        candidate.id!==entry.id&&
+        candidate.movementType===opposite&&
+        candidate.contractId===entry.contractId&&
+        candidate.accountId===entry.accountId&&
+        candidate.competence===entry.competence&&
+        Math.abs(bankEntryAmount(candidate)-bankEntryAmount(entry))<=.02&&
+        (opposite==='DEBITO'||isLikelyBankReversalCredit(candidate)||candidate.id===currentId)
+      )
+      .sort((a,b)=>
+        (a.id===currentId?-1:0)-(b.id===currentId?-1:0)||
+        (a.reversalEntryId?1:0)-(b.reversalEntryId?1:0)||
+        daysBetweenIso(entry.date,a.date)-daysBetweenIso(entry.date,b.date)||
+        Math.abs(Number(a.sourceRow||0)-Number(entry.sourceRow||0))-
+          Math.abs(Number(b.sourceRow||0)-Number(entry.sourceRow||0))
+      );
+  }
+
+  function bankReversalCandidateText(candidate){
+    const linked=candidate.reversalEntryId?bankEntryById(candidate.reversalEntryId):null;
+    const linkedText=linked
+      ? ` — já vinculado a ${isoToBr(linked.date)||'outra linha'}`
+      : '';
+    return `${isoToBr(candidate.date)||'—'} — ${candidate.documentNumber||'sem documento'} — `+
+      `${candidate.party||candidate.history||'sem histórico'} — ${money(bankEntryAmount(candidate))}${linkedText}`;
+  }
+
+  function renderBankReversalExistingLink(){
+    const box=document.getElementById('bankReversalExistingLink');
+    const entry=bankEntryById(bankReversalEntryId);
+    if(!box||!entry)return;
+    const counterpart=entry.reversalEntryId?bankEntryById(entry.reversalEntryId):null;
+    box.innerHTML=counterpart?`<div class="bank-existing-link">
+      <div>
+        <strong>${safe(counterpart.movementType==='CREDITO'?'Crédito de estorno':'Débito original')}</strong><br>
+        <small>${safe(isoToBr(counterpart.date)||'—')} • ${safe(counterpart.party||counterpart.history||'Sem histórico')}</small>
+      </div>
+      <div>${money(bankEntryAmount(counterpart))} • ${entry.reversalMode==='manual'?'manual':'automático'}</div>
+      <button class="link-btn" style="color:#b42318" onclick="removeBankReversalLink('${entry.id}')">Remover</button>
+    </div>`:'<div class="bank-document-empty">Nenhum estorno vinculado a este lançamento.</div>';
+  }
+
+  window.openBankReversalLinkModal=function(entryId){
+    const entry=bankEntryById(entryId);
+    if(!entry)return;
+    bankReversalEntryId=entryId;
+    const account=bankAccountById(entry.contractId,entry.accountId);
+    const isDebit=entry.movementType==='DEBITO';
+    document.getElementById('bankReversalLinkTitle').textContent=isDebit
+      ? 'Vincular débito ao crédito de estorno'
+      : 'Vincular crédito de estorno ao débito original';
+    document.getElementById('bankReversalCandidateLabel').textContent=isDebit
+      ? 'Crédito de estorno / PIX rejeitado'
+      : 'Débito original';
+    document.getElementById('bankReversalLinkSummary').innerHTML=`
+      <strong>${safe(isoToBr(entry.date)||'—')}</strong> •
+      ${safe(bankAccountLabel(account)||'Conta não localizada')} •
+      ${safe(entry.movementType)} <strong>${money(bankEntryAmount(entry))}</strong><br>
+      ${safe(entry.party||entry.history||'Sem histórico')}`;
+
+    const candidates=bankReversalCandidates(entry);
+    const select=document.getElementById('bankReversalCandidate');
+    select.innerHTML='<option value="">Selecione o lançamento correspondente</option>'+candidates.map(candidate=>
+      `<option value="${candidate.id}">${safe(bankReversalCandidateText(candidate))}</option>`
+    ).join('');
+    if(entry.reversalEntryId&&candidates.some(candidate=>candidate.id===entry.reversalEntryId)){
+      select.value=entry.reversalEntryId;
+    }
+
+    document.getElementById('bankReversalLinkNotice').innerHTML=candidates.length
+      ? `<div class="notice info">${candidates.length} lançamento(s) de mesmo valor foram localizados na mesma conta e competência. É possível corrigir um vínculo automático escolhendo outra linha.</div>`
+      : '<div class="notice warn">Nenhum lançamento oposto de mesmo valor foi localizado nesta conta e competência.</div>';
+    renderBankReversalExistingLink();
+    document.getElementById('bankReversalLinkModal').classList.add('open');
+  }
+
+  window.closeBankReversalLinkModal=function(){
+    bankReversalEntryId=null;
+    document.getElementById('bankReversalLinkModal').classList.remove('open');
+  }
+
+  window.saveManualBankReversalLink=function(){
+    const entry=bankEntryById(bankReversalEntryId);
+    const candidateId=document.getElementById('bankReversalCandidate').value;
+    const candidate=bankEntryById(candidateId);
+    if(!entry||!candidate){
+      alert('Selecione o lançamento correspondente.');
+      return;
+    }
+    if(entry.movementType===candidate.movementType){
+      alert('O vínculo de estorno precisa relacionar um débito e um crédito.');
+      return;
+    }
+    if(entry.contractId!==candidate.contractId||entry.accountId!==candidate.accountId||entry.competence!==candidate.competence){
+      alert('Os lançamentos precisam pertencer à mesma conta bancária e competência.');
+      return;
+    }
+    if(Math.abs(bankEntryAmount(entry)-bankEntryAmount(candidate))>.02){
+      alert('Os valores do débito e do crédito de estorno precisam ser iguais.');
+      return;
+    }
+    const debit=entry.movementType==='DEBITO'?entry:candidate;
+    const credit=entry.movementType==='CREDITO'?entry:candidate;
+    if(bankEntryLinks(debit.id).length){
+      alert('Este débito possui vínculo com a Relação de Pagamentos. Remova esse vínculo antes de classificá-lo como estornado.');
+      return;
+    }
+
+    const conflicting=[entry,candidate]
+      .filter(item=>item.reversalEntryId&&item.reversalEntryId!==(item.id===entry.id?candidate.id:entry.id));
+    if(conflicting.length&&!confirm('Um dos lançamentos já está vinculado a outra linha. Deseja substituir o vínculo atual?'))return;
+
+    detachBankReversal(entry);
+    detachBankReversal(candidate);
+    const linkedAt=new Date().toISOString();
+    debit.reversalEntryId=credit.id;
+    debit.reversalMode='manual';
+    debit.reversalLinkedAt=linkedAt;
+    debit.suggestedPaymentId='';
+    debit.suggestedScore=0;
+    credit.reversalEntryId=debit.id;
+    credit.reversalMode='manual';
+    credit.reversalLinkedAt=linkedAt;
+    saveState();
+    openBankReversalLinkModal(entry.id);
+  }
+
+  window.removeBankReversalLink=function(entryId){
+    const entry=bankEntryById(entryId);
+    if(!entry?.reversalEntryId)return;
+    detachBankReversal(entry);
+    saveState();
+    openBankReversalLinkModal(entry.id);
   }
 
   window.openBankLinkModal=function(entryId){
@@ -12190,8 +12750,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   function renderProgramExecutionList(){const box=document.getElementById('programExecutionList');if(!box)return;box.innerHTML=state.programExecutions.slice().sort((a,b)=>(b.competence||'').localeCompare(a.competence||'')).map(execution=>{const program=state.workPrograms.find(item=>item.id===execution.programId),contract=contractById(execution.contractId),physicalCompleted=program?.physicalGoals?.filter(goal=>Number(execution.physicalActuals?.[goal.id]||0)>0).length||0;return`<div class="compact-register"><div><small>Contrato</small><strong>${safe(contractShortLabel(contract))}</strong></div><div><small>Projeto</small>${safe(program?.project||'—')}</div><div><small>Competência</small>${safe(competenceLabel(execution.competence))}</div><div><small>Metas informadas</small>${physicalCompleted} de ${program?.physicalGoals?.length||0}</div><div><small>Pagamentos vinculados</small>${state.payments.filter(payment=>payment.contractId===execution.contractId&&payment.competence===execution.competence&&payment.planItemId).length}</div><div><small>Situação</small><span class="status-pill ${physicalCompleted?'ok':'warn'}">${physicalCompleted?'EM ACOMPANHAMENTO':'PENDENTE'}</span></div><div>${execution.documentId?`<button class="link-btn" onclick="openStoredDocument('${execution.documentId}',false)">Abrir relatório</button>`:'—'}</div></div>`}).join('')||'<div class="compact-register-empty">Nenhum acompanhamento salvo.</div>'}
 
   /* Integração Extrato → Pagamentos */
-  function findBankPlaceholderForImportedPayment(candidate){return state.payments.find(payment=>payment.source==='extrato'&&payment.contractId===candidate.contractId&&payment.competence===candidate.competence&&Math.abs(Number(payment.paidValue||0)-Number(candidate.paidValue||0))<=.02&&daysBetweenIso(payment.compensationDate,candidate.compensationDate)<=2&&(!normalizeCheque(candidate.cheque)||!normalizeCheque(payment.cheque)||normalizeCheque(candidate.cheque)===normalizeCheque(payment.cheque)))||null}
-  function createPaymentFromBankEntry(entry){if(entry.movementType!=='DEBITO')return null;const existingLink=bankEntryLinks(entry.id)[0];if(existingLink)return state.payments.find(payment=>payment.id===existingLink.paymentId)||null;const existing=state.payments.find(payment=>payment.source==='extrato'&&payment.bankEntryId===entry.id);if(existing)return existing;const contract=contractById(entry.contractId),payment={id:id(),bankEntryId:entry.id,contractId:entry.contractId,ug:contract?.ug||'',sacc:contract?.sacc||'',contrato:contract?.contrato||'',projeto:contract?.projeto||'',creditor:entry.party||'',creditorDocument:'',competence:entry.competence,process:'',expenseType:'',sourceExpenseType:'',expenseNature:entry.history||entry.party||'Débito bancário',cheque:entry.documentNumber||'',issueDate:entry.date,documentValue:0,compensationDate:entry.date,paidValue:Number(entry.debit||0),accountabilityStatus:'AGUARDANDO PRESTAÇÃO DE CONTAS',fundingSource:'CONTRATO',planItemId:'',reimbursements:[],source:'extrato',sourceFile:bankStatementById(entry.statementId)?.fileName||'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};state.payments.push(payment);createBankLink(entry.id,payment.id,entry.debit,'automatico',100);return payment}
+  function findBankPlaceholderForImportedPayment(candidate){return state.payments.find(payment=>payment.source==='extrato'&&payment.contractId===candidate.contractId&&payment.competence===candidate.competence&&paymentAccountKind(payment.bankAccountKind)===paymentAccountKind(candidate.bankAccountKind)&&Math.abs(Number(payment.paidValue||0)-Number(candidate.paidValue||0))<=.02&&daysBetweenIso(payment.compensationDate,candidate.compensationDate)<=2&&(!normalizeCheque(candidate.cheque)||!normalizeCheque(payment.cheque)||normalizeCheque(candidate.cheque)===normalizeCheque(payment.cheque)))||null}
+  function createPaymentFromBankEntry(entry){if(entry.movementType!=='DEBITO')return null;const existingLink=bankEntryLinks(entry.id)[0];if(existingLink)return state.payments.find(payment=>payment.id===existingLink.paymentId)||null;const existing=state.payments.find(payment=>payment.source==='extrato'&&payment.bankEntryId===entry.id);if(existing)return existing;const contract=contractById(entry.contractId),payment={id:id(),bankEntryId:entry.id,contractId:entry.contractId,ug:contract?.ug||'',sacc:contract?.sacc||'',contrato:contract?.contrato||'',projeto:contract?.projeto||'',creditor:entry.party||'',creditorDocument:'',competence:entry.competence,bankAccountKind:'GESTAO',process:'',expenseType:'',sourceExpenseType:'',expenseNature:entry.history||entry.party||'Débito bancário',cheque:entry.documentNumber||'',issueDate:entry.date,documentValue:0,compensationDate:entry.date,paidValue:Number(entry.debit||0),accountabilityStatus:'AGUARDANDO PRESTAÇÃO DE CONTAS',fundingSource:'CONTRATO',planItemId:'',reimbursements:[],source:'extrato',sourceFile:bankStatementById(entry.statementId)?.fileName||'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};state.payments.push(payment);createBankLink(entry.id,payment.id,entry.debit,'automatico',100);return payment}
 
 
   function activateSubmodule(containerPrefix,selectedId,buttonIds){
@@ -13091,6 +13651,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     clearPaymentPreview();
     refreshPaymentContractOptions();
     const competence=document.getElementById('payImportCompetence');
+    const accountKind=document.getElementById('payImportAccountKind');
+    if(accountKind)accountKind.value='GESTAO';
     const now=new Date();
     const year=now.getFullYear();
     const month=String(now.getMonth()+1).padStart(2,'0');
@@ -13712,6 +14274,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     );
     const competence=document.getElementById('payImportCompetence').value;
     const initialStatus=document.getElementById('payImportStatus').value;
+    const bankAccountKind=paymentAccountKind(document.getElementById('payImportAccountKind')?.value);
 
     if(!contract||!competence||!paymentPreview?.rows.length){
       alert('A prévia não está pronta para importação.');
@@ -13736,6 +14299,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const previousReport=state.paymentReports.find(report=>
         report.contractId===contract.id&&
         report.competence===competence&&
+        paymentAccountKind(report.bankAccountKind)===bankAccountKind&&
         report.fileName===paymentPreview.fileName
       );
 
@@ -13790,6 +14354,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           creditor:contract.os,
           creditorDocument:contract.cnpj,
           competence,
+          bankAccountKind,
           process:row.process||'',
           expenseType:(row.expenseType||'').trim(),
           sourceExpenseType:(row.sourceExpenseType||'').trim(),
@@ -13865,6 +14430,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         contrato:contract.contrato,
         projeto:contract.projeto,
         competence,
+        bankAccountKind,
         fileName:paymentPreview.fileName,
         rowCount:paymentPreview.rows.length,
         personalCount:paymentPreview.personalCount,
@@ -13961,6 +14527,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
               contrato:contract.contrato,
               projeto:contract.projeto,
               competencia:competence,
+              bankAccountKind,
               hasFile:true,
               createdAt:new Date().toISOString()
             });
@@ -14008,7 +14575,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       }
 
       alert(
-        `Importação concluída: ${inserted} pagamento(s) incluído(s) e `+
+        `Importação concluída na ${paymentAccountKindLabel(bankAccountKind)}: ${inserted} pagamento(s) incluído(s) e `+
         `${updated} atualizado(s), sem duplicação.`+
         pendingMessage+
         pdfWarning
@@ -15471,6 +16038,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <td>
           <strong>${safe(d.name)}</strong><br>
           <span class="doc-status">${d.hasFile?'ARQUIVO GUARDADO':'SOMENTE REGISTRO'}</span>
+          ${d.folder==='relatorios_pagamentos'?`<span class="tag ${paymentAccountKind(d.bankAccountKind)==='PROVISAO'?'warn':'info'}">${safe(paymentAccountKindLabel(d.bankAccountKind).toUpperCase())}</span>`:''}
         </td>
         <td>${safe(documentFolderLabel(d))}</td>
         <td>${safe(d.ug||'—')}</td>
@@ -15533,6 +16101,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       const placeholderPaymentIds=new Set(state.payments.filter(payment=>payment.source==='extrato'&&entryIds.has(payment.bankEntryId)).map(payment=>payment.id));
       state.bankLinks=state.bankLinks.filter(link=>!entryIds.has(link.entryId)&&!placeholderPaymentIds.has(link.paymentId));
       state.payments=state.payments.filter(payment=>!placeholderPaymentIds.has(payment.id));
+      clearBankReversalLinksForEntryIds(entryIds);
       state.bankEntries=state.bankEntries.filter(entry=>entry.statementId!==bankStatement.id);
       state.bankApplicationTransfers=state.bankApplicationTransfers.filter(
         transfer=>transfer.statementId!==bankStatement.id

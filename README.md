@@ -79,3 +79,9 @@ Depois abra com Ctrl+F5.
 - Login único e retorno ao portal pelo cabeçalho.
 - Administradores recebem acesso automático ao novo módulo.
 - Solicitação de cadastro permite pedir acesso ao Encerramento Mensal ou a todos os sistemas.
+
+
+## v167
+- Prestação de Contas CG atualizada para a versão v166 enviada.
+- Eliminado o piscar da tela de login ao entrar nos módulos e voltar ao portal.
+- Favicon da bandeira TRANCELIM unificado no portal e em todos os módulos.
