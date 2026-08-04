@@ -70,3 +70,12 @@ Depois abra com Ctrl+F5.
 - extrato CDB é guardado como documento de aplicação e não entra na conciliação operacional;
 - incluídos totais separados de PESSOAL e CUSTEIO;
 - limpeza única dos dados incorretos de Pagamentos e Extratos para nova importação.
+
+
+## v165 — Sistema de Encerramento Mensal
+
+- Adicionado o módulo `/encerramento-mensal/`, baseado na versão v25.
+- Novo card no portal principal.
+- Login único e retorno ao portal pelo cabeçalho.
+- Administradores recebem acesso automático ao novo módulo.
+- Solicitação de cadastro permite pedir acesso ao Encerramento Mensal ou a todos os sistemas.

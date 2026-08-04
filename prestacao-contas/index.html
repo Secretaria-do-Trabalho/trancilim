@@ -3738,7 +3738,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div>
 <div>
 <label>Competência *</label>
-<input id="payCompetence" onchange="refreshPaymentBankDebitOptions()" type="month"/>
+<input id="payCompetence" type="month"/>
 </div>
 <div>
 <label>Nº do Processo</label>
@@ -3778,13 +3778,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 <div>
 <label>Valor Pago *</label>
 <input id="payPaidValue" placeholder="R$ 0,00"/>
-</div>
-<div class="payment-span-2">
-<label>Débito do extrato bancário</label>
-<select id="payBankDebit" onchange="paymentBankDebitChanged()">
-<option value="">Não vincular agora</option>
-</select>
-<div class="select-help">Mostra somente débitos ainda não conciliados ou com saldo disponível, do mesmo contrato e competência.</div>
 </div>
 <div>
 <label>Status da Prestação de Contas *</label>
@@ -4626,36 +4619,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
 </div>
 </div>
 </div>
-<div class="modal" id="paymentBankDebitModal">
-<div class="modal-box" style="width:min(980px,100%)">
-<div class="modal-head">
-<div>
-<strong>Selecionar débito do extrato</strong>
-<div class="small">Vincule ao pagamento um débito ainda não conciliado ou parcialmente conciliado.</div>
-</div>
-<button class="close" onclick="closePaymentBankDebitModal()">×</button>
-</div>
-<div class="modal-body">
-<div class="modal-summary" id="paymentBankDebitSummary"></div>
-<div class="bank-link-form">
-<div>
-<label>Débito disponível</label>
-<select id="paymentBankDebitEntry" onchange="paymentBankDebitEntryChanged()"></select>
-</div>
-<div>
-<label>Valor vinculado</label>
-<input id="paymentBankDebitAmount" placeholder="R$ 0,00"/>
-</div>
-<button class="btn btn-primary" onclick="addPaymentBankDebitLink()">Adicionar vínculo</button>
-</div>
-<h3 style="font-size:15px;color:#0b2f4a;margin:17px 0 9px">Débitos já vinculados</h3>
-<div class="bank-existing-links" id="paymentBankDebitExisting"></div>
-</div>
-<div class="modal-foot">
-<button class="btn btn-outline" onclick="closePaymentBankDebitModal()">Fechar</button>
-</div>
-</div>
-</div>
 <div class="modal" id="paymentEditModal">
 <div class="modal-box" style="width:min(1100px,100%)">
 <div class="modal-head">
@@ -5414,32 +5377,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
     localStorage.setItem(PAYMENT_BANK_RESET_V161_MARKER,'1');
   }
-
-  /* v165 — zera uma única vez os dados de Pagamentos e Extratos, preservando contratos e demais cadastros. */
-  const PAYMENT_BANK_RESET_V165_MARKER='prestacao_contas_cg_reset_pagamentos_extratos_v165';
-  if(!localStorage.getItem(PAYMENT_BANK_RESET_V165_MARKER)){
-    const paymentBankFolders=[
-      'relatorios_pagamentos',
-      'comprovantes_pagamentos',
-      'extratos_bancarios'
-    ];
-    paymentTestDocumentIdsToDelete.push(
-      ...state.documents
-        .filter(document=>paymentBankFolders.includes(document.folder))
-        .map(document=>document.id)
-    );
-    paymentTestDocumentIdsToDelete=[...new Set(paymentTestDocumentIdsToDelete)];
-    state.payments=[];
-    state.paymentReports=[];
-    state.bankStatements=[];
-    state.bankEntries=[];
-    state.bankLinks=[];
-    state.bankApplicationTransfers=[];
-    state.documents=state.documents.filter(document=>!paymentBankFolders.includes(document.folder));
-    state.issues=state.issues.filter(issue=>issue.module!=='pagamentos');
-    localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-    localStorage.setItem(PAYMENT_BANK_RESET_V165_MARKER,'1');
-  }
   let preview = null;
   let editId = null;
   let editInclude = true;
@@ -5468,7 +5405,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   let bankStatementPreview = null;
   let selectedBankStatementFile = null;
   let bankLinkEntryId = null;
-  let paymentBankDebitModalId = null;
   let bankImportBusy = false;
   let editingResourceTransferId=null,editingProcurementId=null,currentWorkProgramId=null;
   let workProgramDraft={physicalGoals:[],financialItems:[],indicators:[],disbursements:[]};
@@ -8502,12 +8438,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     if(!contract){
       box.classList.add('hidden');
       box.innerHTML='';
-      refreshPaymentBankDebitOptions();
       return;
     }
     box.classList.remove('hidden');
     box.innerHTML=`UG ${safe(contract.ug)} • SACC/SCC ${safe(contract.sacc)} • Contrato ${safe(contract.contrato)} • Projeto/Lotação: ${safe(contract.projeto)}`;
-    refreshPaymentBankDebitOptions();
   }
 
   window.paymentImportContractChanged=function(){
@@ -8567,7 +8501,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     editPaymentId=null;
     selectedPaymentEvidenceFiles=[];
     document.getElementById('paymentFormTitle').textContent='Cadastrar pagamento';
-    ['payContractId','payExpenseType','payBankDebit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+    ['payContractId','payExpenseType'].forEach(id=>document.getElementById(id).value='');
     ['payContractDisplay','payCreditor','payCreditorDocument','payProcess','payExpenseNature','payCheque',
      'payIssueDate','payDocumentValue','payCompensationDate','payPaidValue'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('payAccountabilityStatus').value='AGUARDANDO DOCUMENTO COMPROBATÓRIO';
@@ -8578,103 +8512,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const month=String(now.getMonth()+1).padStart(2,'0');
     competence.value=`${year}-${month}`;
     document.getElementById('paymentContractInfo').classList.add('hidden');
-    refreshPaymentBankDebitOptions();
     renderPaymentEvidenceList();
   }
 
-  function bankContractIdentity(contractId){
-    const contract=state.contracts.find(item=>item.id===contractId);
-    if(!contract)return String(contractId||'');
-    return [contract.ug,contract.sacc,contract.contrato]
-      .map(value=>normalizeForChecklist(value||''))
-      .join('|');
-  }
-
-  function sameBankContract(leftId,rightId){
-    if(!leftId||!rightId)return !leftId&&!rightId;
-    if(leftId===rightId)return true;
-    const left=bankContractIdentity(leftId);
-    const right=bankContractIdentity(rightId);
-    return Boolean(left&&right&&left===right);
-  }
-
-  function paymentReferenceCompetences(payment){
-    return [...new Set([
-      payment?.competence||'',
-      payment?.compensationDate?.slice(0,7)||'',
-      payment?.issueDate?.slice(0,7)||''
-    ].filter(Boolean))];
-  }
-
-  function entryMatchesPaymentPeriod(entry,payment){
-    const entryMonths=[...new Set([
-      entry?.competence||'',
-      entry?.date?.slice(0,7)||''
-    ].filter(Boolean))];
-    const paymentMonths=paymentReferenceCompetences(payment);
-    return !entryMonths.length||!paymentMonths.length||entryMonths.some(month=>paymentMonths.includes(month));
-  }
-
-  function availableBankDebitsForPaymentDraft(contractId,competence,paymentId=''){
-    const payment=paymentId?state.payments.find(item=>item.id===paymentId):null;
-    const requestedMonths=[...new Set([
-      competence||'',
-      payment?.compensationDate?.slice(0,7)||'',
-      payment?.issueDate?.slice(0,7)||''
-    ].filter(Boolean))];
-    const allOpen=state.bankEntries
-      .filter(entry=>{
-        if(entry.movementType!=='DEBITO'||entry.reversalEntryId)return false;
-        if(contractId&&!sameBankContract(entry.contractId,contractId))return false;
-        const links=bankEntryLinks(entry.id);
-        const linkedToThis=paymentId?links.some(link=>link.paymentId===paymentId):false;
-        const remaining=bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id);
-        return linkedToThis||remaining>.02;
-      });
-    const samePeriod=allOpen.filter(entry=>{
-      if(!requestedMonths.length)return true;
-      return requestedMonths.includes(entry.competence)||requestedMonths.includes((entry.date||'').slice(0,7));
-    });
-    const rows=samePeriod.length?samePeriod:allOpen;
-    return rows.sort((a,b)=>{
-      if(payment){
-        const aa=bankPaymentCandidateScore(a,payment).score;
-        const bb=bankPaymentCandidateScore(b,payment).score;
-        if(bb!==aa)return bb-aa;
-      }
-      return (a.date||'').localeCompare(b.date||'')||bankEntryAmount(a)-bankEntryAmount(b);
-    });
-  }
-
-  window.refreshPaymentBankDebitOptions=function(selected=''){
-    const select=document.getElementById('payBankDebit');
-    if(!select)return;
-    const contractId=document.getElementById('payContractId')?.value||'';
-    const competence=document.getElementById('payCompetence')?.value||'';
-    const current=selected||select.value;
-    const entries=availableBankDebitsForPaymentDraft(contractId,competence);
-    select.innerHTML='<option value="">Não vincular agora</option>'+entries.map(entry=>{
-      const remaining=Math.max(0,bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id));
-      return `<option value="${entry.id}">${safe(isoToBr(entry.date)||'—')} • ${safe(entry.documentNumber||'sem documento')} • ${safe(entry.history||entry.party||'Débito')} • disponível ${money(remaining)}</option>`;
-    }).join('');
-    if(entries.some(entry=>entry.id===current))select.value=current;
-    select.disabled=!contractId||!competence||!entries.length;
-  }
-
-  window.paymentBankDebitChanged=function(){
-    const entry=bankEntryById(document.getElementById('payBankDebit')?.value||'');
-    if(!entry)return;
-    const remaining=Math.max(0,bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id));
-    const cheque=document.getElementById('payCheque');
-    const compensation=document.getElementById('payCompensationDate');
-    const paid=document.getElementById('payPaidValue');
-    if(cheque&&!cheque.value)cheque.value=entry.documentNumber||'';
-    if(compensation&&!compensation.value)compensation.value=entry.date||'';
-    if(paid&&!numBR(paid.value))paid.value=remaining.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  }
-
   window.savePayment=async function(){
-    const selectedBankEntryId=document.getElementById('payBankDebit')?.value||'';
     const contract=state.contracts.find(c=>c.id===document.getElementById('payContractId').value);
     const record={
       id:editPaymentId||id(),
@@ -8743,16 +8584,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         hasFile,
         createdAt:new Date().toISOString()
       });
-    }
-
-    if(selectedBankEntryId){
-      const entry=bankEntryById(selectedBankEntryId);
-      if(entry){
-        const entryRemaining=Math.max(0,bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id));
-        const paymentRemaining=Math.max(0,Number(record.paidValue||0)-paymentLinkedAmount(record.id));
-        const linkAmount=Math.min(entryRemaining,paymentRemaining);
-        if(linkAmount>.02)createBankLink(entry.id,record.id,linkAmount,'manual',100);
-      }
     }
 
     saveState();
@@ -10497,11 +10328,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     invalidateRuntimeCaches();
   }
 
-  function unreconciledPaymentRows(entry,maxDays=3){
+  function unreconciledPaymentRows(entry,maxDays=1){
+    const competence=bankEntryReferenceCompetence(entry);
     return state.payments.filter(payment=>
       payment.source!=='extrato'&&
-      sameBankContract(payment.contractId,entry.contractId)&&
-      entryMatchesPaymentPeriod(entry,payment)&&
+      payment.contractId===entry.contractId&&
+      (!competence||payment.competence===competence)&&
       paymentLinkedAmount(payment.id)<Number(payment.paidValue||0)-.01&&
       daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=maxDays
     );
@@ -10564,7 +10396,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     entries.forEach(entry=>{
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const entryDoc=bankDigits(entry.documentNumber);
-      const allTaxCandidates=unreconciledPaymentRows(entry,3)
+      const allTaxCandidates=unreconciledPaymentRows(entry,1)
         .filter(isTaxPayment)
         .map(payment=>({payment,amount:paymentRemainingAmount(payment)}))
         .filter(row=>row.amount>.01);
@@ -10589,7 +10421,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       if(bankEntryLinks(entry.id).length)return;
       const amount=bankEntryAmount(entry);
       const entryDoc=bankDigits(entry.documentNumber);
-      const candidates=unreconciledPaymentRows(entry,3).filter(payment=>{
+      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
         const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
         if(Math.abs(remaining-amount)>.02)return false;
         const paymentDoc=bankDigits(payment.cheque);
@@ -10601,7 +10433,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       });
       const selected=exactDocument.length===1
         ? exactDocument[0]
-        : (candidates.length===1?candidates[0]:null);
+        : (!entryDoc&&candidates.length===1?candidates[0]:null);
       if(selected)createBankLink(entry.id,selected.id,amount,'automatico',100);
     });
   }
@@ -10611,7 +10443,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       if(bankEntryLinks(entry.id).length)return;
       const entryDoc=bankDigits(entry.documentNumber);
       if(!entryDoc)return;
-      const candidates=unreconciledPaymentRows(entry,3).filter(payment=>
+      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>
         bankDigits(payment.cheque)===entryDoc
       );
       if(candidates.length<2)return;
@@ -10626,7 +10458,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     entries.forEach(entry=>{
       if(bankEntryLinks(entry.id).length)return;
       const amount=bankEntryAmount(entry);
-      const candidates=unreconciledPaymentRows(entry,3).filter(payment=>{
+      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
         const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
         return Math.abs(remaining-amount)<=.02;
       });
@@ -10643,9 +10475,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         .filter(entry=>
           bankEntryLinks(entry.id).length===0&&
           !entry.reversalEntryId&&
-          sameBankContract(entry.contractId,payment.contractId)&&
-          entryMatchesPaymentPeriod(entry,payment)&&
-          daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=3&&
+          entry.contractId===payment.contractId&&
+          bankEntryReferenceCompetence(entry)===payment.competence&&
+          daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=1&&
           (!paymentDoc||!bankDigits(entry.documentNumber)||bankDigits(entry.documentNumber)===paymentDoc)
         )
         .map(entry=>({entry,amount:bankEntryAmount(entry)}));
@@ -10691,16 +10523,15 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       entry.movementType==='DEBITO'&&(!statementId||entry.statementId===statementId)
     );
     clearAutomaticBankLinks(targetEntries);
-    /* Primeiro identifica PIX rejeitados/estornos para nunca vinculá-los a pagamentos. */
-    identifyReversedBankDebits(targetEntries);
     reconcileGroupedTaxPayments(targetEntries);
     reconcileExactSinglePayments(targetEntries);
     reconcileGroupedPaymentsByDocument(targetEntries);
     reconcileUniqueValueAndDate(targetEntries);
     reconcileSplitBankDebits(targetEntries);
+    identifyReversedBankDebits(targetEntries);
     targetEntries.forEach(entry=>{
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
-      const candidates=unreconciledPaymentRows(entry,3)
+      const candidates=unreconciledPaymentRows(entry,2)
         .map(payment=>({payment,...bankPaymentCandidateScore(entry,payment)}))
         .filter(candidate=>candidate.remaining>.01)
         .sort((a,b)=>b.score-a.score);
@@ -10711,19 +10542,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       }
     });
   }
-
-  const BANK_RECONCILIATION_REPAIR_V166='prestacao_contas_cg_reconciliacao_reparada_v166';
-  function repairBankReconciliationV166(){
-    if(localStorage.getItem(BANK_RECONCILIATION_REPAIR_V166))return;
-    try{
-      autoReconcileBankEntries();
-      saveState();
-      localStorage.setItem(BANK_RECONCILIATION_REPAIR_V166,'1');
-    }catch(error){
-      console.error('Falha ao reparar a conciliação bancária da v166:',error);
-    }
-  }
-  setTimeout(repairBankReconciliationV166,250);
 
   function refreshBankSelectors(){
     const contractSelect=document.getElementById('bankFilterContract');
@@ -12046,7 +11864,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       reconcileBankApplicationTransfers(contractId,accountId,competence);
 
       /* O extrato não cria pagamentos. A Relação de Pagamentos é a fonte oficial. */
-      if(type==='conta_corrente')autoReconcileBankEntries();
+      if(type==='conta_corrente')autoReconcileBankEntries(statementId);
       saveState();
 
       clearBankStatementPreview();
@@ -12220,95 +12038,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     state.bankLinks=state.bankLinks.filter(link=>link.id!==linkId);
     saveState();
     renderBankExistingLinks();
-  }
-
-  function paymentAvailableDebitRows(payment){
-    if(!payment)return[];
-    return availableBankDebitsForPaymentDraft(payment.contractId,payment.competence,payment.id)
-      .map(entry=>{
-        const existing=bankEntryLinks(entry.id).find(link=>link.paymentId===payment.id);
-        const remaining=Math.max(0,bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id));
-        return {entry,existing,remaining};
-      })
-      .filter(row=>row.existing||row.remaining>.02)
-      .sort((a,b)=>{
-        const aa=bankPaymentCandidateScore(a.entry,payment).score;
-        const bb=bankPaymentCandidateScore(b.entry,payment).score;
-        return bb-aa||(a.entry.date||'').localeCompare(b.entry.date||'');
-      });
-  }
-
-  function renderPaymentBankDebitModal(){
-    const payment=state.payments.find(item=>item.id===paymentBankDebitModalId);
-    if(!payment)return;
-    const linked=paymentLinkedAmount(payment.id);
-    const remaining=Math.max(0,Number(payment.paidValue||0)-linked);
-    const summary=document.getElementById('paymentBankDebitSummary');
-    if(summary)summary.innerHTML=`<strong>${safe(payment.process||'Sem processo')} — ${safe(payment.expenseNature||'Pagamento')}</strong> • Valor pago ${money(payment.paidValue)} • Vinculado ${money(linked)} • Restante ${money(remaining)}`;
-
-    const select=document.getElementById('paymentBankDebitEntry');
-    const rows=paymentAvailableDebitRows(payment).filter(row=>!row.existing);
-    if(select){
-      select.innerHTML='<option value="">Selecione o débito</option>'+rows.map(({entry,remaining})=>`<option value="${entry.id}">${safe(isoToBr(entry.date)||'—')} • ${safe(entry.documentNumber||'sem documento')} • ${safe(entry.history||entry.party||'Débito')} • ${safe(competenceLabel(entry.competence)||'')} • disponível ${money(remaining)}</option>`).join('');
-      select.disabled=!rows.length||remaining<=.02;
-      select.title=rows.length?'Selecione um débito ainda com saldo disponível':'Nenhum débito aberto foi encontrado para este contrato';
-    }
-    const amount=document.getElementById('paymentBankDebitAmount');
-    if(amount)amount.value='';
-
-    const existingBox=document.getElementById('paymentBankDebitExisting');
-    if(existingBox){
-      const links=paymentBankLinks(payment.id).map(link=>({link,entry:bankEntryById(link.entryId)})).filter(item=>item.entry);
-      existingBox.innerHTML=links.map(({link,entry})=>`<div class="bank-existing-link"><div><strong>${safe(isoToBr(entry.date)||'—')} • ${safe(entry.documentNumber||'sem documento')}</strong><div>${safe(entry.history||entry.party||'Débito')} • ${money(link.amount)}</div></div><button class="link-btn" style="color:#b42318" onclick="removePaymentBankDebitLink('${link.id}')">Remover</button></div>`).join('')||'<div class="bank-document-empty">Nenhum débito vinculado a este pagamento.</div>';
-    }
-  }
-
-  window.openPaymentBankDebitModal=function(paymentId){
-    const payment=state.payments.find(item=>item.id===paymentId);
-    if(!payment)return;
-    paymentBankDebitModalId=paymentId;
-    renderPaymentBankDebitModal();
-    document.getElementById('paymentBankDebitModal')?.classList.add('open');
-  }
-
-  window.closePaymentBankDebitModal=function(){
-    paymentBankDebitModalId=null;
-    document.getElementById('paymentBankDebitModal')?.classList.remove('open');
-  }
-
-  window.paymentBankDebitEntryChanged=function(){
-    const payment=state.payments.find(item=>item.id===paymentBankDebitModalId);
-    const entry=bankEntryById(document.getElementById('paymentBankDebitEntry')?.value||'');
-    if(!payment||!entry)return;
-    const entryRemaining=Math.max(0,bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id));
-    const paymentRemaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
-    const amount=Math.min(entryRemaining,paymentRemaining);
-    const input=document.getElementById('paymentBankDebitAmount');
-    if(input)input.value=amount.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  }
-
-  window.addPaymentBankDebitLink=function(){
-    const payment=state.payments.find(item=>item.id===paymentBankDebitModalId);
-    const entry=bankEntryById(document.getElementById('paymentBankDebitEntry')?.value||'');
-    const amount=numBR(document.getElementById('paymentBankDebitAmount')?.value||'');
-    if(!payment||!entry||amount<=0){alert('Selecione o débito e informe o valor vinculado.');return;}
-    const entryRemaining=Math.max(0,bankEntryAmount(entry)-bankEntryLinkedAmount(entry.id));
-    const paymentRemaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
-    if(amount>entryRemaining+.02){alert(`O valor ultrapassa o saldo disponível do débito: ${money(entryRemaining)}.`);return;}
-    if(amount>paymentRemaining+.02){alert(`O valor ultrapassa o saldo restante do pagamento: ${money(paymentRemaining)}.`);return;}
-    createBankLink(entry.id,payment.id,amount,'manual',100);
-    entry.suggestedPaymentId='';
-    entry.suggestedScore=0;
-    saveState();
-    renderPaymentBankDebitModal();
-    renderPayments();
-  }
-
-  window.removePaymentBankDebitLink=function(linkId){
-    state.bankLinks=state.bankLinks.filter(link=>link.id!==linkId);
-    saveState();
-    renderPaymentBankDebitModal();
-    renderPayments();
   }
 
   window.exportBankReconciliationExcel=function(){
@@ -13332,7 +13061,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         </td>
         <td>
           <div class="payment-action-buttons payment-actions-vertical">
-            <button class="link-btn" onclick="openPaymentBankDebitModal('${p.id}')">${paymentBankLinks(p.id).length?'Gerenciar débitos':'Selecionar débito'}</button>
             <button class="link-btn" onclick="openPaymentEditModal('${p.id}')">Editar</button>
             <button class="link-btn" onclick="openPaymentEvidenceModal('${p.id}')">Comprovantes</button>
             <button class="link-btn" style="color:#b42318" onclick="deletePayment('${p.id}')">Excluir</button>

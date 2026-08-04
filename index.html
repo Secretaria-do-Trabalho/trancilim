@@ -226,7 +226,7 @@
     .portal-title{margin-bottom:25px;text-align:center}
     .portal-title h2{margin:0;color:var(--azul);font-size:28px}
     .portal-title p{margin:7px 0 0;color:var(--muted);font-size:12px}
-    .systems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+    .systems{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
     .systems.single{grid-template-columns:minmax(0,460px);justify-content:center}
     .system-card{display:none;flex-direction:column;min-height:248px;padding:24px;border:1px solid var(--borda);border-radius:19px;background:#fff;box-shadow:0 14px 34px rgba(25,68,86,.08);transition:transform .16s ease,box-shadow .16s ease}
     .system-card.allowed{display:flex}
@@ -235,12 +235,14 @@
     .system-icon svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
     .patrimonio .system-icon{color:var(--verde);background:var(--verde-claro)}
     .prestacao .system-icon{color:var(--azul-medio);background:var(--azul-claro)}
+    .encerramento .system-icon{color:#8a5a00;background:#fff2d4}
     .system-card small{color:var(--muted);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
     .system-card h3{margin:8px 0 9px;color:var(--azul);font-size:20px;line-height:1.2}
     .system-card p{margin:0 0 19px;color:#627986;font-size:11px;line-height:1.5}
     .access{display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:auto;border-radius:10px;color:#fff;text-decoration:none;font-size:12px;font-weight:900}
     .patrimonio .access{background:linear-gradient(135deg,var(--verde),#12a059)}
     .prestacao .access{background:linear-gradient(135deg,#0b5279,#2387b1)}
+    .encerramento .access{background:linear-gradient(135deg,#c87900,#ee9c23)}
     .no-access{display:none;padding:26px;border:1px solid #f0c9c5;border-radius:16px;background:#fff5f4;color:#8e2f27;text-align:center;font-size:12px}
     .no-access.active{display:block}
 
@@ -489,7 +491,9 @@
               <option value="">Selecione</option>
               <option value="patrimonio">Gestão Patrimonial</option>
               <option value="prestacao-contas">Prestação de Contas CG</option>
-              <option value="ambos">Ambos os sistemas</option>
+              <option value="encerramento-mensal">Encerramento Mensal</option>
+              <option value="ambos">Patrimônio e Prestação de Contas</option>
+              <option value="todos">Todos os sistemas</option>
             </select>
           </div>
           <div class="request-field full">
@@ -555,6 +559,14 @@
           <h3>Sistema de Prestação de Contas CG</h3>
           <p>Contratos, pagamentos, extratos, pessoal, prazos, documentos e relatório anual.</p>
           <a class="access" href="./prestacao-contas/index.html">Acessar sistema</a>
+        </article>
+
+        <article class="system-card encerramento" data-module="encerramento-mensal">
+          <div class="system-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="5" width="15" height="14.5" rx="2.5"></rect><path d="M8 3.5v4"></path><path d="M16 3.5v4"></path><path d="M4.5 9.5h15"></path><path d="m8.2 14 2.1 2.1 5-5"></path></svg></div>
+          <small>Encerramento mensal</small>
+          <h3>Sistema de Encerramento Mensal</h3>
+          <p>Conferência, processos, despachos, anexos, contas bancárias e controle das quatro UGs.</p>
+          <a class="access" href="./encerramento-mensal/index.html">Acessar sistema</a>
         </article>
       </section>
 
@@ -703,7 +715,9 @@
       portalAvatar.setAttribute('aria-label', session?.photo ? `Foto de ${name}` : `Iniciais de ${name}`);
     }
     function modulesFromProfile(profile) {
+      if (profile?.is_admin === true) return ['patrimonio', 'prestacao-contas', 'encerramento-mensal'];
       if (Array.isArray(profile?.modulos) && profile.modulos.length) return profile.modulos;
+      if (profile?.modulo_solicitado === 'todos') return ['patrimonio', 'prestacao-contas', 'encerramento-mensal'];
       if (profile?.modulo_solicitado === 'ambos') return ['patrimonio', 'prestacao-contas'];
       if (profile?.modulo_solicitado) return [profile.modulo_solicitado];
       return [];
@@ -871,6 +885,7 @@
       renderProfileUsers();
     }
     function requestedModules(profile) {
+      if (profile.modulo_solicitado === 'todos') return ['patrimonio', 'prestacao-contas', 'encerramento-mensal'];
       if (profile.modulo_solicitado === 'ambos') return ['patrimonio', 'prestacao-contas'];
       return profile.modulo_solicitado ? [profile.modulo_solicitado] : [];
     }
@@ -887,7 +902,7 @@
           <span>${escapeHtml(item.justificativa || 'Sem justificativa informada.')}</span>
           <div class="request-admin-actions">
             <button class="approve" onclick="approveUser('${item.id}','solicitado')">Aprovar solicitado</button>
-            <button onclick="approveUser('${item.id}','ambos')">Aprovar ambos</button>
+            <button onclick="approveUser('${item.id}','todos')">Aprovar todos</button>
             <button class="reject" onclick="rejectUser('${item.id}')">Rejeitar</button>
           </div>
         </div>`).join('');
@@ -898,7 +913,7 @@
     window.approveUser = async function(id, mode) {
       const item = pendingRequests.find(row => row.id === id);
       if (!item) return;
-      const modulos = mode === 'ambos' ? ['patrimonio','prestacao-contas'] : requestedModules(item);
+      const modulos = mode === 'todos' ? ['patrimonio','prestacao-contas','encerramento-mensal'] : requestedModules(item);
       const { error } = await supabaseClient.from('usuarios_perfis').update({ status:'aprovado', permissao:'total', perfil:'Usuário', modulos, approved_at:new Date().toISOString(), approved_by:currentPortalSession.authUserId }).eq('id', id);
       if (error) { alert('Erro ao aprovar: ' + error.message); return; }
       await refreshNotifications();

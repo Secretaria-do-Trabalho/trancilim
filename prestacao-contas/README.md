@@ -1,36 +1,35 @@
-# Sistema de Prestação de Contas CG — v165
+# Sistema de Prestação de Contas CG — v161
 
-## Pagamentos e extratos zerados
+## Rol de Responsáveis
 
-Ao abrir a v165 pela primeira vez, o sistema apaga somente:
+### Barra de rolagem superior
 
-- pagamentos cadastrados e importados;
-- relatórios mensais de pagamentos;
-- comprovantes vinculados aos pagamentos;
-- extratos bancários;
-- lançamentos bancários;
-- vínculos da conciliação;
-- transferências entre conta corrente e aplicação geradas pelos extratos;
-- pendências do módulo de pagamentos.
+A tabela de responsáveis possui agora uma barra de rolagem horizontal acima do
+cabeçalho. A barra superior e a barra inferior permanecem sincronizadas.
 
-Permanecem preservados contratos, contas bancárias cadastradas, responsáveis, pessoal, cronogramas e os demais módulos.
+### Copiar responsável
 
-## Selecionar débito pelo pagamento
+Foi acrescentada a ação **Copiar**.
 
-Na Relação de Pagamentos, cada pagamento possui a ação **Selecionar débito**. A janela mostra somente débitos:
+Ao copiar:
 
-- do mesmo contrato;
-- da mesma competência;
-- ainda não conciliados ou parcialmente conciliados;
-- com saldo disponível.
+- o cadastro original não é alterado;
+- os dados pessoais são preenchidos automaticamente;
+- categoria, representação, endereços e observações são mantidos;
+- períodos de gestão são copiados;
+- atos são copiados;
+- publicações anexadas aos atos são duplicadas e vinculadas ao novo contrato;
+- o campo Contrato fica vazio para selecionar o novo vínculo.
 
-Também foi incluído no cadastro manual de pagamento o campo **Débito do extrato bancário**. Ao selecionar um débito, o sistema pode preencher documento, data de compensação e valor, e cria o vínculo ao salvar.
-
-Um pagamento pode continuar ligado a mais de um débito, e um débito pode ser distribuído entre vários pagamentos, respeitando os saldos disponíveis.
+Depois, basta selecionar o outro Contrato de Gestão, fazer os ajustes
+necessários e clicar em **Salvar responsável**.
 
 
-## v166 — correção da conciliação
-- Reexecuta a conciliação existente sem apagar dados.
-- Lista débitos abertos no vínculo pelo pagamento, com fallback pela conta/contrato e data.
-- Aceita diferença de até 3 dias e considera competência, emissão e compensação.
-- Identifica estornos antes da conciliação.
+## Importação e conciliação v161
+
+- Relação de Pagamentos é a fonte oficial dos pagamentos.
+- Extrato de conta corrente não cria pagamentos automaticamente.
+- A conciliação usa documento, data de compensação e valor.
+- Um débito pode ser conciliado com várias linhas que tenham o mesmo documento e totalizem seu valor.
+- Débitos estornados por Pix rejeitado são separados dos débitos efetivos.
+- Extratos de aplicação/CDB ficam anexados, sem integrar a conciliação de despesas.
