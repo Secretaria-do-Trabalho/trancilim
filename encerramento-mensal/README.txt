@@ -1,29 +1,35 @@
-TRANCILIM - Sistema de Encerramento Mensal v28
+TRANCILIM - Sistema de Encerramento Mensal v29
 
-Base: v27, preservando o padrão visual da Prestação de Contas CG v164.
+Base: v28, preservando o padrão visual da Prestação de Contas CG v164.
 
 Principais ajustes desta versão:
-- A aba separada de Despachos foi retirada do menu.
-- O despacho passou a fazer parte do cadastro do próprio processo.
-- Todo novo processo solicita também os dados do despacho correspondente:
-  destinatário, assunto, texto, data e situação.
-- Na tabela de Processos, o despacho pode ser visualizado e baixado em Word ou PDF.
-- Os modelos de processo agora podem guardar juntos o assunto, a observação,
-  o WhatsApp e os textos do despacho para reutilização nas competências seguintes.
-- Os campos de assunto continuam livres para digitação e também aceitam modelos salvos.
-- O texto explicativo sobre a retirada do campo Colab foi removido da tela.
-- Processos e despachos já existentes são associados automaticamente quando possuem
-  o mesmo NUP ou a mesma combinação de UG, competência e assunto.
+- O despacho permanece incorporado ao cadastro do processo.
+- Incluída a opção de escolher a fonte do despacho: Times New Roman, Arial ou Calibri.
+- Incluída a opção de deixar o texto justificado ou alinhado à esquerda.
+- O assunto do despacho aparece no início da visualização e dos arquivos gerados.
+- Incluído botão para copiar diretamente o assunto do despacho.
+- Retirada a assinatura automática no final do despacho.
+- O sistema não acrescenta mais nome, cargo ou UG da pessoa responsável no rodapé.
+- A data do despacho continua sendo apresentada automaticamente.
+- A fonte e o alinhamento escolhidos ficam salvos junto ao processo e ao modelo.
+- As alterações foram aplicadas à visualização, ao Word e ao PDF.
 
 Observação:
 Os dados e modelos são mantidos no armazenamento local do navegador do computador
 em que o sistema for utilizado. Use a opção de exportar backup periodicamente.
 
+VERSÃO 30
+- O botão "Usar" abre o modelo completo na UG correta.
+- Carrega assunto, observação, WhatsApp e todos os campos reutilizáveis do despacho.
+- Ao alterar a competência, o mês e o ano são substituídos automaticamente em todos esses textos.
+- Compatível também com modelos antigos que ainda tenham a competência escrita como Julho/2026, julho de 2026 ou 07/2026.
+- NUP, situação e conclusão continuam livres, pois pertencem ao novo processo.
 
-INTEGRAÇÃO TRANCELIM v170:
-- login único e controle de acesso pelo portal;
-- perfil e foto carregados da sessão;
-- retorno ao portal pela marca/cabeçalho;
-- favicon unificado;
-- barra lateral fixa;
-- versão interna não exibida no menu.
+
+INTEGRAÇÃO TRANCELIM v174:
+- Encerramento Mensal atualizado para a versão 30.
+- O botão Usar carrega o modelo completo na UG correta.
+- A competência é substituída automaticamente no assunto, observação, WhatsApp e despacho.
+- Fonte e alinhamento escolhidos para o despacho permanecem salvos.
+- Login único, perfil, foto, retorno ao portal, favicon e barra lateral fixa preservados.
+- Número interno da versão não é exibido no menu lateral.

@@ -12,7 +12,7 @@
 })();
 </script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=170">
+<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=174">
 <title>TRANCILIM - Encerramento Mensal</title>
 <style>
 :root{--green:#087a38;--green2:#05672f;--green3:#15a64a;--nav:#075e32;--nav2:#0b4f3f;--orange:#ff641f;--cyan:#70c5d3;--teal:#4ab7ad;--blue:#063b5c;--blue2:#075c86;--bg:#eff7f6;--card:#fff;--text:#082c47;--muted:#63798c;--border:#d6e5e7;--danger:#c3342f;--shadow:0 14px 34px rgba(15,64,73,.10)}
@@ -187,13 +187,20 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 .workflow-field-help{display:block;margin-top:7px;color:var(--muted);font-size:11px;line-height:1.45;font-weight:500}
 #process-subject,#dispatch-subject{background:#fff!important;cursor:text!important}
 
-/* Processo e despacho unificados — v28 */
+/* Processo e despacho unificados — v29 */
 .process-complete-modal{width:min(980px,100%)}
 .workflow-divider{display:flex;align-items:center;gap:12px;margin:8px 0 2px;color:var(--blue);font-weight:900;font-size:15px}
 .workflow-divider::before,.workflow-divider::after{content:"";height:1px;background:#d4e4e7;flex:1}.workflow-divider span{white-space:nowrap}
 .process-table{min-width:1900px}.process-table th:nth-child(7),.process-table td:nth-child(7){min-width:230px}.dispatch-inline{display:grid;gap:7px}.dispatch-inline strong{color:var(--blue)}.dispatch-inline small{color:var(--muted)}.dispatch-inline .cell-actions{margin-top:4px}
 
-/* Integração TRANCELIM v170: barra lateral fixa, perfil do portal e layout preservado */
+/* Despacho v29 */
+.workflow-preview .preview-subject-top{margin:0 0 22px;padding:12px 14px;border:1px solid #d9e5e8;background:#f6fafb;border-radius:10px}
+.workflow-preview .preview-recipient{margin:0 0 22px}
+.workflow-preview .preview-body{white-space:pre-wrap;line-height:1.6}
+.workflow-preview .preview-date{margin-top:34px}
+
+
+/* Integração TRANCELIM v174: barra lateral fixa, perfil do portal e layout preservado */
 @media (min-width:981px){
   .app{display:block;min-height:100vh}
   .sidebar{position:fixed!important;left:0;top:0;bottom:0;width:292px;height:100vh;overflow-y:auto;overflow-x:hidden;z-index:30;padding-bottom:110px}
@@ -207,6 +214,7 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 #portalSidebarAvatar{overflow:hidden;flex:none}
 #portalSidebarAvatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 #portalSidebarAvatar span{display:grid;place-items:center;width:100%;height:100%}
+
 </style>
 </head>
 <body>
@@ -289,7 +297,7 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 <div class="field"><label>Competência *</label><input id="process-ref" type="month" required onchange="updateProcessCalculatedFields()"></div>
 <div class="field"><label>NUP</label><input id="process-nup" placeholder="Ex.: 59000.000675/2026-49" oninput="updateProcessCalculatedFields()"></div>
 <select id="process-template" hidden onchange="applyProcessTemplate()"><option value="">Novo assunto</option></select>
-<div class="field full"><label>Assunto do processo *</label><input id="process-subject" list="process-subject-options" required placeholder="Digite um assunto novo ou escolha um já salvo" oninput="handleProcessSubjectInput()" onchange="handleProcessSubjectInput(true)"><datalist id="process-subject-options"></datalist></div>
+<div class="field full"><label>Assunto do processo *</label><div class="section-note" style="margin:0 0 7px">Ao usar um modelo, todos os campos são carregados. Ao mudar a competência, o mês e o ano são atualizados em todo o processo e no despacho.</div><input id="process-subject" list="process-subject-options" required placeholder="Digite um assunto novo ou escolha um já salvo" oninput="handleProcessSubjectInput()" onchange="handleProcessSubjectInput(true)"><datalist id="process-subject-options"></datalist></div>
 <div class="field full"><label>Observação</label><textarea id="process-observation" rows="4" placeholder="Informação interna do processo"></textarea></div>
 <div class="field full"><label>Texto do WhatsApp</label><textarea id="process-whatsapp" rows="5" placeholder="Mensagem para encaminhamento e acompanhamento"></textarea></div>
 <div class="field"><label>Prazo SEFAZ — 5º dia útil</label><input id="process-deadline" type="date"></div>
@@ -297,6 +305,8 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 <div class="workflow-divider full"><span>Despacho do processo</span></div>
 <div class="field"><label>Data do despacho *</label><input id="process-dispatch-date" type="date" required></div>
 <div class="field"><label>Situação do despacho</label><select id="process-dispatch-status"><option>Minuta</option><option>Pronto para assinatura</option><option>Assinado</option><option>Enviado</option></select></div>
+<div class="field"><label>Fonte do despacho</label><select id="process-dispatch-font"><option value="Times New Roman">Times New Roman</option><option value="Arial">Arial</option><option value="Calibri">Calibri</option></select></div>
+<div class="field"><label>Alinhamento do texto</label><select id="process-dispatch-alignment"><option value="justify">Justificado</option><option value="left">Alinhado à esquerda</option></select></div>
 <div class="field full"><label>Para quem é o despacho? *</label><input id="process-dispatch-recipient" required placeholder="Ex.: Senhora Coordenadora, CODIP ou COAFI"></div>
 <div class="field full"><label>Assunto do despacho *</label><input id="process-dispatch-subject" required placeholder="Digite o assunto do despacho"></div>
 <div class="field full"><label>Texto do despacho *</label><textarea id="process-dispatch-text" rows="9" required placeholder="Digite o texto completo do despacho"></textarea></div>
@@ -304,7 +314,7 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 <div class="field full"><label>Observação final</label><textarea id="process-final-observation" rows="3" placeholder="Resultado, retorno ou providência final"></textarea></div>
 <div class="field full"><label class="workflow-check"><input id="process-save-template" type="checkbox"> Salvar ou atualizar este processo e o despacho como modelo para os próximos meses</label></div>
 </div></div><div class="modal-foot"><button type="button" class="btn" onclick="closeModal('process-modal')">Cancelar</button><button class="btn primary">Salvar processo completo</button></div></form></div></div>
-<div id="workflow-view-modal" class="modal-backdrop"><div class="modal workflow-modal"><div class="modal-head"><h3 id="workflow-view-title">Visualizar</h3><button class="close" onclick="closeModal('workflow-view-modal')">×</button></div><div class="modal-body"><div id="workflow-view-content" class="workflow-preview"></div></div><div class="modal-foot"><button class="btn" onclick="closeModal('workflow-view-modal')">Fechar</button></div></div></div>
+<div id="workflow-view-modal" class="modal-backdrop"><div class="modal workflow-modal"><div class="modal-head"><h3 id="workflow-view-title">Visualizar</h3><button class="close" onclick="closeModal('workflow-view-modal')">×</button></div><div class="modal-body"><div id="workflow-view-content" class="workflow-preview"></div></div><div class="modal-foot"><button id="workflow-copy-subject" class="btn primary" onclick="copyWorkflowSubject()">Copiar assunto</button><button class="btn" onclick="closeModal('workflow-view-modal')">Fechar</button></div></div></div>
 <div id="toast" class="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script><script src="vendor/jszip.min.js"></script><script src="assets/embedded_assets.js"></script><script src="assets/anexo3_embedded.js"></script><script src="assets/anexo3_pdf_templates.js"></script>
 <script>
@@ -520,7 +530,7 @@ function exportPdf2(){const d=declarationData(true);if(!d)return;if(!d.date)retu
 function exportPdf(){const ref=document.getElementById('report-ref').value,rows=linesForUg(document.getElementById('report-ug').value,ref);downloadBytes(buildPdf(rows,ref),'application/pdf',FILE_BASE+'.pdf');toast('PDF gerado no modelo oficial.')}function exportBackup(){downloadBytes(new TextEncoder().encode(JSON.stringify(state,null,2)),'application/json','TRANCILIM_encerramento_backup.json')}
 initMonths();renderAll();
 </script><script src="assets/justification_template.js"></script><script src="assets/conference.js"></script><script src="assets/workflow.js"></script>
-<script data-trancelim-encerramento-integration-v170>
+<script data-trancelim-encerramento-integration-v174>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
   function initials(name){return String(name||'Usuário').split(' ').filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase()||'U';}

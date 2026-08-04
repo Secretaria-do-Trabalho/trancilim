@@ -18,8 +18,8 @@
 </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=167">
-<title>Sistema de Prestação de Contas CG — v169</title>
+<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=174">
+<title>Sistema de Prestação de Contas CG — v171</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -8892,6 +8892,10 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const index=state.payments.findIndex(payment=>payment.id===draft.id);
     if(index<0)return;
 
+    const previousCreditIds=new Set((state.payments[index].reimbursements||[]).map(item=>item.creditEntryId).filter(Boolean));
+    const nextCreditIds=new Set((draft.reimbursements||[]).map(item=>item.creditEntryId).filter(Boolean));
+    previousCreditIds.forEach(entryId=>{if(nextCreditIds.has(entryId))return;const entry=bankEntryById(entryId);if(entry?.relatedPaymentId===draft.id){entry.relatedPaymentId='';entry.reimbursementLinkId='';entry.reimbursementLinkedAt=''}});
+    (draft.reimbursements||[]).forEach(item=>{if(!item.creditEntryId)return;const entry=bankEntryById(item.creditEntryId);if(!entry||entry.financialCategory!=='RESSARCIMENTO')return;entry.relatedPaymentId=draft.id;entry.reimbursementLinkId=item.id;entry.reimbursementLinkedAt=new Date().toISOString()});
     state.payments[index]=draft;
     saveState();
     closePaymentEditModal();
@@ -10362,6 +10366,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         : {key:'ESTORNO',label:'CRÉDITO DE ESTORNO',className:'bank-status-info'};
     }
     if(entry.movementType==='CREDITO'){
+      if(entry.financialCategory==='RESSARCIMENTO'&&entry.relatedPaymentId){
+        return {key:'RESSARCIMENTO_VINCULADO',label:'RESSARCIMENTO VINCULADO',className:'bank-status-ok'};
+      }
+      if(entry.financialCategory==='RESSARCIMENTO'){
+        return {key:'RESSARCIMENTO_AGUARDANDO',label:'RESSARCIMENTO AGUARDANDO VÍNCULO',className:'bank-status-warn'};
+      }
       return {key:'CREDITO',label:'CRÉDITO LISTADO',className:'bank-status-info'};
     }
 
@@ -11342,6 +11352,12 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         ${safe(isoToBr(reversalEntry.date)||'—')} • ${money(bankEntryAmount(reversalEntry))} •
         ${entry.reversalMode==='manual'?'manual':'automático'}
       </span>`:'';
+      const reimbursementPayment=entry.relatedPaymentId
+        ? state.payments.find(item=>item.id===entry.relatedPaymentId)
+        : null;
+      const reimbursementHtml=reimbursementPayment&&entry.financialCategory==='RESSARCIMENTO'
+        ? `<span class="bank-payment-link">Ressarcimento vinculado: ${safe(reimbursementPayment.process||reimbursementPayment.cheque||reimbursementPayment.expenseNature||'Pagamento')} • ${money(entry.credit||0)}</span>`
+        : '';
 
       const suggestion=entry.suggestedPaymentId
         ? state.payments.find(item=>item.id===entry.suggestedPaymentId)
@@ -11363,7 +11379,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         <td class="money">${entry.movementType==='CREDITO'?money(entry.credit):'—'}</td>
         <td><span class="bank-status ${status.className}">${safe(status.label)}</span></td>
         <td>
-          ${linkedHtml||reversalHtml||
+          ${linkedHtml||reversalHtml||reimbursementHtml||
             (suggestion
               ? `<span class="bank-suggestion">
                   Sugestão: ${safe(suggestion.process||suggestion.expenseNature)} •
@@ -12784,13 +12800,14 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   /* Classificação bancária */
   window.openBankEntryClassificationModal=function(entryId){const entry=bankEntryById(entryId);if(!entry)return;bankEntryClassificationId=entry.id;document.getElementById('bankEntryClassificationSummary').innerHTML=`<strong>${safe(entry.movementType)}</strong> • ${safe(isoToBr(entry.date))} • ${money(bankEntryAmount(entry))}<br>${safe(entry.party||entry.history||'Sem histórico')}`;document.getElementById('becCategory').value=entry.financialCategory||'';document.getElementById('becNotes').value=entry.financialNotes||'';const select=document.getElementById('becRelatedContract');select.innerHTML='<option value="">Não vinculado</option>'+state.contracts.map(contract=>`<option value="${contract.id}">${safe(contractShortLabel(contract))}</option>`).join('');select.value=entry.relatedContractId||'';document.getElementById('bankEntryClassificationModal').classList.add('open')}
   window.closeBankEntryClassificationModal=function(){bankEntryClassificationId=null;document.getElementById('bankEntryClassificationModal').classList.remove('open')}
-  window.saveBankEntryClassification=function(){const entry=bankEntryById(bankEntryClassificationId);if(!entry)return;entry.financialCategory=document.getElementById('becCategory').value;entry.relatedContractId=document.getElementById('becRelatedContract').value;entry.financialNotes=document.getElementById('becNotes').value.trim();entry.classifiedAt=new Date().toISOString();saveState();closeBankEntryClassificationModal()}
+  window.saveBankEntryClassification=function(){const entry=bankEntryById(bankEntryClassificationId);if(!entry)return;const nextCategory=document.getElementById('becCategory').value;if(entry.relatedPaymentId&&nextCategory!=='RESSARCIMENTO'){const payment=state.payments.find(item=>item.id===entry.relatedPaymentId);if(payment){payment.reimbursements=(payment.reimbursements||[]).map(item=>item.creditEntryId===entry.id?{...item,creditEntryId:'',returnedAmount:0,returnDate:''}:item)}entry.relatedPaymentId='';entry.reimbursementLinkId='';entry.reimbursementLinkedAt=''}entry.financialCategory=nextCategory;entry.relatedContractId=document.getElementById('becRelatedContract').value;entry.financialNotes=document.getElementById('becNotes').value.trim();entry.classifiedAt=new Date().toISOString();saveState();closeBankEntryClassificationModal()}
 
   /* Ressarcimentos de pagamentos */
   function paymentReimbursementTotal(payment){return(payment?.reimbursements||[]).reduce((sum,item)=>sum+Number(item.amount||0),0)}
-  function reimbursementCreditOptions(payment){return state.bankEntries.filter(entry=>entry.contractId===payment.contractId&&entry.movementType==='CREDITO'&&entry.date>=(payment.compensationDate||payment.issueDate||''))}
-  function renderPaymentReimbursements(){const payment=state.payments.find(item=>item.id===paymentEditModalId),list=document.getElementById('paymentReimbursementList'),balance=document.getElementById('paymentReimbursementBalance');if(!payment||!list||!balance)return;const contractSelect=document.getElementById('perContract');contractSelect.innerHTML='<option value="">Outro / externo</option>'+state.contracts.filter(contract=>contract.id!==payment.contractId).map(contract=>`<option value="${contract.id}">${safe(contractShortLabel(contract))}</option>`).join('');const creditSelect=document.getElementById('perCreditEntry');creditSelect.innerHTML='<option value="">Aguardando crédito</option>'+reimbursementCreditOptions(payment).map(entry=>`<option value="${entry.id}">${safe(isoToBr(entry.date))} • ${money(entry.credit)} • ${safe(entry.party||entry.history)}</option>`).join('');list.innerHTML=paymentReimbursementDraft.map(item=>{const contract=contractById(item.responsibleContractId),credit=bankEntryById(item.creditEntryId),returned=credit?Number(credit.credit||0):Number(item.returnedAmount||0),pending=Math.max(0,Number(item.amount||0)-returned),destination=contract?contractShortLabel(contract):`${item.externalSacc||'—'} • ${item.externalContract||'Externo'}`;return`<div class="allocation-row"><div><small>Contrato responsável</small>${safe(destination)}</div><div><small>Valor</small><strong>${money(item.amount)}</strong></div><div><small>Despesa</small>${safe(isoToBr(item.expenseDate)||'—')}</div><div><small>Prazo</small>${safe(isoToBr(item.dueDate)||'—')}</div><div><small>Devolvido</small>${money(returned)}</div><div><small>Pendente</small><strong>${money(pending)}</strong></div><div><small>Crédito</small>${credit?safe(`${isoToBr(credit.date)} • ${credit.party||credit.history}`):'Não localizado'}</div><button class="link-btn" style="color:#b42318" onclick="removePaymentReimbursement('${item.id}')">Excluir</button></div>`}).join('')||'<div class="compact-register-empty">Nenhum ressarcimento informado.</div>';const difference=Math.max(0,Number(payment.paidValue||0)-Number(payment.documentValue||0)),total=paymentReimbursementDraft.reduce((sum,item)=>sum+Number(item.amount||0),0);balance.innerHTML=`<span>Diferença pago x documento: <strong>${money(difference)}</strong></span><span>Detalhado: <strong>${money(total)}</strong></span><span>Não explicado: <strong>${money(Math.max(0,difference-total))}</strong></span>`}
-  window.addPaymentReimbursement=function(){const payment=state.payments.find(item=>item.id===paymentEditModalId),amount=numBR(document.getElementById('perAmount').value);if(!payment||amount<=0){alert('Informe o valor.');return}const creditEntryId=document.getElementById('perCreditEntry').value,credit=bankEntryById(creditEntryId);paymentReimbursementDraft.push({id:id(),responsibleContractId:document.getElementById('perContract').value,externalSacc:document.getElementById('perExternalSacc').value.trim(),externalContract:document.getElementById('perExternalContract').value.trim(),amount,expenseDate:document.getElementById('perExpenseDate').value||payment.compensationDate||payment.issueDate,dueDate:document.getElementById('perDueDate').value,creditEntryId,returnedAmount:credit?Number(credit.credit||0):0,returnDate:credit?.date||'',createdAt:new Date().toISOString()});if(credit){credit.financialCategory='RESSARCIMENTO';credit.relatedPaymentId=payment.id}['perContract','perExternalSacc','perExternalContract','perAmount','perExpenseDate','perDueDate','perCreditEntry'].forEach(fieldId=>document.getElementById(fieldId).value='');renderPaymentReimbursements();renderPaymentEditIssues()}
+  function reimbursementCreditUsedByAnotherPayment(entryId,currentPaymentId){if(state.payments.some(payment=>payment.id!==currentPaymentId&&(payment.reimbursements||[]).some(item=>item.creditEntryId===entryId)))return true;const entry=bankEntryById(entryId);return !!(entry?.relatedPaymentId&&entry.relatedPaymentId!==currentPaymentId)}
+  function reimbursementCreditOptions(payment){const selectedInDraft=new Set(paymentReimbursementDraft.map(item=>item.creditEntryId).filter(Boolean));return state.bankEntries.filter(entry=>entry.contractId===payment.contractId&&entry.movementType==='CREDITO'&&entry.financialCategory==='RESSARCIMENTO'&&!selectedInDraft.has(entry.id)&&!reimbursementCreditUsedByAnotherPayment(entry.id,payment.id)).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')))}
+  function renderPaymentReimbursements(){const payment=state.payments.find(item=>item.id===paymentEditModalId),list=document.getElementById('paymentReimbursementList'),balance=document.getElementById('paymentReimbursementBalance');if(!payment||!list||!balance)return;const contractSelect=document.getElementById('perContract');contractSelect.innerHTML='<option value="">Outro / externo</option>'+state.contracts.filter(contract=>contract.id!==payment.contractId).map(contract=>`<option value="${contract.id}">${safe(contractShortLabel(contract))}</option>`).join('');const creditSelect=document.getElementById('perCreditEntry');creditSelect.innerHTML='<option value="">Aguardando crédito classificado como ressarcimento</option>'+reimbursementCreditOptions(payment).map(entry=>`<option value="${entry.id}">${safe(isoToBr(entry.date))} • ${money(entry.credit)} • ${safe(entry.party||entry.history)}</option>`).join('');list.innerHTML=paymentReimbursementDraft.map(item=>{const contract=contractById(item.responsibleContractId),credit=bankEntryById(item.creditEntryId),returned=credit?Number(credit.credit||0):Number(item.returnedAmount||0),pending=Math.max(0,Number(item.amount||0)-returned),destination=contract?contractShortLabel(contract):`${item.externalSacc||'—'} • ${item.externalContract||'Externo'}`;return`<div class="allocation-row"><div><small>Contrato responsável</small>${safe(destination)}</div><div><small>Valor</small><strong>${money(item.amount)}</strong></div><div><small>Despesa</small>${safe(isoToBr(item.expenseDate)||'—')}</div><div><small>Prazo</small>${safe(isoToBr(item.dueDate)||'—')}</div><div><small>Devolvido</small>${money(returned)}</div><div><small>Pendente</small><strong>${money(pending)}</strong></div><div><small>Crédito</small>${credit?safe(`${isoToBr(credit.date)} • ${credit.party||credit.history}`):'Não localizado'}</div><button class="link-btn" style="color:#b42318" onclick="removePaymentReimbursement('${item.id}')">Excluir</button></div>`}).join('')||'<div class="compact-register-empty">Nenhum ressarcimento informado.</div>';const difference=Math.max(0,Number(payment.paidValue||0)-Number(payment.documentValue||0)),total=paymentReimbursementDraft.reduce((sum,item)=>sum+Number(item.amount||0),0);balance.innerHTML=`<span>Diferença pago x documento: <strong>${money(difference)}</strong></span><span>Detalhado: <strong>${money(total)}</strong></span><span>Não explicado: <strong>${money(Math.max(0,difference-total))}</strong></span>`}
+  window.addPaymentReimbursement=function(){const payment=state.payments.find(item=>item.id===paymentEditModalId),amount=numBR(document.getElementById('perAmount').value);if(!payment||amount<=0){alert('Informe o valor.');return}const creditEntryId=document.getElementById('perCreditEntry').value,credit=bankEntryById(creditEntryId);if(creditEntryId&&(!credit||credit.movementType!=='CREDITO'||credit.financialCategory!=='RESSARCIMENTO')){alert('Selecione somente um crédito previamente classificado como Ressarcimento recebido.');return}if(credit&&reimbursementCreditUsedByAnotherPayment(credit.id,payment.id)){alert('Este crédito já está vinculado a outro pagamento.');return}paymentReimbursementDraft.push({id:id(),responsibleContractId:document.getElementById('perContract').value,externalSacc:document.getElementById('perExternalSacc').value.trim(),externalContract:document.getElementById('perExternalContract').value.trim(),amount,expenseDate:document.getElementById('perExpenseDate').value||payment.compensationDate||payment.issueDate,dueDate:document.getElementById('perDueDate').value,creditEntryId,returnedAmount:credit?Number(credit.credit||0):0,returnDate:credit?.date||'',createdAt:new Date().toISOString()});['perContract','perExternalSacc','perExternalContract','perAmount','perExpenseDate','perDueDate','perCreditEntry'].forEach(fieldId=>document.getElementById(fieldId).value='');renderPaymentReimbursements();renderPaymentEditIssues()}
   window.removePaymentReimbursement=function(itemId){paymentReimbursementDraft=paymentReimbursementDraft.filter(item=>item.id!==itemId);renderPaymentReimbursements();renderPaymentEditIssues()}
   function reimbursementIssues(payment){const issues=[],difference=Math.max(0,Number(payment.paidValue||0)-Number(payment.documentValue||0)),total=paymentReimbursementTotal(payment);if(difference>.02&&Math.abs(difference-total)>.02)issues.push('Diferença entre valor pago e documento não detalhada nos ressarcimentos');(payment.reimbursements||[]).forEach(item=>{if(!item.responsibleContractId&&!item.externalSacc&&!item.externalContract)issues.push('Ressarcimento sem identificação do contrato responsável');const credit=bankEntryById(item.creditEntryId),returned=credit?Number(credit.credit||0):Number(item.returnedAmount||0);if(returned>Number(item.amount||0)+.02)issues.push('Crédito de ressarcimento maior que o valor devido');if(returned<Number(item.amount||0)-.02&&item.dueDate&&dateIsPast(item.dueDate))issues.push('Ressarcimento vencido e não devolvido')} );return[...new Set(issues)]}
   function refreshPaymentPlanItems(payment){const select=document.getElementById('pemPlanItem');if(!select)return;const program=programForContract(payment.contractId);select.innerHTML='<option value="">Não vinculado</option>'+(program?.financialItems||[]).map(item=>`<option value="${item.id}">${safe(item.group)} • ${safe(item.code||'')} • ${safe(item.description)}</option>`).join('');select.value=payment.planItemId||''}
@@ -12837,16 +12854,26 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   const financialOpeningReadInProgress=new Set();
 
   function financialOpeningFromLines(lines){
-    const line=(lines||[]).find(value=>{
-      const normalized=normalizeForChecklist(value);
-      return normalized.includes('SALDO DO PERIODO ANTERIOR')||
+    const rows=(lines||[]).map(value=>String(value||''));
+    for(let index=0;index<rows.length;index++){
+      const normalized=normalizeForChecklist(rows[index]);
+      const isOpeningLine=
+        normalized.includes('SALDO DO PERIODO ANTERIOR')||
         normalized.includes('SALDO ANTERIOR')||
         normalized.includes('SALDO INICIAL');
-    });
-    if(!line)return null;
-    const compact=String(line).replace(/\s+/g,'');
-    const values=(compact.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[]).map(value=>numBR(value));
-    return values.length?values[values.length-1]:null;
+      if(!isOpeningLine)continue;
+
+      /*
+       * Alguns relatórios deixam o valor na mesma linha; outros o colocam
+       * imediatamente abaixo. A leitura usa uma pequena janela para manter
+       * compatibilidade com os dois formatos.
+       */
+      const context=rows.slice(index,index+4).join(' ');
+      const values=(context.match(/(?:\d{1,3}(?:\.\d{3})*|\d+),\d{2}/g)||[])
+        .map(value=>numBR(value));
+      if(values.length)return values[0];
+    }
+    return null;
   }
 
   async function ensureFinancialPaymentReportOpening(contractId,competence,accountKind){
@@ -12859,18 +12886,31 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         item.documentId
       )
       .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''))[0];
-    if(!report||financialOpeningReadInProgress.has(report.id))return;
+    if(!report||financialOpeningReadInProgress.has(report.id))return false;
     financialOpeningReadInProgress.add(report.id);
     try{
       const blob=await getFileBlob(report.documentId);
-      if(!blob)return;
+      if(!blob)return false;
       const lines=await extractLines(blob);
       const openingBalance=financialOpeningFromLines(lines);
-      if(openingBalance===null)return;
+      if(openingBalance===null)return false;
       report.openingBalance=openingBalance;
-      saveState();
+      saveState({render:false});
+
+      const selection=financialSelection();
+      if(
+        selection.contractId===contractId&&
+        selection.competence===competence&&
+        selection.accountKind===accountKind
+      ){
+        renderFinancialExecution();
+      }
+      return true;
     }catch(error){
       console.warn('Não foi possível recuperar o saldo anterior da Relação de Pagamentos:',error);
+      return false;
+    }finally{
+      financialOpeningReadInProgress.delete(report.id);
     }
   }
 
@@ -12965,19 +13005,54 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
   function financialApplicationIncome(contractId,accountId,competence){
-    const yields=state.bankApplicationTransfers.filter(item=>
+    const belongsToAccount=item=>
+      !accountId||
+      item.currentAccountId===accountId||
+      item.applicationAccountId===accountId||
+      (!item.currentAccountId&&!item.applicationAccountId);
+    const direction=item=>
+      item.manualReconciliationDirection||
+      item.reconciledDirection||
+      item.transferDirection||'';
+
+    const rows=state.bankApplicationTransfers.filter(item=>
       item.contractId===contractId&&
-      (item.currentAccountId===accountId||item.applicationAccountId===accountId)&&
       item.competence===competence&&
-      item.transferDirection==='RENDIMENTO'&&
-      item.sourceSide==='APLICACAO'
+      belongsToAccount(item)&&
+      direction(item)==='RENDIMENTO'
     );
+
+    /*
+     * Prioriza a linha originada do extrato de aplicação. Versões anteriores
+     * nem sempre gravavam sourceSide, por isso sourceStatementType também é
+     * aceito e, na ausência dos dois, a linha continua elegível.
+     */
+    const applicationRows=rows.filter(item=>
+      item.sourceSide==='APLICACAO'||
+      item.sourceStatementType==='aplicacao'
+    );
+    const sourceRows=applicationRows.length?applicationRows:rows;
     const unique=new Map();
-    yields.forEach(item=>{
-      const key=[item.statementId,item.date,item.documentNumber,Number(item.amount||0).toFixed(2)].join('|');
+    sourceRows.forEach(item=>{
+      const group=item.manualReconciliationId||item.reconciliationId||'';
+      const key=group
+        ? `${group}|${Number(item.amount||0).toFixed(2)}`
+        : [item.statementId||'',item.date||'',item.documentNumber||'',Number(item.amount||0).toFixed(2)].join('|');
       if(!unique.has(key))unique.set(key,item);
     });
-    return [...unique.values()].reduce((sum,item)=>sum+Number(item.amount||0),0);
+    const transferIncome=[...unique.values()].reduce((sum,item)=>sum+Number(item.amount||0),0);
+
+    /* Classificação manual no extrato também é aceita como fonte auxiliar. */
+    const classifiedIncome=state.bankEntries.filter(item=>
+      item.contractId===contractId&&
+      item.accountId===accountId&&
+      item.competence===competence&&
+      item.movementType==='CREDITO'&&
+      item.financialCategory==='RENDIMENTO'&&
+      !item.reversalEntryId
+    ).reduce((sum,item)=>sum+bankEntryAmount(item),0);
+
+    return Math.max(transferIncome,classifiedIncome);
   }
 
   function financialExecutionSystemValues(){
@@ -12995,19 +13070,47 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       .filter(item=>item.financialCategory===name)
       .reduce((sum,item)=>sum+bankEntryAmount(item),0);
 
-    const paymentReport=state.paymentReports
+    /*
+     * A Relação de Pagamentos é a fonte do saldo anterior e das despesas.
+     * Usa-se o relatório mais recente da conta escolhida, mesmo quando as
+     * linhas individuais ainda não foram recriadas por uma versão antiga.
+     */
+    const paymentReports=state.paymentReports
       .filter(report=>
         report.contractId===contractId&&
         report.competence===competence&&
-        paymentAccountKind(report.bankAccountKind)===accountKind&&
-        report.openingBalance!==null&&report.openingBalance!==undefined
+        paymentAccountKind(report.bankAccountKind)===accountKind
       )
-      .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''))[0];
-    const statementOpening=statements
-      .filter(item=>item.openingBalance!==null&&item.openingBalance!==undefined)
-      .reduce((sum,item)=>sum+Number(item.openingBalance||0),0);
-    const opening=paymentReport?Number(paymentReport.openingBalance||0):statementOpening;
-    const openingSource=paymentReport?'Relação de Pagamentos':'Extratos bancários';
+      .sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+    const paymentReport=paymentReports.find(report=>
+      Number(report.rowCount||0)>0||
+      Number(report.totalPaid||0)>0||
+      (report.openingBalance!==null&&report.openingBalance!==undefined)
+    )||paymentReports[0]||null;
+    const paymentReportIds=new Set(paymentReports.map(report=>report.id));
+
+    const reportPayments=paymentReport
+      ? state.payments.filter(payment=>payment.reportId===paymentReport.id)
+      : [];
+    const selectionPayments=state.payments.filter(payment=>
+      payment.contractId===contractId&&
+      payment.competence===competence&&
+      paymentAccountKind(payment.bankAccountKind)===accountKind&&
+      (
+        payment.source!=='extrato'||
+        (payment.reportId&&paymentReportIds.has(payment.reportId))
+      )
+    );
+    const payments=reportPayments.length?reportPayments:selectionPayments;
+
+    const opening=paymentReport&&paymentReport.openingBalance!==null&&paymentReport.openingBalance!==undefined
+      ? Number(paymentReport.openingBalance||0)
+      : 0;
+    const openingSource=paymentReport
+      ? (paymentReport.openingBalance===null||paymentReport.openingBalance===undefined
+        ? 'Relação de Pagamentos — aguardando leitura do saldo informado'
+        : 'Relação de Pagamentos')
+      : 'Relação de Pagamentos não localizada';
 
     const currentClosing=statements
       .filter(item=>item.type==='conta_corrente'&&item.closingBalance!==null&&item.closingBalance!==undefined)
@@ -13018,25 +13121,45 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     const bankClosing=currentClosing+applicationClosing;
     const hasBankClosing=statements.some(item=>item.closingBalance!==null&&item.closingBalance!==undefined);
 
-    const payments=state.payments.filter(payment=>
-      payment.contractId===contractId&&
-      payment.competence===competence&&
-      paymentAccountKind(payment.bankAccountKind)===accountKind&&
-      payment.source!=='extrato'
-    );
     const expenseBySource=source=>payments
       .filter(payment=>(payment.fundingSource||'CONTRATO')===source)
       .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
     const contractPayments=payments.filter(payment=>(payment.fundingSource||'CONTRATO')==='CONTRATO');
-    const expensePersonal=contractPayments
+    const rowExpensePersonal=contractPayments
       .filter(payment=>financialPaymentGroup(payment)==='PESSOAL')
       .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
-    const expenseOs=contractPayments
+    const rowExpenseOs=contractPayments
       .filter(payment=>financialPaymentGroup(payment)==='DESPESAS_OS')
       .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
-    const expenseCusteio=contractPayments
+    const rowExpenseCusteio=contractPayments
       .filter(payment=>financialPaymentGroup(payment)==='CUSTEIO')
       .reduce((sum,payment)=>sum+financialPaymentAmount(payment),0);
+
+    const reportNumber=(field)=>{
+      if(!paymentReport||paymentReport[field]===null||paymentReport[field]===undefined)return null;
+      const value=Number(paymentReport[field]);
+      return Number.isFinite(value)?value:null;
+    };
+    const reportTotalPaid=reportNumber('totalPaid');
+    const reportPersonalPaid=reportNumber('personalPaidTotal');
+    const reportCusteioPaid=reportNumber('custeioPaidTotal');
+    const reportExpenseOsPaid=reportNumber('expenseOsPaidTotal');
+
+    const expenseBorrowed=expenseBySource('RECURSO_OUTRO_CONTRATO');
+    const expenseIncome=expenseBySource('RENDIMENTO');
+    const expenseOther=expenseBySource('OUTRA_RECEITA');
+    const nonContractExpenses=expenseBorrowed+expenseIncome+expenseOther;
+    const expenseContract=reportTotalPaid!==null
+      ? Math.max(0,reportTotalPaid-nonContractExpenses)
+      : expenseBySource('CONTRATO');
+
+    const expensePersonal=reportPersonalPaid!==null?reportPersonalPaid:rowExpensePersonal;
+    const expenseOs=reportExpenseOsPaid!==null?reportExpenseOsPaid:rowExpenseOs;
+    let expenseCusteio=reportCusteioPaid!==null?reportCusteioPaid:rowExpenseCusteio;
+    /* Quando a OS está dentro do subtotal de Custeio, evita duplicação. */
+    if(expenseOs>0&&reportCusteioPaid!==null&&expensePersonal+expenseCusteio>expenseContract+.02){
+      expenseCusteio=Math.max(0,expenseCusteio-expenseOs);
+    }
 
     const outgoing=state.resourceTransfers.filter(item=>
       item.originContractId===contractId&&
@@ -13057,10 +13180,6 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         .includes(item.financialCategory||'')
     ).reduce((sum,item)=>sum+bankEntryAmount(item),0);
 
-    const expenseContract=expenseBySource('CONTRATO');
-    const expenseBorrowed=expenseBySource('RECURSO_OUTRO_CONTRATO');
-    const expenseIncome=expenseBySource('RENDIMENTO');
-    const expenseOther=expenseBySource('OUTRA_RECEITA');
     const revenueTotal=parcel+otherContracts+opening+income+otherReceipts;
     const incomeBalance=Math.max(0,income-expenseIncome);
     const expensesBeforeBalances=expenseContract+expenseBorrowed+expenseIncome+expenseOther+outgoing;
@@ -13076,6 +13195,9 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
         return subtotal+Math.max(0,Number(item.amount||0)-returned);
       },0),0);
     const unclassifiedCredits=credits.filter(item=>!item.financialCategory).length;
+    const paymentsCount=paymentReport
+      ? Math.max(Number(paymentReport.rowCount||0),payments.length)
+      : payments.length;
 
     return{
       parcel,otherContracts,opening,income,otherReceipts,revenueTotal,
@@ -13083,7 +13205,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       expenseBorrowed,expenseIncome,expenseOther,transfersOut:outgoing,
       contractBalance,incomeBalance,expenseTotal,
       bankClosing,calculatedClosing,closingDifference,hasBankClosing,
-      openingSource,reimbursementsPending,paymentsCount:payments.length,
+      openingSource,reimbursementsPending,paymentsCount,
+      paymentReportFound:Boolean(paymentReport),
       unclassifiedCredits,accountKind
     };
   }

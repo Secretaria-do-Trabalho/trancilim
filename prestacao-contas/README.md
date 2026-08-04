@@ -1,4 +1,27 @@
-# Sistema de Prestação de Contas CG — v169
+# Sistema de Prestação de Contas CG — v171
+
+Integração da correção v168 da aba **Execução da Receita e Despesa** sobre a versão v170, preservando os vínculos de ressarcimento, a conciliação bancária restaurada e os dados existentes.
+
+## Execução da Receita e Despesa
+
+- O saldo do período anterior passa a vir exclusivamente da Relação de Pagamentos da conta selecionada.
+- Relações de Pagamentos antigas são relidas automaticamente quando o saldo anterior ainda não estiver armazenado.
+- As despesas utilizam também os totais consolidados do relatório importado, mesmo quando nem todas as linhas individuais estiverem disponíveis.
+- O detalhamento permanece separado em Pessoal, Custeio e Despesas da OS, evitando dupla contagem.
+- Rendimentos são reconhecidos em registros novos e antigos dos extratos de aplicação e em conciliações manuais.
+- Créditos classificados manualmente como rendimento podem alimentar o demonstrativo como fonte auxiliar.
+- A conta principal de gestão e a conta de provisão continuam separadas.
+
+## Preservado
+
+- Ressarcimentos vinculados somente a créditos classificados como Ressarcimento recebido.
+- Atualização da conciliação sem apagar vínculos válidos.
+- Rollback da importação de extratos em caso de erro.
+- Pagamentos agrupados, estornos e vínculos manuais.
+- Nenhuma rotina de limpeza de pagamentos, extratos ou conciliações.
+
+---
+
 
 Integração da correção do Demonstrativo de Execução da Receita e Despesa da v167 com a conciliação bancária restaurada da v168.
 
@@ -96,3 +119,10 @@ necessários e clicar em **Salvar responsável**.
 - Pagamentos agrupados, tributos pagos juntos, pagamentos divididos em vários débitos e estornos permanecem suportados.
 - A importação de extratos mantém rollback: em caso de erro, extratos e vínculos anteriores são restaurados.
 - Não existe rotina de limpeza de pagamentos, extratos ou conciliações nesta versão.
+
+## v170 — vínculo de ressarcimento controlado
+- O seletor **Crédito da devolução** lista apenas lançamentos de crédito previamente classificados, na aba Extratos, como **Ressarcimento recebido**.
+- Créditos já usados por outro pagamento ficam indisponíveis, evitando vínculo duplicado.
+- Depois de adicionar o ressarcimento e salvar o pagamento, o lançamento do extrato recebe o status **RESSARCIMENTO VINCULADO** e mostra o pagamento relacionado.
+- Se o vínculo for removido, o crédito volta a ficar disponível.
+- Se o crédito for reclassificado para outra categoria, o vínculo de ressarcimento é removido também do pagamento.

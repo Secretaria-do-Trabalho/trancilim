@@ -1,8 +1,12 @@
-# TRANCELIM v172
+# TRANCELIM v174
 
-Prestação de Contas CG atualizada para a versão integrada v169: correção do Demonstrativo de Execução da Receita e Despesa, preservando a conciliação bancária restaurada e todos os vínculos válidos.
-
-Atualização da conciliação bancária da Prestação de Contas CG, preservando vínculos válidos e reprocessando apenas pendências.
+- Prestação de Contas CG atualizada para a versão integrada v171.
+- Aba Execução da Receita e Despesa corrigida para buscar saldo anterior e totais consolidados da Relação de Pagamentos.
+- Rendimentos de aplicação reconhecidos em registros atuais, antigos e conciliações manuais.
+- Ressarcimentos, conciliação bancária, estornos e vínculos existentes preservados.
+- Encerramento Mensal atualizado para a versão 30, com reutilização completa de modelos e competência automática nos textos.
+- Login, portal, Patrimônio, perfil, foto, favicon e navegação preservados.
+- Nenhum dado é apagado por esta atualização.
 
 # TRANCELIM - v164
 
@@ -120,3 +124,9 @@ Depois abra com Ctrl+F5.
 - O botão Atualizar conciliação não apaga vínculos válidos e reprocessa somente pendências.
 - Nenhum dado de pagamentos, extratos ou conciliações é apagado.
 - Encerramento Mensal v28, Patrimônio e portal preservados.
+
+## v173
+- Na edição de pagamento, o campo Crédito da devolução mostra somente créditos do mesmo contrato previamente classificados como **Ressarcimento recebido**.
+- Créditos já vinculados a outro pagamento não aparecem novamente na lista.
+- Ao salvar o pagamento, o crédito selecionado passa a constar no extrato como **RESSARCIMENTO VINCULADO**, com identificação do pagamento.
+- Ao remover o vínculo ou mudar a classificação do crédito, o extrato e o pagamento são atualizados de forma consistente.
