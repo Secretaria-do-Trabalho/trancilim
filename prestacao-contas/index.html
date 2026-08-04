@@ -10450,27 +10450,28 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     return link;
   }
 
-  function clearAutomaticBankLinks(targetEntries){
+  function clearAutomaticBankLinks(targetEntries,{force=false}={}){
     const targetIds=new Set(targetEntries.map(entry=>entry.id));
-    const linkedReversalCreditIds=new Set(
-      targetEntries
-        .filter(entry=>entry.reversalEntryId&&entry.reversalMode!=='manual')
-        .map(entry=>entry.reversalEntryId)
-    );
-    state.bankLinks=state.bankLinks.filter(link=>
-      !targetIds.has(link.entryId)||link.mode==='manual'
-    );
+    const entryIds=new Set(state.bankEntries.map(entry=>entry.id));
+    const paymentIds=new Set(state.payments.map(payment=>payment.id));
+
+    /*
+     * Atualizar a conciliação não pode apagar vínculos automáticos válidos.
+     * Mantém tudo que já foi conciliado e remove somente vínculos órfãos,
+     * zerados ou, quando solicitado explicitamente, os automáticos do alvo.
+     */
+    state.bankLinks=state.bankLinks.filter(link=>{
+      if(!entryIds.has(link.entryId)||!paymentIds.has(link.paymentId))return false;
+      if(!(Number(link.amount||0)>0))return false;
+      if(!targetIds.has(link.entryId))return true;
+      if(link.mode==='manual')return true;
+      return !force;
+    });
+
     targetEntries.forEach(entry=>{
       entry.suggestedPaymentId='';
       entry.suggestedScore=0;
-      if(entry.reversalMode!=='manual'){
-        entry.reversalEntryId='';
-        entry.reversalMode='';
-        entry.reversalLinkedAt='';
-      }
-    });
-    state.bankEntries.forEach(entry=>{
-      if(linkedReversalCreditIds.has(entry.id)&&entry.reversalMode!=='manual'){
+      if(force&&entry.reversalMode!=='manual'){
         entry.reversalEntryId='';
         entry.reversalMode='';
         entry.reversalLinkedAt='';
@@ -10479,12 +10480,24 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     invalidateRuntimeCaches();
   }
 
-  function unreconciledPaymentRows(entry,maxDays=1){
+  function paymentMatchesEntryPeriod(entry,payment){
     const competence=bankEntryReferenceCompetence(entry);
+    const entryMonth=(entry.date||'').slice(0,7);
+    const paymentReference=bankPaymentReferenceDate(payment);
+    const paymentMonths=new Set([
+      payment.competence||'',
+      (payment.issueDate||'').slice(0,7),
+      (payment.compensationDate||'').slice(0,7),
+      (paymentReference||'').slice(0,7)
+    ].filter(Boolean));
+    return !competence||payment.competence===competence||paymentMonths.has(entryMonth)||paymentMonths.has(competence);
+  }
+
+  function unreconciledPaymentRows(entry,maxDays=3){
     return state.payments.filter(payment=>
       payment.source!=='extrato'&&
       payment.contractId===entry.contractId&&
-      (!competence||payment.competence===competence)&&
+      paymentMatchesEntryPeriod(entry,payment)&&
       paymentLinkedAmount(payment.id)<Number(payment.paidValue||0)-.01&&
       daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=maxDays
     );
@@ -10547,7 +10560,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     entries.forEach(entry=>{
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const entryDoc=bankDigits(entry.documentNumber);
-      const allTaxCandidates=unreconciledPaymentRows(entry,1)
+      const allTaxCandidates=unreconciledPaymentRows(entry,3)
         .filter(isTaxPayment)
         .map(payment=>({payment,amount:paymentRemainingAmount(payment)}))
         .filter(row=>row.amount>.01);
@@ -10572,7 +10585,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const amount=bankEntryAmount(entry);
       const entryDoc=bankDigits(entry.documentNumber);
-      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
+      const candidates=unreconciledPaymentRows(entry,3).filter(payment=>{
         const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
         if(Math.abs(remaining-amount)>.02)return false;
         const paymentDoc=bankDigits(payment.cheque);
@@ -10584,7 +10597,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       });
       const selected=exactDocument.length===1
         ? exactDocument[0]
-        : (!entryDoc&&candidates.length===1?candidates[0]:null);
+        : (candidates.length===1?candidates[0]:null);
       if(selected)createBankLink(entry.id,selected.id,amount,'automatico',100);
     });
   }
@@ -10594,7 +10607,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const entryDoc=bankDigits(entry.documentNumber);
       if(!entryDoc)return;
-      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>
+      const candidates=unreconciledPaymentRows(entry,3).filter(payment=>
         bankDigits(payment.cheque)===entryDoc
       );
       if(candidates.length<2)return;
@@ -10609,7 +10622,7 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
     entries.forEach(entry=>{
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
       const amount=bankEntryAmount(entry);
-      const candidates=unreconciledPaymentRows(entry,1).filter(payment=>{
+      const candidates=unreconciledPaymentRows(entry,3).filter(payment=>{
         const remaining=Math.max(0,Number(payment.paidValue||0)-paymentLinkedAmount(payment.id));
         return Math.abs(remaining-amount)<=.02;
       });
@@ -10627,8 +10640,8 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
           bankEntryLinks(entry.id).length===0&&
           !entry.reversalEntryId&&
           entry.contractId===payment.contractId&&
-          bankEntryReferenceCompetence(entry)===payment.competence&&
-          daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=1&&
+          paymentMatchesEntryPeriod(entry,payment)&&
+          daysBetweenIso(entry.date,bankPaymentReferenceDate(payment))<=3&&
           (!paymentDoc||!bankDigits(entry.documentNumber)||bankDigits(entry.documentNumber)===paymentDoc)
         )
         .map(entry=>({entry,amount:bankEntryAmount(entry)}));
@@ -10676,24 +10689,39 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
       entry.movementType==='DEBITO'&&(!statementId||entry.statementId===statementId)
     );
     clearAutomaticBankLinks(targetEntries);
+
+    /* Primeiro identifica PIX rejeitado/estorno para não vincular o débito ao pagamento. */
+    identifyReversedBankDebits(targetEntries);
+
+    /* Depois executa do critério mais seguro para o mais amplo. */
     reconcileGroupedTaxPayments(targetEntries);
     reconcileExactSinglePayments(targetEntries);
     reconcileGroupedPaymentsByDocument(targetEntries);
     reconcileUniqueValueAndDate(targetEntries);
     reconcileSplitBankDebits(targetEntries);
-    identifyReversedBankDebits(targetEntries);
+
     targetEntries.forEach(entry=>{
       if(bankEntryLinks(entry.id).length||entry.reversalEntryId)return;
-      const candidates=unreconciledPaymentRows(entry,2)
+      const candidates=unreconciledPaymentRows(entry,3)
         .map(payment=>({payment,...bankPaymentCandidateScore(entry,payment)}))
         .filter(candidate=>candidate.remaining>.01)
         .sort((a,b)=>b.score-a.score);
       const best=candidates[0];
-      if(best&&best.score>=50){
+      const second=candidates[1];
+
+      /*
+       * Quando há uma única melhor correspondência forte, conclui o vínculo.
+       * Casos ambíguos continuam apenas como sugestão para conferência manual.
+       */
+      if(best&&best.score>=72&&(!second||best.score-second.score>=10)){
+        const amount=Math.min(bankEntryAmount(entry),best.remaining);
+        createBankLink(entry.id,best.payment.id,amount,'automatico',best.score);
+      }else if(best&&best.score>=45){
         entry.suggestedPaymentId=best.payment.id;
         entry.suggestedScore=best.score;
       }
     });
+    invalidateRuntimeCaches();
   }
 
   function refreshBankSelectors(){
@@ -12307,10 +12335,32 @@ body,button,input,select,textarea{font-family:Inter,Segoe UI,Arial,sans-serif !i
   }
 
   window.runBankReconciliation=function(){
-    autoReconcileBankEntries();
-    reconcileBankApplicationTransfers();
-    saveState();
-    alert('Conciliação automática atualizada. As conciliações manuais foram preservadas.');
+    const backup={
+      bankLinks:structuredClone(state.bankLinks||[]),
+      bankEntries:structuredClone(state.bankEntries||[]),
+      bankApplicationTransfers:structuredClone(state.bankApplicationTransfers||[])
+    };
+    try{
+      autoReconcileBankEntries();
+      reconcileBankApplicationTransfers();
+      saveState();
+      const debits=state.bankEntries.filter(entry=>entry.movementType==='DEBITO');
+      const reconciled=debits.filter(entry=>bankEntryLinks(entry.id).length>0).length;
+      const reversed=debits.filter(entry=>entry.reversalEntryId).length;
+      const pending=debits.filter(entry=>!bankEntryLinks(entry.id).length&&!entry.reversalEntryId).length;
+      alert(
+        `Conciliação automática atualizada. ${reconciled} débito(s) conciliado(s), `+
+        `${reversed} estorno(s) identificado(s) e ${pending} pendência(s) para conferência manual. `+
+        `Nenhum vínculo anterior válido foi apagado.`
+      );
+    }catch(error){
+      state.bankLinks=backup.bankLinks;
+      state.bankEntries=backup.bankEntries;
+      state.bankApplicationTransfers=backup.bankApplicationTransfers;
+      invalidateRuntimeCaches();
+      saveState();
+      alert(`Não foi possível atualizar a conciliação. Os vínculos anteriores foram restaurados. Motivo: ${error.message||error}`);
+    }
   }
 
   window.deleteBankStatement=async function(statementId){
@@ -16547,7 +16597,7 @@ Total bruto: ${money(a.proventos)}`)}
   });
   if(!Array.isArray(state.accountabilityPlans))state.accountabilityPlans=[];
 
-  const BANK_RECONCILIATION_REPAIR_KEY='prestacao_contas_cg_v167_reparo_conciliacao';
+  const BANK_RECONCILIATION_REPAIR_KEY='prestacao_contas_cg_v168_reparo_conciliacao_preservando_vinculos';
   if(!localStorage.getItem(BANK_RECONCILIATION_REPAIR_KEY)){
     try{
       autoReconcileBankEntries();

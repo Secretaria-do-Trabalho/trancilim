@@ -1,3 +1,7 @@
+# TRANCELIM v171
+
+Atualização da conciliação bancária da Prestação de Contas CG, preservando vínculos válidos e reprocessando apenas pendências.
+
 # TRANCELIM - v164
 
 ## Atualização principal
