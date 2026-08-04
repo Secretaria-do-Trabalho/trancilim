@@ -1,0 +1,9 @@
+SISTEMA DE PRESTAÇÃO DE CONTAS CG — v166
+
+Correção sobre a v165:
+- não apaga novamente pagamentos ou extratos;
+- repara automaticamente a conciliação dos dados já importados;
+- débito pode ser selecionado a partir da Relação de Pagamentos;
+- usa contrato físico, competência, data de emissão/compensação e tolerância de até 3 dias;
+- PIX rejeitado/estornado é identificado antes da vinculação;
+- mantém vínculos manuais existentes.

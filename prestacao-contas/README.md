@@ -27,3 +27,10 @@ Na Relação de Pagamentos, cada pagamento possui a ação **Selecionar débito*
 Também foi incluído no cadastro manual de pagamento o campo **Débito do extrato bancário**. Ao selecionar um débito, o sistema pode preencher documento, data de compensação e valor, e cria o vínculo ao salvar.
 
 Um pagamento pode continuar ligado a mais de um débito, e um débito pode ser distribuído entre vários pagamentos, respeitando os saldos disponíveis.
+
+
+## v166 — correção da conciliação
+- Reexecuta a conciliação existente sem apagar dados.
+- Lista débitos abertos no vínculo pelo pagamento, com fallback pela conta/contrato e data.
+- Aceita diferença de até 3 dias e considera competência, emissão e compensação.
+- Identifica estornos antes da conciliação.
