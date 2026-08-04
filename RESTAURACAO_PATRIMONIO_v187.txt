@@ -1,0 +1,15 @@
+TRANCELIM v187 — RESTAURAÇÃO SEGURA DO PATRIMÔNIO
+
+Esta versão restaura exatamente a base estável da v185/v134.
+Ela não contém a otimização defeituosa da v186/v135.
+
+IMPORTANTE:
+- Não executa limpeza de dados.
+- Não altera tabelas do Supabase.
+- Não troca chaves de armazenamento.
+- Mantém as correções do tombo, edição completa, competência persistente e depreciação acumulada.
+
+Após publicar:
+1. Aguarde o GitHub Pages atualizar.
+2. Faça Ctrl + F5.
+3. Entre no Patrimônio e clique em Atualizar aba, se necessário.

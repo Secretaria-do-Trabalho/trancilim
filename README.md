@@ -1,12 +1,3 @@
-# TRANCELIM v186
-
-- Sistema de Gestão Patrimonial atualizado para a v135.
-- Salvamento da edição de bens otimizado: grava somente o bem alterado e seus dados complementares.
-- Removidas a sincronização completa de todos os bens e a regravação sequencial dos itens da mesma NF/lote durante cada edição.
-- A tela é atualizada imediatamente após a confirmação do Supabase.
-- Alteração de tombo, competência persistente, depreciação acumulada, OCR e demais módulos preservados.
-- Nenhum dado cadastrado é apagado.
-
 # TRANCELIM v184
 
 - Sistema de Gestão Patrimonial atualizado para a v133.
@@ -190,4 +181,4 @@ Atualização v180: Sistema de Gestão Patrimonial integrado na versão v128, pr
 - OCR é usado apenas quando o PDF não possui texto pesquisável.
 
 
-Atualização v185/v134: correção do salvamento do tombo na edição completa; migração dos dados complementares para o novo número patrimonial; validação de tombo duplicado; retorno à lista de bens após salvar.
+Atualização v187/v134: correção do salvamento do tombo na edição completa; migração dos dados complementares para o novo número patrimonial; validação de tombo duplicado; retorno à lista de bens após salvar.

@@ -7,9 +7,3 @@ Atualização v132: OCR automático para NF/OF digitalizadas; leitura reforçada
 
 
 Atualização v133: coluna Início da requisição incluída na Depreciação Mensal e depreciação acumulada dos exercícios anteriores calculada até 31/12 do ano anterior.
-
-
-Atualização v185/v134: correção do salvamento do tombo na edição completa; migração dos dados complementares para o novo número patrimonial; validação de tombo duplicado; retorno à lista de bens após salvar.
-
-
-Atualização v135: salvamento otimizado na edição de bens; remove sincronização completa e regravação sequencial do lote, salva somente o bem alterado e mantém a atualização da tela imediata.
