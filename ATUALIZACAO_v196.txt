@@ -1,0 +1,10 @@
+TRANCELIM v196
+
+ENCERRAMENTO MENSAL v41
+- Anexo III do FERDT: geração de PDF, Excel e ZIP usando os modelos oficiais enviados.
+- Conta 000569495151-0 em uma página de conta corrente, sem página de aplicação.
+- Nova aba Justificativas para o Anexo VI, com geração em PDF e Word e histórico por UG/competência.
+
+DEMAIS MÓDULOS
+- Patrimônio e Prestação de Contas não foram alterados.
+- Nenhuma rotina de limpeza ou exclusão de dados foi adicionada.

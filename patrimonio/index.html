@@ -28,12 +28,12 @@
   } catch (error) {}
 })();
 </script>
+
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=179">
+<link rel="icon" type="image/png" href="../assets/favicon-trancilim.png?v=197">
 <title>Sistema de Gestão Patrimonial - SGP</title>
 <style>
-
 html.portal-autologin-patrimonio #login{display:none !important;visibility:hidden !important}
 html.portal-autologin-patrimonio #app{display:grid !important;visibility:visible !important}
 html.portal-autologin-patrimonio body{background:#eef8f6 !important}
@@ -44,6 +44,7 @@ button,.primary,.secondary,.delete-btn,.refresh-btn,.btn,.nav button,.actions-ro
   font-weight:800 !important;
 }
 .header-title-logo,.side-head{cursor:pointer}
+
 
 :root{
   --verde:#18a83a;
@@ -3456,7 +3457,7 @@ img,svg,canvas{
 }
 
 
-/* v104 - campo visível de início da requisição */
+/* v104 - campo visível de início da depreciação */
 #inicioDepV104Label{
   border:1px solid #ccefe0;
   background:#eefaf5;
@@ -4865,41 +4866,12 @@ button.doc-link-v106:hover,
 }
 
 
-/* v138 — exclusão selecionada compacta e alinhada */
-#btnExcluirSelecionadosV137{
-  background:#fff1f0!important;
-  border-color:#e2a6a2!important;
-  color:#a92823!important;
-  font-weight:900!important;
-  min-width:190px;
-}
-#btnExcluirSelecionadosV137:not(:disabled){
-  background:#b52520!important;
-  border-color:#b52520!important;
-  color:#fff!important;
-}
-#btnExcluirSelecionadosV137:disabled{opacity:.46;cursor:not-allowed}
-#btnLimparSelecaoV137{font-weight:800;min-width:110px}
-.pat-select-col-v137{width:46px!important;min-width:46px!important;max-width:46px!important;text-align:center!important;padding-left:8px!important;padding-right:8px!important}
-.pat-select-v137{width:18px;height:18px;accent-color:#b92e29;cursor:pointer}
-#bens .bens-filters{
-  grid-template-columns:minmax(280px,1fr) 210px 170px repeat(3,minmax(118px,auto)) minmax(190px,auto) minmax(110px,auto)!important;
-  align-items:stretch!important;
-}
-#bens .bens-filters input#busca{min-width:280px!important}
-#bens .bens-filters button{height:100%;min-height:54px}
-@media(max-width:1480px){
-  #bens .bens-filters{grid-template-columns:repeat(4,minmax(150px,1fr))!important}
-  #bens .bens-filters input#busca{min-width:0!important;grid-column:span 2}
-}
-@media(max-width:900px){
-  #bens .bens-filters{grid-template-columns:1fr 1fr!important}
-  #bens .bens-filters input#busca{grid-column:1/-1}
-}
-@media(max-width:620px){
-  #bens .bens-filters{grid-template-columns:1fr!important}
-  #bens .bens-filters input#busca{grid-column:auto}
-}
+/* v129 - leitura robusta no cadastro por lote */
+.v129-doc-debug{background:#eef8fb;border:1px solid #cfe7ee;border-radius:12px;padding:8px 10px;color:#075d7d;font-weight:900;margin-top:8px;white-space:pre-wrap;font-size:12px}
+.v129-warn{background:#fff4e6!important;color:#9a4b00!important;border-color:#ffd9ad!important}
+.v129-ok{background:#eefaf5!important;color:#075d32!important;border-color:#ccefe0!important}
+.v129-base-local{font-size:12px;font-weight:900;color:#075d7d;background:#eef8fb;border-radius:12px;padding:8px 10px;margin-top:8px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -4968,7 +4940,7 @@ button.doc-link-v106:hover,
     </div>
     <div class="side-status">
       <span>Status da competência</span>
-      <strong id="statusCompetencia">Julho/2026 • Em conferência</strong>
+      <strong id="statusCompetencia">Junho/2026 • Em conferência</strong>
     </div>
   </aside>
 
@@ -4998,8 +4970,8 @@ button.doc-link-v106:hover,
             <option value="2">Março</option>
             <option value="3">Abril</option>
             <option value="4">Maio</option>
-            <option value="5">Junho</option>
-            <option value="6" selected>Julho</option>
+            <option value="5" selected>Junho</option>
+            <option value="6">Julho</option>
             <option value="7">Agosto</option>
             <option value="8">Setembro</option>
             <option value="9">Outubro</option>
@@ -5016,7 +4988,7 @@ button.doc-link-v106:hover,
       <div class="title">
         <div>
           <h2>Dashboard Patrimonial</h2>
-          <p>Visão consolidada dos bens móveis da SET e acompanhamento do almoxarifado — competência <span class="mesTexto">Julho/2026</span>.</p>
+          <p>Visão consolidada dos bens móveis da SET e acompanhamento do almoxarifado — competência <span class="mesTexto">Junho/2026</span>.</p>
         </div>
         <div class="pill posicaoCompetencia">Posição em 30/06/2026</div>
       </div>
@@ -5036,14 +5008,14 @@ button.doc-link-v106:hover,
         <div class="chart-card patrimonio-dinamico-v66">
           <div class="panel-head">
             <h3>Evolução patrimonial mensal</h3>
-            <div class="pill" id="evoCompetenciaSelecionada">Julho/2026</div>
+            <div class="pill" id="evoCompetenciaSelecionada">Junho/2026</div>
           </div>
 
           <div class="evo-layout-v66">
             <div class="evo-box-v66">
               <div class="evo-box-header">
                 <h4>Bens Patrimoniais</h4>
-                <strong id="evoResumoTituloBens">Julho/2026</strong>
+                <strong id="evoResumoTituloBens">Junho/2026</strong>
               </div>
               <div class="evo-donut-block">
                 <div class="evo-donut" id="evoPizzaBens"><span id="evoPctDep">0%</span></div>
@@ -5061,7 +5033,7 @@ button.doc-link-v106:hover,
             <div class="evo-box-v66">
               <div class="evo-box-header">
                 <h4>Almoxarifado</h4>
-                <strong id="evoResumoTituloAlmox">Julho/2026</strong>
+                <strong id="evoResumoTituloAlmox">Junho/2026</strong>
               </div>
               <div class="evo-donut-block">
                 <div class="evo-donut green" id="evoPizzaAlmox"><span id="evoPctConsumo">0%</span></div>
@@ -5124,6 +5096,7 @@ button.doc-link-v106:hover,
         <button class="secondary" onclick="baixarTemplateExcel()">Baixar Template Excel</button>
         <button data-edit-action onclick="podeEditar()?document.getElementById('arquivoImportacaoExcel').click():avisarSemPermissao()">Importar Template Preenchido</button>
         <button data-edit-action onclick="podeEditar()?document.getElementById('arquivoImportacaoAnexos').click():avisarSemPermissao()">Importar ZIP de Anexos</button>
+        <button class="secondary" onclick="sincronizarDoSupabase(true).then(()=>{renderTudo(); alert('Tabela atualizada com o banco.');}).catch(e=>alert('Erro ao atualizar: '+(e.message||e)))">Atualizar Banco</button>
         
         
         <input id="arquivoImportacaoExcel" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcelBens(event)">
@@ -5166,7 +5139,7 @@ button.doc-link-v106:hover,
       <div class="title">
         <div>
           <h2>Almoxarifado</h2>
-          <p>Controle mensal dos materiais de consumo na competência <span class="mesTexto">Julho/2026</span>.</p>
+          <p>Controle mensal dos materiais de consumo na competência <span class="mesTexto">Junho/2026</span>.</p>
         </div>
         <div class="pill posicaoCompetencia">Posição em 30/06/2026</div>
       </div>
@@ -5254,7 +5227,8 @@ button.doc-link-v106:hover,
           <label>Mês
             <select id="mesDep" onchange="sincronizarCompetenciaDep()">
               <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
-              <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option><option value="6" selected>Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+              <option value="3">Abril</option><option value="4">Maio</option><option value="5" selected>Junho</option>
+              <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
               <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
             </select>
           </label>
@@ -5314,7 +5288,7 @@ button.doc-link-v106:hover,
       </div>
 
       <div class="panel">
-        <h3>Movimentações da competência <span id="movCompetenciaTitulo">Julho/2026</span></h3>
+        <h3>Movimentações da competência <span id="movCompetenciaTitulo">Junho/2026</span></h3>
         <div class="table-wrap">
           <table class="mov-table">
             <thead>
@@ -5334,7 +5308,7 @@ button.doc-link-v106:hover,
       </div>
 
       <div class="panel">
-        <h3>Movimentações do Almoxarifado na competência <span id="movAlmoxCompetenciaTitulo">Julho/2026</span></h3>
+        <h3>Movimentações do Almoxarifado na competência <span id="movAlmoxCompetenciaTitulo">Junho/2026</span></h3>
         <div class="cards small" style="margin-bottom:16px">
           <div class="card"><span>Entradas</span><strong id="movAlmoxEntradas">R$ 0,00</strong><small>Total de entradas do mês</small></div>
           <div class="card danger"><span>Saídas</span><strong id="movAlmoxSaidas">R$ 0,00</strong><small>Consumo, baixas e demais saídas</small></div>
@@ -5362,7 +5336,7 @@ button.doc-link-v106:hover,
       <div class="title">
         <div>
           <h2>Fechamento Mensal</h2>
-          <p>Detalhamento das movimentações patrimoniais e do almoxarifado na competência <span class="mesTexto">Julho/2026</span>.</p>
+          <p>Detalhamento das movimentações patrimoniais e do almoxarifado na competência <span class="mesTexto">Junho/2026</span>.</p>
         </div>
       </div>
 <div class="fechamento-grid">
@@ -5409,7 +5383,7 @@ button.doc-link-v106:hover,
       </div>
 
       <div class="accounting-status">
-        <div><span>Competência</span><strong class="mesTexto">Julho/2026</strong></div>
+        <div><span>Competência</span><strong class="mesTexto">Junho/2026</strong></div>
         <div><span>Status</span><strong id="notaStatusResumo">Em conferência</strong></div>
         <div><span>Documento Contábil</span><strong id="notaArquivoResumo">Não anexado</strong></div>
         <div><span>Nota Patrimonial</span><strong id="notaNumeroResumo">Não informada</strong></div>
@@ -5512,7 +5486,7 @@ button.doc-link-v106:hover,
           Para alterar número da nota, valor contabilizado ou documento contábil, use a aba Nota Patrimonial.
         </p>
         <div class="accounting-status">
-          <div><span>Competência</span><strong class="mesTexto">Julho/2026</strong></div>
+          <div><span>Competência</span><strong class="mesTexto">Junho/2026</strong></div>
           <div><span>Nota Patrimonial</span><strong id="concNotaAtual">Não informada</strong></div>
           <div><span>Documento</span><strong id="concDocAtual">Não anexado</strong></div>
           <div><span>Última atualização</span><strong id="concAtualizacao">-</strong></div>
@@ -5568,7 +5542,7 @@ button.doc-link-v106:hover,
       <div class="title">
         <div>
           <h2>Pendências Patrimoniais</h2>
-          <p>Itens que precisam de complementação cadastral na competência <span class="mesTexto">Julho/2026</span>.</p>
+          <p>Itens que precisam de complementação cadastral na competência <span class="mesTexto">Junho/2026</span>.</p>
         </div>
         <button class="refresh-btn" onclick="atualizarDashboardBanco()">Atualizar Banco</button>
       </div>
@@ -5616,8 +5590,8 @@ button.doc-link-v106:hover,
       </div>
 
       <div class="cards small relatorio-resumo-cards">
-        <div class="card"><span>Competência</span><strong class="mesTexto">Julho/2026</strong><small>Filtro selecionado</small></div>
-        <div class="card blue"><span>Posição do relatório</span><strong id="relDataPosicao">31/07/2026</strong><small>Último dia da competência</small></div>
+        <div class="card"><span>Competência</span><strong class="mesTexto">Junho/2026</strong><small>Filtro selecionado</small></div>
+        <div class="card blue"><span>Posição do relatório</span><strong id="relDataPosicao">30/06/2026</strong><small>Último dia da competência</small></div>
         <div class="card"><span>Bens no relatório</span><strong id="relQtdBens">0</strong><small>Existentes até a posição</small></div>
         <div class="card teal"><span>Itens do consumo</span><strong id="relQtdConsumo">0</strong><small>Almoxarifado / consumo</small></div>
         <div class="card orange"><span>Data de emissão</span><strong id="relDataEmissao">-</strong><small>Gerada automaticamente</small></div>
@@ -5783,7 +5757,7 @@ button.doc-link-v106:hover,
       <label>Responsável pelo bem<input id="cadResponsavel" placeholder="Nome do responsável"></label>
       <label>Nota Fiscal <span class="required-mark">*</span><input id="cadNF" placeholder="13389"></label>
       <label>Data de aquisição <span class="required-mark">*</span><input id="cadAquisicao" type="date"></label>
-      <label>Início da requisição <span class="required-mark">*</span><small style="display:block;color:var(--muted);font-weight:700;margin-bottom:6px">O cálculo usa o mês informado.</small><input id="cadInicio" type="date"></label>
+      <label>Início da depreciação <span class="required-mark">*</span><small style="display:block;color:var(--muted);font-weight:700;margin-bottom:6px">O cálculo usa o mês informado.</small><input id="cadInicio" type="date"></label>
       <label>Valor de aquisição <span class="required-mark">*</span><input id="cadValor" placeholder="1200,00"></label>
       <label>Valor residual <span class="required-mark">*</span><input id="cadResidual" placeholder="120,00"></label>
       <label>Taxa de depreciação <span class="required-mark">*</span><input id="cadTaxa" value="10%"></label>
@@ -5933,23 +5907,8 @@ button.doc-link-v106:hover,
 <script>
 const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const mesesCurtos = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-const COMPETENCIA_PATRIMONIO_KEY = "trancelim_patrimonio_competencia_v1";
-function carregarCompetenciaPatrimonio(){
-  try{
-    const salva = JSON.parse(localStorage.getItem(COMPETENCIA_PATRIMONIO_KEY) || "null");
-    const mes = Number(salva?.mes), ano = Number(salva?.ano);
-    if(Number.isInteger(mes) && mes >= 0 && mes <= 11 && Number.isInteger(ano) && ano >= 2024 && ano <= 2100){
-      return {mes, ano};
-    }
-  }catch(error){}
-  return {mes:6, ano:2026};
-}
-function salvarCompetenciaPatrimonio(){
-  try{ localStorage.setItem(COMPETENCIA_PATRIMONIO_KEY, JSON.stringify({mes:mesSelecionado, ano:anoSelecionado})); }catch(error){}
-}
-const competenciaPatrimonioInicial = carregarCompetenciaPatrimonio();
-let mesSelecionado = competenciaPatrimonioInicial.mes;
-let anoSelecionado = competenciaPatrimonioInicial.ano;
+let mesSelecionado = 5;
+let anoSelecionado = 2026;
 let bens = [];
 let pagina = 1;
 let editandoPatrimonio = null;
@@ -6105,7 +6064,6 @@ function depMesTotalPorCompetencia(mes, ano){
 
 function selecionarMesEvolucao(mes){
   mesSelecionado = Number(mes);
-  salvarCompetenciaPatrimonio();
   setCompetenciaUI();
   renderTudo();
 }
@@ -6267,26 +6225,14 @@ async function salvarBemSupabase(item){
     atualizado_em: new Date().toISOString()
   };
 
-  let response;
-  if(item.id){
-    response = await supabaseClient
-      .from("bens_patrimoniais")
-      .update(payload)
-      .eq("id", item.id)
-      .select()
-      .single();
-  }else{
-    response = await supabaseClient
-      .from("bens_patrimoniais")
-      .upsert(payload, { onConflict: "numero_patrimonial" })
-      .select()
-      .single();
-  }
+  const { data, error } = await supabaseClient
+    .from("bens_patrimoniais")
+    .upsert(payload, { onConflict: "numero_patrimonial" })
+    .select()
+    .single();
 
-  const { data, error } = response;
   if(error) throw error;
   item.id = data.id;
-  item.pat = data.numero_patrimonial || item.pat;
   return data;
 }
 
@@ -7488,7 +7434,6 @@ function trocarCompetenciaGlobal(){
   const anoEl = document.getElementById("anoGlobal");
   mesSelecionado = parseInt(mesEl?.value ?? mesSelecionado);
   anoSelecionado = parseInt(anoEl?.value ?? anoSelecionado);
-  salvarCompetenciaPatrimonio();
   setCompetenciaUI();
   renderTudo();
 }
@@ -7500,7 +7445,6 @@ function sincronizarCompetenciaDep(){
   const anoEl = document.getElementById("anoDep");
   mesSelecionado = parseInt(mesEl?.value ?? mesSelecionado);
   anoSelecionado = parseInt(anoEl?.value ?? anoSelecionado);
-  salvarCompetenciaPatrimonio();
   setCompetenciaUI();
   renderTudo();
 }
@@ -7924,7 +7868,7 @@ function competenciaIndexDepV40(ano, mes){
   return Number(ano) * 12 + Number(mes);
 }
 function dataRefBemDepV40(b){
-  // A depreciação deve obedecer à coluna Data de início da requisição.
+  // A depreciação deve obedecer à coluna Data de início da depreciação.
   // Data de aquisição só é usada como fallback se a data de início não existir.
   const d = b?.inicio && b.inicio !== "-" ? b.inicio : b?.aquisicao;
   const ref = mesReferenciaData(d);
@@ -8107,7 +8051,7 @@ function validarCadastroItem(existente){
     ["cadDesc", "Descrição"],
     ["cadNF", "Nota Fiscal"],
     ["cadAquisicao", "Data de aquisição"],
-    ["cadInicio", "Início da requisição"],
+    ["cadInicio", "Início da depreciação"],
     ["cadValor", "Valor de aquisição"],
     ["cadResidual", "Valor residual"],
     ["cadTaxa", "Taxa de depreciação"],
@@ -8331,7 +8275,7 @@ function abrirDetalhe(pat){
         <div><span>Responsável pelo bem</span><strong>${b.responsavel || "-"}</strong></div>
         <div><span>Nota Fiscal</span><strong>${b.nf}</strong></div>
         <div><span>Aquisição</span><strong>${b.aquisicao}</strong></div>
-        <div><span>Início da requisição</span><strong>${b.inicio}</strong></div>
+        <div><span>Início da Depreciação</span><strong>${b.inicio}</strong></div>
         <div><span>Valor de Aquisição</span><strong>${moeda(b.valor)}</strong></div>
         <div><span>Valor Residual</span><strong>${moeda(b.residual)}</strong></div>
         <div><span>Taxa Depreciação</span><strong>${b.taxa}</strong></div>
@@ -9059,8 +9003,7 @@ button.delete-btn:hover{
 
 </style>
     </head>
-    <body>${conteudo}
-</body>
+    <body>${conteudo}</body>
     </html>
   `);
   janela.document.close();
@@ -12949,7 +12892,7 @@ function depAcumuladaTotalAteMesAnterior(){
               <tr><th>Responsável</th><td>${b.responsavel || "-"}</td></tr>
               <tr><th>Nota Fiscal</th><td>${b.nf || "-"}</td></tr>
               <tr><th>Aquisição</th><td>${b.aquisicao || "-"}</td></tr>
-              <tr><th>Início da requisição</th><td>${b.inicio || "-"}</td></tr>
+              <tr><th>Início da depreciação</th><td>${b.inicio || "-"}</td></tr>
               <tr><th>Valor aquisição</th><td>${moedaV81(b.valor)}</td></tr>
               <tr><th>Valor residual</th><td>${moedaV81(b.residual)}</td></tr>
               <tr><th>Taxa depreciação</th><td>${b.taxa || "-"}</td></tr>
@@ -13132,7 +13075,7 @@ function depAcumuladaTotalAteMesAnterior(){
               <tr><th>Responsável pelo bem</th><td>${b.responsavel || "-"}</td></tr>
               <tr><th>Nota Fiscal</th><td>${b.nf || "-"}</td></tr>
               <tr><th>Aquisição</th><td>${dataBRV82(b.aquisicao)}</td></tr>
-              <tr><th>Início da requisição</th><td>${dataBRV82(b.inicio)}</td></tr>
+              <tr><th>Início da Depreciação</th><td>${dataBRV82(b.inicio)}</td></tr>
               <tr><th>Valor de Aquisição</th><td>${moedaV82(b.valor)}</td></tr>
               <tr><th>Valor Residual</th><td>${moedaV82(b.residual)}</td></tr>
               <tr><th>Taxa Depreciação</th><td>${b.taxa || "-"}</td></tr>
@@ -18053,7 +17996,7 @@ function depAcumuladaTotalAteMesAnterior(){
     const data = document.getElementById("loteNFDataV98")?.value || "";
     const resumo = document.getElementById("loteResumoDepV98");
     if(resumo){
-      resumo.textContent = `Quantidade: ${qtd} bem(ns). Valor unitário: ${moeda(vu)}. Residual: ${moeda(residual)}. Taxa: ${taxa}. Início da requisição: ${data ? "mês da aquisição" : "preencher data de aquisição"}.`;
+      resumo.textContent = `Quantidade: ${qtd} bem(ns). Valor unitário: ${moeda(vu)}. Residual: ${moeda(residual)}. Taxa: ${taxa}. Início da depreciação: ${data ? "mês da aquisição" : "preencher data de aquisição"}.`;
     }
     const vuInput = document.getElementById("loteValorUnitV98");
     if(vuInput && !vuInput.matches(":focus") && vu > 0) vuInput.value = String(vu.toFixed(2)).replace(".", ",");
@@ -20005,7 +19948,7 @@ function depAcumuladaTotalAteMesAnterior(){
   // v103
   // - NF não sobrescreve mais os itens/descrições quando a OF já preencheu.
   // - Antes de salvar o lote, a descrição é saneada.
-  // - Início da requisição passa a ser o mês subsequente à data da NF.
+  // - Início da depreciação passa a ser o mês subsequente à data da NF.
   // - Tenta corrigir automaticamente o lote de sofás salvo com descrição ruim.
 
   function limpa103(s){ return String(s || "").replace(/\s+/g, " ").trim(); }
@@ -20290,7 +20233,7 @@ function depAcumuladaTotalAteMesAnterior(){
 <script>
 
 (function(){
-  // v104 - adiciona campo visível/editável: Data de início da requisição.
+  // v104 - adiciona campo visível/editável: Data de início da depreciação.
   // Mantém regra padrão: mês subsequente à data da NF, mas permite conferência/alteração.
 
   function parseBR104(v){
@@ -20337,7 +20280,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
     const label = document.createElement("label");
     label.id = "inicioDepV104Label";
-    label.innerHTML = `<span>Data de início da requisição</span><input id="inicioDepV104" type="date">`;
+    label.innerHTML = `<span>Data de início da depreciação</span><input id="inicioDepV104" type="date">`;
     grid.appendChild(label);
 
     atualizarInicioDep104(false);
@@ -20392,7 +20335,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
       if(!nf){ alert("Informe ou leia a Nota Fiscal."); return; }
       if(!dataAquisicao){ alert("Informe a data de emissão/aquisição da NF."); return; }
-      if(!inicioDep){ alert("Informe a data de início da requisição."); return; }
+      if(!inicioDep){ alert("Informe a data de início da depreciação."); return; }
       if(!cp || !cs){ alert("Informe a classificação contábil."); return; }
       if(!rows.length){ alert("Nenhum bem gerado."); return; }
 
@@ -20467,7 +20410,7 @@ function depAcumuladaTotalAteMesAnterior(){
       await sincronizarDoSupabase(true);
       renderTudo();
       document.getElementById("modalCadastro")?.classList.add("hidden");
-      alert(`Lote salvo com sucesso: ${salvos} bens gerados. Início da requisição: ${inicioDep.split("-").reverse().join("/")}.`);
+      alert(`Lote salvo com sucesso: ${salvos} bens gerados. Início da depreciação: ${inicioDep.split("-").reverse().join("/")}.`);
       viewById("bens");
     }catch(e){
       console.error(e);
@@ -20666,7 +20609,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <div><span>Categoria secundária</span><strong>${esc105(c.cs)}</strong></div>
           <div><span>Depreciável</span><strong>${esc105(c.depreciavel)}</strong></div>
           <div><span>Aquisição</span><strong>${dataBR105(b.aquisicao)}</strong></div>
-          <div><span>Início da requisição</span><strong>${dataBR105(b.inicio)}</strong></div>
+          <div><span>Início da Depreciação</span><strong>${dataBR105(b.inicio)}</strong></div>
           <div><span>Valor de Aquisição</span><strong>${moeda(b.valor)}</strong></div>
           <div><span>Valor Residual</span><strong>${moeda(b.residual)}</strong></div>
           <div><span>Taxa Depreciação</span><strong>${esc105(b.taxa)}</strong></div>
@@ -20797,7 +20740,7 @@ function depAcumuladaTotalAteMesAnterior(){
         <tr><th>Categoria secundária</th><td>${esc105(c.cs)}</td></tr>
         <tr><th>Depreciável</th><td>${esc105(c.depreciavel)}</td></tr>
         <tr><th>Aquisição</th><td>${dataBR105(b.aquisicao)}</td></tr>
-        <tr><th>Início da requisição</th><td colspan="2">${dataBR105(b.inicio)}</td></tr>
+        <tr><th>Início da Depreciação</th><td colspan="2">${dataBR105(b.inicio)}</td></tr>
         <tr><th>Valor de Aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
         <tr><th>Valor Residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
         <tr><th>Taxa Depreciação</th><td colspan="2">${esc105(b.taxa)}</td></tr>
@@ -21096,7 +21039,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <div><span>Categoria secundária</span><strong>${esc106(c.cs)}</strong></div>
           <div><span>Depreciável</span><strong>${esc106(c.depreciavel)}</strong></div>
           <div><span>Aquisição</span><strong>${dataBR106(b.aquisicao)}</strong></div>
-          <div><span>Início da requisição</span><strong>${dataBR106(b.inicio)}</strong></div>
+          <div><span>Início da Depreciação</span><strong>${dataBR106(b.inicio)}</strong></div>
           <div><span>Valor de Aquisição</span><strong>${moeda(b.valor)}</strong></div>
           <div><span>Valor Residual</span><strong>${moeda(b.residual)}</strong></div>
           <div><span>Taxa Depreciação</span><strong>${esc106(b.taxa)}</strong></div>
@@ -21343,7 +21286,7 @@ function depAcumuladaTotalAteMesAnterior(){
         <tr><th>Categoria secundária</th><td>${esc107(c.cs)}</td></tr>
         <tr><th>Depreciável</th><td>${esc107(c.depreciavel)}</td></tr>
         <tr><th>Aquisição</th><td>${dataBR107(b.aquisicao)}</td></tr>
-        <tr><th>Início da requisição</th><td colspan="2">${dataBR107(b.inicio)}</td></tr>
+        <tr><th>Início da Depreciação</th><td colspan="2">${dataBR107(b.inicio)}</td></tr>
         <tr><th>Valor de Aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
         <tr><th>Valor Residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
         <tr><th>Taxa Depreciação</th><td colspan="2">${esc107(b.taxa)}</td></tr>
@@ -21670,7 +21613,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <div><span>Categoria secundária</span><strong>${esc108(c.cs)}</strong></div>
           <div><span>Depreciável</span><strong>${esc108(c.depreciavel)}</strong></div>
           <div><span>Aquisição</span><strong>${dataBR108(b.aquisicao)}</strong></div>
-          <div><span>Início da requisição</span><strong>${dataBR108(b.inicio)}</strong></div>
+          <div><span>Início da Depreciação</span><strong>${dataBR108(b.inicio)}</strong></div>
           <div><span>Valor de Aquisição</span><strong>${moeda(b.valor)}</strong></div>
           <div><span>Valor Residual</span><strong>${moeda(b.residual)}</strong></div>
           <div><span>Taxa Depreciação</span><strong>${esc108(b.taxa)}</strong></div>
@@ -21795,7 +21738,7 @@ function depAcumuladaTotalAteMesAnterior(){
         <tr><th>Categoria secundária</th><td>${esc108(c.cs)}</td></tr>
         <tr><th>Depreciável</th><td>${esc108(c.depreciavel)}</td></tr>
         <tr><th>Aquisição</th><td>${dataBR108(b.aquisicao)}</td></tr>
-        <tr><th>Início da requisição</th><td colspan="2">${dataBR108(b.inicio)}</td></tr>
+        <tr><th>Início da Depreciação</th><td colspan="2">${dataBR108(b.inicio)}</td></tr>
         <tr><th>Valor de Aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
         <tr><th>Valor Residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
         <tr><th>Taxa Depreciação</th><td colspan="2">${esc108(b.taxa)}</td></tr>
@@ -22147,7 +22090,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria secundária</th><td>${esc109(c.cs)}</td></tr>
           <tr><th>Depreciável</th><td>${esc109(c.depreciavel)}</td></tr>
           <tr><th>Aquisição</th><td>${dataBR109(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td>${dataBR109(b.inicio)}</td></tr>
+          <tr><th>Início da Depreciação</th><td>${dataBR109(b.inicio)}</td></tr>
           <tr><th>Valor de Aquisição</th><td>${moeda(b.valor)}</td></tr>
           <tr><th>Valor Residual</th><td>${moeda(b.residual)}</td></tr>
           <tr><th>Taxa Depreciação</th><td>${esc109(b.taxa)}</td></tr>
@@ -22179,7 +22122,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
 (function(){
   // v110
-  // - Entrada do mês e movimentação usam a data de início da requisição/incorporação.
+  // - Entrada do mês e movimentação usam a data de início da depreciação/incorporação.
   // - Fechamento e Nota Patrimonial mostram depreciação mensal por item de despesa.
   // - Editar bem mostra dados contábeis e todos os anexos para corrigir.
   // - Foto usa URL assinada estável em cache para parar de "piscar".
@@ -22512,7 +22455,7 @@ function depAcumuladaTotalAteMesAnterior(){
         setor_origem:"Aquisição/Fornecedor",
         setor_destino:b.setor || "-",
         responsavel:b.responsavel || "-",
-        observacoes:`Entrada automática na competência de início da requisição/incorporação (${dataBR110(dataInicioIncorporacao110(b))})`
+        observacoes:`Entrada automática na competência de início da depreciação/incorporação (${dataBR110(dataInicioIncorporacao110(b))})`
       }));
 
     const lista = [...auto, ...manuais];
@@ -22830,7 +22773,7 @@ function depAcumuladaTotalAteMesAnterior(){
         renderTudo();
       }
     }catch(e){
-      console.warn("Não corrigiu datas antigas de início da requisição:", e);
+      console.warn("Não corrigiu datas antigas de início da depreciação:", e);
     }
   }
 
@@ -23436,7 +23379,7 @@ function depAcumuladaTotalAteMesAnterior(){
   // v114
   // Correções principais:
   // 1) O bem aparece desde a DATA DE AQUISIÇÃO/NF, mesmo que a depreciação comece depois.
-  // 2) Depreciação continua começando somente na data de início da requisição.
+  // 2) Depreciação continua começando somente na data de início da depreciação.
   // 3) Salvamento por lote não duplica lote já cadastrado: atualiza/reaproveita bens existentes da mesma NF/data/valor.
   // 4) NF/NE/OF são propagadas para todos os bens do mesmo lote, quando um deles já tem o documento.
   // 5) Editar preserva fornecedor/CNPJ/categoria/NE em todos.
@@ -23954,7 +23897,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
       if(!nf){ alert("Informe ou leia a Nota Fiscal."); return; }
       if(!dataAquisicao){ alert("Informe a data de emissão/aquisição da NF."); return; }
-      if(!inicioDep){ alert("Informe a data de início da requisição."); return; }
+      if(!inicioDep){ alert("Informe a data de início da depreciação."); return; }
       if(!cp || !cs){ alert("Informe a classificação contábil."); return; }
       if(!rows.length){ alert("Nenhum bem gerado."); return; }
 
@@ -25078,7 +25021,7 @@ function depAcumuladaTotalAteMesAnterior(){
   // v119
   // - Limpa o Editar: remove os blocos duplicados de cima e deixa documentos só no bloco de baixo.
   // - Preenche fornecedor/CNPJ/categorias/NE ao editar.
-  // - Inclui Data de início da requisição no bloco editável.
+  // - Inclui Data de início da depreciação no bloco editável.
   // - Salva fornecedor/CNPJ sem apagar dados existentes.
   // - Ficha PDF passa a trazer imagens/PDFs anexados como páginas renderizadas.
 
@@ -25331,7 +25274,7 @@ function depAcumuladaTotalAteMesAnterior(){
     const grid = document.querySelector("#editExtraV110 .v110-grid");
     if(grid && !document.getElementById("editInicioDepV119")){
       grid.insertAdjacentHTML("beforeend", `
-        <label>Data de início da requisição
+        <label>Data de início da depreciação
           <input id="editInicioDepV119" type="date" value="${esc119(dataISO119(b.inicio))}">
         </label>
       `);
@@ -25622,7 +25565,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc119(b.categoriaPrincipal || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc119(b.categoriaSecundaria || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR119(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR119(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR119(b.inicio)}</td></tr>
           <tr><th>Valor de aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc119(b.taxa || "-")}</td></tr>
@@ -26018,7 +25961,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
       if(!nf){ alert("Informe ou leia a Nota Fiscal."); return; }
       if(!dataAquisicao){ alert("Informe a data de emissão/aquisição da NF."); return; }
-      if(!inicioDep){ alert("Informe a data de início da requisição."); return; }
+      if(!inicioDep){ alert("Informe a data de início da depreciação."); return; }
       if(!cp || !cs){ alert("Informe a classificação contábil."); return; }
       if(!rows.length){ alert("Nenhum bem gerado."); return; }
 
@@ -26764,7 +26707,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc121(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc121(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR121(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR121(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR121(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc121(b.taxa || "-")}</td></tr>
@@ -26820,7 +26763,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
       if(!nf){ alert("Informe ou leia a Nota Fiscal."); return; }
       if(!dataAquisicao){ alert("Informe a data de emissão/aquisição da NF."); return; }
-      if(!inicioDep){ alert("Informe a data de início da requisição."); return; }
+      if(!inicioDep){ alert("Informe a data de início da depreciação."); return; }
       if(!cp || !cs){ alert("Informe a classificação contábil."); return; }
       if(valorVazio121(fornecedor) || valorVazio121(cnpj)){
         alert("Fornecedor e CNPJ são obrigatórios para salvar o lote. Se a leitura não puxou, preencha manualmente antes de salvar.");
@@ -27532,7 +27475,7 @@ function depAcumuladaTotalAteMesAnterior(){
       const depreciavel = (document.getElementById("manualDepreciavelV122")?.value || "sim") === "sim";
 
       if(!pat || !desc || !nf || !aquisicao || !inicio || !valor || !taxa){
-        alert("Preencha os campos obrigatórios: Nº Patrimonial, descrição, NF, aquisição, início da requisição, valor e taxa.");
+        alert("Preencha os campos obrigatórios: Nº Patrimonial, descrição, NF, aquisição, início da depreciação, valor e taxa.");
         return;
       }
 
@@ -27554,7 +27497,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
       const item = {
         id: existente?.id || null,
-        pat,
+        pat: existente?.pat || pat,
         desc,
         setor: document.getElementById("cadSetor")?.value?.trim() || "",
         responsavel: document.getElementById("cadResponsavel")?.value?.trim() || "",
@@ -27582,17 +27525,14 @@ function depAcumuladaTotalAteMesAnterior(){
       const salvo = await salvarBemSupabase(item);
       item.id = salvo.id;
 
-      const salvarExtras = typeof window.salvarExtSupabaseV128 === "function" ? window.salvarExtSupabaseV128 : salvarExtSupabaseV95;
-      await salvarExtras({
+      await salvarExtSupabaseV95({
         numero_patrimonial: item.pat,
         notaEmpenho: ne,
         categoriaPrincipal: cp,
         categoriaSecundaria: cs,
         depreciavel,
         fornecedor,
-        cnpj,
-        codigoItemCatalogo,
-        justificativaDivergencia
+        cnpj
       });
 
       const uploads = [
@@ -27898,7 +27838,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc122(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc122(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR122(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR122(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR122(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc122(b.taxa || "-")}</td></tr>
@@ -28212,7 +28152,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <label>Data de aquisição <span class="required-mark">*</span>
             <input id="cadAquisicao" type="date" value="${esc123(dataISO123(b?.aquisicao))}">
           </label>
-          <label>Início da requisição <span class="required-mark">*</span>
+          <label>Início da depreciação <span class="required-mark">*</span>
             <input id="cadInicio" type="date" value="${esc123(dataISO123(b?.inicio))}">
           </label>
           <label>Valor de aquisição <span class="required-mark">*</span>
@@ -28364,7 +28304,7 @@ function depAcumuladaTotalAteMesAnterior(){
       const depreciavel = (document.getElementById("manualDepreciavelV123")?.value || "sim") === "sim";
 
       if(!pat || !desc || !nf || !aquisicao || !inicio || !valor || !residual || !taxa){
-        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor, residual e taxa.");
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da depreciação, valor, residual e taxa.");
         return;
       }
 
@@ -28385,7 +28325,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
       const item = {
         id: existente?.id || null,
-        pat: patNovo,
+        pat: existente?.pat || pat,
         desc,
         setor: document.getElementById("cadSetor")?.value?.trim() || "",
         responsavel: document.getElementById("cadResponsavel")?.value?.trim() || "",
@@ -28756,7 +28696,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc123(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc123(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR123(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR123(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR123(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc123(b.taxa || "-")}</td></tr>
@@ -29081,16 +29021,12 @@ function depAcumuladaTotalAteMesAnterior(){
     const cnpj = b?.cnpj || info.cnpj || "";
     const ne = b?.notaEmpenho || info.notaEmpenho || "";
     const dep = (b?.depreciavel === false || info.depreciavel === false || cs === "Obras de arte") ? "nao" : "sim";
-    let ext128 = {};
-    try{ ext128 = (JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {})[normPat124(b?.pat)] || {}; }catch(e){}
-    const codigoItemCatalogo = b?.codigoItemCatalogo || ext128.codigoItemCatalogo || "";
-    const justificativaDivergencia = b?.justificativaDivergencia || ext128.justificativaDivergencia || "";
 
     return `
       <button class="x" onclick="fecharCadastro()">×</button>
-      <h2>Editar bem patrimonial</h2>
-      <p>Todos os campos abaixo podem ser alterados. Os dados já salvos aparecem preenchidos para conferência.</p>
-      <div class="v124-pendencias-topo">Pendências identificadas: ${pendencias.length ? pendencias.map(esc124).join(" • ") : "nenhuma"}</div>
+      <h2>Corrigir Pendências do Bem</h2>
+      <p>Todos os dados já salvos vêm preenchidos. Preencha apenas o que estiver pendente.</p>
+      <div class="v124-pendencias-topo">Pendências encontradas: ${pendencias.length ? pendencias.map(esc124).join(" • ") : "nenhuma pendência cadastral"}</div>
       <div id="cadastroAlert" class="form-alert"></div>
 
       <div class="v123-form-section">
@@ -29128,7 +29064,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <label>Data de aquisição <span class="required-mark">*</span>
             <input id="cadAquisicao" type="date" value="${esc124(dataISO124(b?.aquisicao))}">
           </label>
-          <label>Início da requisição <span class="required-mark">*</span>
+          <label>Início da depreciação <span class="required-mark">*</span>
             <input id="cadInicio" type="date" value="${esc124(dataISO124(b?.inicio))}">
           </label>
           <label>Valor de aquisição <span class="required-mark">*</span>
@@ -29164,18 +29100,12 @@ function depAcumuladaTotalAteMesAnterior(){
           <label>CNPJ
             <input id="manualCnpjV124" value="${esc124(cnpj)}" placeholder="CNPJ">
           </label>
-          <label>Código do item do catálogo
-            <input id="manualCodigoCatalogoV130" value="${esc124(codigoItemCatalogo)}" placeholder="Código do catálogo">
-          </label>
-          <label class="span-2">Justificativa de divergência
-            <textarea id="manualJustificativaV130" rows="3" placeholder="Informe a justificativa quando houver diferença entre os documentos">${esc124(justificativaDivergencia)}</textarea>
-          </label>
         </div>
-        <div class="v123-note">Para anexar foto ou documentos, use o modo com importação. Todos os dados cadastrais podem ser editados neste formulário.</div>
+        <div class="v123-note">Para anexar foto ou documentos, use o modo com importação. Aqui é só correção dos dados cadastrais.</div>
       </div>
 
       <div class="actions-row" style="margin-top:16px">
-        <button id="btnSalvarItem" class="primary" data-edit-action onclick="podeEditar()?salvarItemManualV124():avisarSemPermissao()">Salvar alterações</button>
+        <button id="btnSalvarItem" class="primary" data-edit-action onclick="podeEditar()?salvarItemManualV124():avisarSemPermissao()">Salvar correção</button>
         <button class="secondary" onclick="fecharCadastro()">Cancelar</button>
       </div>
     `;
@@ -29253,26 +29183,16 @@ function depAcumuladaTotalAteMesAnterior(){
       const cs = document.getElementById("manualCatSecV124")?.value || "";
       const fornecedor = document.getElementById("manualFornecedorV124")?.value?.trim() || "";
       const cnpj = document.getElementById("manualCnpjV124")?.value?.trim() || "";
-      const codigoItemCatalogo = document.getElementById("manualCodigoCatalogoV130")?.value?.trim() || "";
-      const justificativaDivergencia = document.getElementById("manualJustificativaV130")?.value?.trim() || "";
       const depreciavel = (document.getElementById("manualDepreciavelV124")?.value || "sim") === "sim";
 
-      const patAnterior = String(editandoPatrimonio || "").trim();
-      const patNovo = typeof normalizarTombo === "function" ? normalizarTombo(pat) : pat;
-
-      if(!patNovo || !desc || !nf || !aquisicao || !inicio || !(valor > 0) || residual < 0 || !taxa){
-        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da requisição, valor e taxa. O valor residual pode ser zero, mas não pode ser negativo.");
+      if(!pat || !desc || !nf || !aquisicao || !inicio || !valor || !residual || !taxa){
+        alert("Preencha os obrigatórios: Tombo, descrição, NF, aquisição, início da depreciação, valor, residual e taxa.");
         return;
       }
 
-      const existente = (bens || []).find(b=>String(b.pat)===String(patAnterior || patNovo)) || (bens || []).find(b=>String(b.pat)===String(patNovo));
-      const conflitoTombo = (bens || []).find(b=>String(b.pat)===String(patNovo) && String(b.id||"")!==String(existente?.id||""));
-      if(conflitoTombo){
-        alert(`O tombo ${patNovo} já pertence a outro bem. Informe um número patrimonial diferente.`);
-        return;
-      }
+      const existente = (bens || []).find(b=>String(b.pat)===String(editandoPatrimonio || pat)) || (bens || []).find(b=>String(b.pat)===String(pat));
 
-      if(btn){ btn.disabled=true; btn.textContent="Salvando alterações..."; }
+      if(btn){ btn.disabled=true; btn.textContent="Salvando correção..."; }
 
       const item = {
         id: existente?.id || null,
@@ -29304,55 +29224,24 @@ function depAcumuladaTotalAteMesAnterior(){
       const salvo = await salvarBemSupabase(item);
       item.id = salvo.id;
 
-      const salvarExtrasCompleto = typeof window.salvarExtSupabaseV128 === "function" ? window.salvarExtSupabaseV128 : salvarExtSupabaseV95;
-      await salvarExtrasCompleto({
+      await salvarExtSupabaseV95({
         numero_patrimonial: item.pat,
         notaEmpenho: ne,
         categoriaPrincipal: cp,
         categoriaSecundaria: cs,
         depreciavel,
         fornecedor,
-        cnpj,
-        codigoItemCatalogo,
-        justificativaDivergencia
+        cnpj
       });
-
-      // Se o tombo foi alterado, migra os dados complementares e elimina a chave antiga
-      // somente depois que o novo tombo foi salvo com sucesso.
-      const tomboAlterado = !!patAnterior && String(patAnterior) !== String(item.pat);
-      if(tomboAlterado){
-        try{
-          const cache = JSON.parse(localStorage.getItem("bensExtSGP_v95") || "{}") || {};
-          const antigo = cache[String(patAnterior)] || {};
-          cache[String(item.pat)] = {...antigo, ...(cache[String(item.pat)] || {}),
-            notaEmpenho:ne || antigo.notaEmpenho || "",
-            categoriaPrincipal:cp || antigo.categoriaPrincipal || "",
-            categoriaSecundaria:cs || antigo.categoriaSecundaria || "",
-            depreciavel,
-            fornecedor:fornecedor || antigo.fornecedor || "",
-            cnpj:cnpj || antigo.cnpj || "",
-            codigoItemCatalogo:codigoItemCatalogo || antigo.codigoItemCatalogo || "",
-            justificativaDivergencia:justificativaDivergencia || antigo.justificativaDivergencia || ""
-          };
-          delete cache[String(patAnterior)];
-          localStorage.setItem("bensExtSGP_v95", JSON.stringify(cache));
-        }catch(e){ console.warn("Não migrou cache do tombo antigo:", e); }
-        try{
-          if(window.supabaseClient){
-            await supabaseClient.from("bens_patrimoniais_ext").delete().eq("numero_patrimonial", String(patAnterior));
-          }
-        }catch(e){ console.warn("O tombo principal foi alterado, mas não foi possível remover o complemento antigo:", e); }
-      }
 
       // Propaga fornecedor/CNPJ/categorias para o lote quando fizer sentido.
       const loteKey = loteKey124({...item, notaEmpenho:ne});
       const nfNorm = normNF124(nf);
       const lote = (bens || []).filter(x=>{
-        if(tomboAlterado && String(x.pat)===String(patAnterior)) return false;
         return String(x.pat)===String(item.pat) || (loteKey && loteKey124(x)===loteKey) || (nfNorm && normNF124(x.nf)===nfNorm);
       });
       for(const outro of lote){
-        await salvarExtrasCompleto({
+        await salvarExtSupabaseV95({
           numero_patrimonial: outro.pat,
           notaEmpenho: ne || outro.notaEmpenho || "",
           categoriaPrincipal: cp || outro.categoriaPrincipal || "",
@@ -29367,15 +29256,15 @@ function depAcumuladaTotalAteMesAnterior(){
       await carregarExtSupabaseV95();
       renderTudo();
 
-      alert(tomboAlterado ? `Alterações salvas. Tombo atualizado de ${patAnterior} para ${item.pat}.` : "Alterações salvas com sucesso.");
+      alert("Pendências corrigidas e salvas.");
       document.getElementById("modalCadastro")?.classList.add("hidden");
       editandoPatrimonio = null;
-      viewById("bens");
+      viewById("pendencias");
     }catch(e){
       console.error(e);
-      alert("Erro ao salvar alterações: " + (e.message || e));
+      alert("Erro ao salvar correção: " + (e.message || e));
     }finally{
-      if(btn){ btn.disabled=false; btn.textContent="Salvar alterações"; }
+      if(btn){ btn.disabled=false; btn.textContent="Salvar correção"; }
     }
   };
 
@@ -29605,7 +29494,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc124(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc124(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR124(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR124(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR124(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc124(b.taxa || "-")}</td></tr>
@@ -30147,7 +30036,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc125(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc125(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR125(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR125(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR125(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc125(b.taxa || "-")}</td></tr>
@@ -30587,7 +30476,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc126(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc126(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR126(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR126(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR126(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc126(b.taxa || "-")}</td></tr>
@@ -30845,47 +30734,7 @@ function depAcumuladaTotalAteMesAnterior(){
           .doc-page{min-height:277mm}
           .doc-img{max-height:262mm}
         }
-      
-/* v131 - menu lateral sem sobreposição */
-@media (min-width:821px){
-  .sidebar{
-    display:flex!important;
-    flex-direction:column!important;
-    overflow:hidden!important;
-  }
-  .side-head,
-  .sidebar-profile{
-    flex:0 0 auto;
-  }
-  .nav{
-    flex:1 1 auto!important;
-    min-height:0!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-    padding-right:4px;
-    padding-bottom:8px;
-    margin-bottom:10px;
-    scrollbar-width:thin;
-    scrollbar-color:rgba(255,255,255,.32) transparent;
-  }
-  .nav::-webkit-scrollbar{width:7px}
-  .nav::-webkit-scrollbar-track{background:transparent}
-  .nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.28);border-radius:999px}
-  .side-status{
-    position:static!important;
-    left:auto!important;
-    right:auto!important;
-    bottom:auto!important;
-    margin-top:auto!important;
-    flex:0 0 auto!important;
-    width:100%!important;
-  }
-  .side-status strong{
-    line-height:1.25;
-    overflow-wrap:anywhere;
-  }
-}
-</style>`;
+      </style>`;
   }
 
   function abrirJanela127(titulo, texto){
@@ -31169,7 +31018,7 @@ function depAcumuladaTotalAteMesAnterior(){
           <tr><th>Categoria principal</th><td>${esc127(cp || "-")}</td></tr>
           <tr><th>Categoria secundária / item de despesa</th><td>${esc127(cs || "-")}</td></tr>
           <tr><th>Aquisição</th><td colspan="2">${dataBR127(b.aquisicao)}</td></tr>
-          <tr><th>Início da requisição</th><td colspan="2">${dataBR127(b.inicio)}</td></tr>
+          <tr><th>Início da depreciação</th><td colspan="2">${dataBR127(b.inicio)}</td></tr>
           <tr><th>Valor aquisição</th><td colspan="2">${moeda(b.valor)}</td></tr>
           <tr><th>Valor residual</th><td colspan="2">${moeda(b.residual)}</td></tr>
           <tr><th>Taxa</th><td colspan="2">${esc127(b.taxa || "-")}</td></tr>
@@ -31559,7 +31408,6 @@ function depAcumuladaTotalAteMesAnterior(){
       if(error) console.warn("Campos v128 não enviados à base. Rode o script SQL v128 se quiser compartilhar esses campos:", error);
     }catch(e){ console.warn("Campos v128 ficaram locais; base ainda precisa do script SQL:", e); }
   }
-  window.salvarExtSupabaseV128 = salvarExtSupabaseV128;
 
   function capturarExtrasLote128(){
     const nfVal=parseBR128(document.getElementById("nfValorV100")?.value||"0");
@@ -31647,6 +31495,375 @@ function depAcumuladaTotalAteMesAnterior(){
   setInterval(()=>{
     if(document.getElementById("itensBodyV100")) initLoteV128();
   }, 1500);
+})();
+
+</script>
+
+<script>
+
+(function(){
+  // v129 - correção da Paula: leitura dos itens/código catálogo/classificação sem depender de cache/localStorage.
+  // O problema não era a base da Paula: era a leitura dos PDFs com regex frágil em alguns navegadores/PDFs.
+
+  const CATS129 = {
+    "Máquinas, aparelhos e equipamentos": [
+      "Aparelhos e equipamentos de comunicação",
+      "Aparelhos e equipamentos de informática",
+      "Máquinas e equipamentos energéticos",
+      "Máquinas, ferramentas e utensílios de oficina",
+      "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
+      "Equipamentos de proteção, segurança e socorro",
+      "Outros aparelhos, máquinas e equipamentos"
+    ],
+    "Móveis e utensílios": ["Mobiliário em geral","Utensílios em geral","Material de copa e cozinha","Outros móveis e utensílios"],
+    "Veículos": ["Veículos de tração mecânica","Veículos diversos","Peças e acessórios para veículos"],
+    "Bens culturais": ["Obras de arte","Peças para museu","Coleções e materiais bibliográficos","Outros bens culturais"],
+    "Outros bens móveis": ["Equipamentos diversos","Bens móveis a classificar","Outros bens patrimoniais"]
+  };
+
+  function esc129(v){return String(v??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]));}
+  function limpa129(v){return String(v||"").replace(/\u00a0/g," ").replace(/[ \t]+/g," ").replace(/\s+\n/g,"\n").replace(/\n\s+/g,"\n").trim();}
+  function upper129(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase();}
+  function parseBR129(v){
+    const s=String(v||"").replace(/R\$/gi,"").replace(/\s/g,"").trim();
+    if(!s) return 0;
+    if(/^\d+[.,]\d{2}$/.test(s)) return Number(s.replace(/\./g,"").replace(",","."))||0;
+    if(/^\d+$/.test(s)) return Number(s)||0;
+    return Number(s.replace(/\./g,"").replace(",","."))||0;
+  }
+  function fmt129(n){return Number(n||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function moeda129(n){try{return moeda(n)}catch(e){return "R$ "+fmt129(n)}}
+  function iso129(v){
+    const s=String(v||"").replace(/\s/g,"").trim();
+    let m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+    m=s.match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
+    if(m) return `20${m[3]}-${m[2]}-${m[1]}`;
+    m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m) return s;
+    return "";
+  }
+  function valorEq129(a,b){return Math.abs(Number(a||0)-Number(b||0)) < 0.02;}
+
+  async function carregarPdf129(){
+    if(window.pdfjsLib) return true;
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement("script");
+      s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+    });
+    if(window.pdfjsLib){
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      return true;
+    }
+    return false;
+  }
+
+  async function textoArquivo129(id){
+    const f=document.getElementById(id)?.files?.[0];
+    if(!f) throw new Error("Selecione o arquivo primeiro.");
+    const nome=f.name||"";
+    if(f.type==="application/pdf" || nome.toLowerCase().endsWith(".pdf")){
+      await carregarPdf129();
+      const ab=await f.arrayBuffer();
+      const pdf=await window.pdfjsLib.getDocument({data:ab}).promise;
+      const pages=[];
+      for(let p=1;p<=pdf.numPages;p++){
+        const page=await pdf.getPage(p);
+        const tc=await page.getTextContent();
+        const itens=tc.items.map(it=>({str:String(it.str||"").trim(), x:it.transform?.[4]||0, y:it.transform?.[5]||0})).filter(it=>it.str);
+        const sorted=[...itens].sort((a,b)=>Math.abs(b.y-a.y)>3 ? b.y-a.y : a.x-b.x);
+        const linhas=[];
+        for(const it of sorted){
+          let ln=linhas.find(l=>Math.abs(l.y-it.y)<3);
+          if(!ln){ln={y:it.y, itens:[]}; linhas.push(ln);}
+          ln.itens.push(it);
+        }
+        const byLine=linhas.map(l=>l.itens.sort((a,b)=>a.x-b.x).map(i=>i.str).join(" ")).join("\n");
+        const plain=itens.map(i=>i.str).join(" ");
+        pages.push(byLine+"\n"+plain);
+      }
+      return limpa129(pages.join("\n"));
+    }
+    if(/^text\//.test(f.type||"")) return limpa129(await f.text());
+    return nome.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ");
+  }
+
+  function inferirCategoria129(txt){
+    const s=upper129(txt);
+    if(/MOBILIARIO|SOFA|CADEIRA|MESA|ARMARIO|GAVETEIRO|ESTANTE|LONGARINA|POLTRONA|BALCAO/.test(s)) return ["Móveis e utensílios","Mobiliário em geral"];
+    if(/AR CONDICIONADO|CONDICIONADOR|SPLIT|BTU|INVERTER|REFRIGERADOR|BEBEDOURO|FREEZER|VENTILADOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Máquinas e equipamentos energéticos"];
+    if(/INFORMATICA|COMPUTADOR|NOTEBOOK|MONITOR|IMPRESSORA|SCANNER|TABLET|NOBREAK|SERVIDOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Aparelhos e equipamentos de informática"];
+    if(/TELEFONE|COMUNICACAO|COMUNICAÇÃO|RADIO|RÁDIO|ROTEADOR|SWITCH|MODEM|CENTRAL TELEFONICA/.test(s)) return ["Máquinas, aparelhos e equipamentos","Aparelhos e equipamentos de comunicação"];
+    if(/SEGURANCA|SEGURANÇA|CAMERA|CÂMERA|ALARME|EXTINTOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Equipamentos de proteção, segurança e socorro"];
+    if(/OBRA DE ARTE|ACERVO|MUSEU|QUADRO|ESCULTURA/.test(s)) return ["Bens culturais","Obras de arte"];
+    if(/EQUIPAMENTOS E MATERIAL PERMANENTE|MATERIAL PERMANENTE/.test(s)) return ["Máquinas, aparelhos e equipamentos","Outros aparelhos, máquinas e equipamentos"];
+    return ["",""];
+  }
+
+  function aplicarCategoria129(cp,cs){
+    const p=document.getElementById("catPrincV100");
+    const s=document.getElementById("catSecV100");
+    if(!p || !s || !cp) return;
+    if(![...p.options].some(o=>o.value===cp)) p.insertAdjacentHTML("beforeend",`<option value="${esc129(cp)}">${esc129(cp)}</option>`);
+    p.value=cp;
+    if(typeof atualizarSecV100==="function") atualizarSecV100();
+    if(cs && ![...s.options].some(o=>o.value===cs)) s.insertAdjacentHTML("beforeend",`<option value="${esc129(cs)}">${esc129(cs)}</option>`);
+    if(cs) s.value=cs;
+    if(typeof gerarBensV100==="function") gerarBensV100(false);
+  }
+
+  function trimDesc129(desc){
+    let d=limpa129(desc).replace(/\s*OBS\s*:\s*null\.?/ig,"").replace(/\s*MARCA\s*:.*/i,"").trim();
+    const m=d.match(/^(.+?\b(?:UNIDADE|UND|UNID|BTUS?|INVERTER|COMPRESSOR|SPLIT SYSTEM|CONTROLE REMOTO SEM FIO)\b)/i);
+    if(m) d=m[1];
+    d=d.replace(/\s+\d+[.,]\d{2}.*$/,"" ).replace(/\s{2,}/g," ").trim();
+    return d;
+  }
+
+  function extrairDescricaoFallback129(txt){
+    const s=limpa129(txt);
+    const pats=[
+      /(CENTRAL\s+DE\s+AR\s+CONDICIONADO.+?)(?=\s+\d+\s+[0-9.]+,\d{2}|\s+R\$|\s+TOTAL|$)/i,
+      /(AR\s+CONDICIONADO.+?)(?=\s+\d+\s+[0-9.]+,\d{2}|\s+R\$|\s+TOTAL|$)/i,
+      /(SOF[ÁA],?.+?)(?=\s+\d+\s+[0-9.]+,\d{2}|\s+R\$|\s+TOTAL|$)/i,
+      /(ARM[ÁA]RIO,?.+?)(?=\s+\d+\s+[0-9.]+,\d{2}|\s+R\$|\s+TOTAL|$)/i,
+      /(CADEIRA,?.+?)(?=\s+\d+\s+[0-9.]+,\d{2}|\s+R\$|\s+TOTAL|$)/i,
+      /(MESA,?.+?)(?=\s+\d+\s+[0-9.]+,\d{2}|\s+R\$|\s+TOTAL|$)/i
+    ];
+    for(const re of pats){const m=s.match(re); if(m) return trimDesc129(m[1]);}
+    return "";
+  }
+
+  function valoresMoeda129(s){
+    return [...String(s||"").matchAll(/(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2}|[0-9]+,\d{2})/g)].map(m=>m[1]);
+  }
+
+  function parseOF129(texto){
+    const raw=limpa129(texto);
+    const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
+    let m=flat.match(/ORDEM\s+DE\s+FORNECIMENTO\s*N[º°o]?\s*([0-9]+\/?\d{4})/i) || flat.match(/\bOF\s*N?[º°o]?\s*([0-9]+\/?\d{4})/i) || flat.match(/\b([0-9]{1,4}\/20\d{2})\b/);
+    const numero=m?m[1]:"";
+    m=flat.match(/DATA\s+DE\s+EMISS[ÃA]O\s*:?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i) || flat.match(/EMISS[ÃA]O\s*:?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i);
+    const data=m?iso129(m[1]):"";
+    m=flat.match(/FORNECEDOR\s*:?\s*(.+?)\s+CNPJ\s*:?\s*([0-9./-]{14,18})/i);
+    const fornecedor=m?limpa129(m[1]):"";
+    const cnpj=m?m[2]:(flat.match(/CNPJ\s*:?\s*([0-9./-]{14,18})/i)?.[1]||"");
+    m=flat.match(/(?:TOTAL\s+DA\s+ORDEM|VALOR\s+TOTAL|TOTAL)\s*(?:R\$)?\s*([0-9.]+,\d{2})/i);
+    let total=m?parseBR129(m[1]):0;
+    if(!total){
+      const vals=valoresMoeda129(flat);
+      if(vals.length) total=parseBR129(vals[vals.length-1]);
+    }
+    m=flat.match(/(?:EMPENHO|Referente\s+ao\s+Empenho\s+n[ºo]?)\s*:?\s*(20\d{2}NE\d{3,})/i);
+    const empenho=m?m[1].toUpperCase():"";
+    const itens=[];
+
+    // 1) Linhas preservadas por coordenada do PDF.
+    const linhas=raw.split(/\n+/).map(l=>limpa129(l)).filter(Boolean);
+    for(let i=0;i<linhas.length;i++){
+      let l=linhas[i];
+      if(!/[0-9]+,\d{2}/.test(l)){
+        // alguns PDFs quebram a descrição em uma linha e os valores na seguinte
+        const juntar=[l, linhas[i+1]||"", linhas[i+2]||""].join(" ");
+        if(/[0-9]+,\d{2}/.test(juntar)) l=limpa129(juntar);
+      }
+      if(!/[0-9]+,\d{2}/.test(l)) continue;
+      if(/TOTAL|VALOR\s+DA\s+ORDEM|ASSINATURA|SUBTOTAL/i.test(l)) continue;
+      const vals=valoresMoeda129(l);
+      if(vals.length<1) continue;
+      const valorTotal=parseBR129(vals[vals.length-1]);
+      const valorUnit=vals.length>=2?parseBR129(vals[vals.length-2]):valorTotal;
+      let qtd=1;
+      const antesValores=l.split(vals[0])[0];
+      const nums=[...antesValores.matchAll(/\b(\d{1,5})\b/g)].map(x=>x[1]);
+      let codItem="", codCat="";
+      if(nums.length>=2){codCat=nums[0]; codItem=nums[1]; qtd=Number(nums[nums.length-1])||1;}
+      else if(nums.length===1){qtd=Number(nums[0])||1;}
+      let desc=antesValores;
+      if(codCat && codItem){
+        const idx=desc.indexOf(codItem);
+        if(idx>=0) desc=desc.slice(idx+codItem.length);
+      }
+      desc=trimDesc129(desc.replace(/^(ITEM|C[ÓO]D\.?\s*CAT\.?|C[ÓO]D\.?\s*ITEM|DESCRI[ÇC][ÃA]O)\s*/i,""));
+      if(desc && desc.length>5 && valorTotal>0){
+        itens.push({codigoItemCatalogo:codItem, codItem, codCat, desc, qtd, valorUnit:valorUnit||valorTotal/qtd, valorTotal, origem:"OF"});
+      }
+    }
+
+    // 2) Regex sobre texto plano se a linha não veio organizada.
+    if(!itens.length){
+      const re=/(\d{3,})\s+(\d{3,})\s+(.{8,}?)(?:\s+)(\d{1,4})(?:[,.]0+)?\s+([0-9.]+,\d{2})\s+(?:R\$\s*)?([0-9.]+,\d{2})/gi;
+      let r;
+      while((r=re.exec(flat))){
+        const desc=trimDesc129(r[3]);
+        if(desc && !/TOTAL|VALOR|EMISS/i.test(desc)) itens.push({codigoItemCatalogo:r[2], codItem:r[2], codCat:r[1], desc, qtd:Number(r[4])||1, valorUnit:parseBR129(r[5]), valorTotal:parseBR129(r[6]), origem:"OF"});
+      }
+    }
+
+    // 3) Fallback: se o PDF descreve o item mas a tabela não veio como linha.
+    if(!itens.length){
+      const desc=extrairDescricaoFallback129(flat);
+      if(desc){
+        const qtdMatch=flat.match(/\b(\d{1,4})\s+(?:[0-9.]+,\d{2})\s+(?:R\$\s*)?[0-9.]+,\d{2}/);
+        const qtd=qtdMatch?Number(qtdMatch[1])||1:1;
+        const vTotal=total||0;
+        itens.push({codigoItemCatalogo:"", codItem:"", codCat:"", desc, qtd, valorUnit:vTotal?qtd? vTotal/qtd : vTotal:0, valorTotal:vTotal, origem:"OF"});
+      }
+    }
+    return {numero,data,total,fornecedor,cnpj,empenho,itens};
+  }
+
+  function parseNE129(texto){
+    const raw=limpa129(texto); const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
+    let m=flat.match(/\b(20\d{2}NE\d{3,})\b/i);
+    const numero=m?m[1].toUpperCase():"";
+    let data="";
+    if(numero){ const re=new RegExp(numero+"\\s+(\\d{2}\\/\\d{2}\\/\\d{2,4})","i"); m=flat.match(re); if(m) data=iso129(m[1]); }
+    if(!data){m=flat.match(/Documento\s+Emiss[ãa]o.*?(\d{2}\/\d{2}\/\d{2,4})/i) || flat.match(/Emiss[ãa]o\s*(\d{2}\/\d{2}\/\d{2,4})/i); if(m)data=iso129(m[1]);}
+    m=flat.match(/Valor\s+NE\s*([0-9.]+,\d{2})/i) || flat.match(/\bValor\s+([0-9.]+,\d{2})\s*\(/i) || flat.match(/\bValor\s+NE\b.*?([0-9.]+,\d{2})/i);
+    let total=m?parseBR129(m[1]):0;
+    if(!total){
+      const vals=valoresMoeda129(flat);
+      if(vals.length) total=parseBR129(vals[vals.length-1]);
+    }
+    m=flat.match(/(\d+\s*-\s*[^\n|]*?(?:GERAL|ENERG[ÉE]TICOS|COMUNICA[ÇC][ÃA]O|INFORM[ÁA]TICA|EQUIPAMENTOS)[^\n|]*?\(IP\s*\d+\))/i) || flat.match(/Sub[- ]?item\s+da\s+Despesa\s+(.+?)(?=UNIDADE|Valor|Saldo|$)/i);
+    const subitem=m?limpa129(m[1]):"";
+    let [catPrincipal,catSecundaria]=inferirCategoria129(subitem || flat);
+    return {numero,data,total,subitem,catPrincipal,catSecundaria};
+  }
+
+  function parseNF129(texto){
+    const raw=limpa129(texto); const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
+    let m=flat.match(/NF-e\s*N[º°.]?\s*\.\s*([0-9.]{2,})/i) || flat.match(/N[º°.]?\s*\.\s*([0-9.]{2,})\s*S[ée]rie/i) || flat.match(/\bN[º°]\s*([0-9.]{2,})/i);
+    const numero=m?m[1].replace(/\.+/g,"."):"";
+    m=flat.match(/DATA\s+DA\s+EMISS[ÃA]O\s*(\d{2}\/\d{2}\/\d{4})/i) || flat.match(/EMISS[ÃA]O\s*:?\s*(\d{2}\/\d{2}\/\d{4})/i);
+    const data=m?iso129(m[1]):"";
+    m=flat.match(/VALOR\s+TOTAL\s+DA\s+NOTA\s*([0-9.]+,\d{2})/i) || flat.match(/VALOR\s+TOTAL\s*:?\s*R?\$?\s*([0-9.]+,\d{2})/i);
+    let total=m?parseBR129(m[1]):0;
+    if(!total){ const vals=valoresMoeda129(flat); if(vals.length) total=parseBR129(vals[vals.length-1]); }
+    let fornecedor="", cnpj="";
+    m=flat.match(/IDENTIFICA[ÇC][ÃA]O\s+DO\s+EMITENTE\s+(.+?)\s+(?:Rua|AV|Avenida|CNPJ)/i) || flat.match(/RECEBEMOS\s+DE\s+(.+?)\s+OS\s+PRODUTOS/i);
+    if(m) fornecedor=limpa129(m[1]);
+    m=flat.match(/CNPJ\s*:?\s*([0-9]{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2})/i); if(m) cnpj=m[1];
+    const itens=[];
+    const re=/([A-Z0-9-]{3,})\s+(.{8,}?)\s+UN\s+([0-9.,]+)\s+([0-9.]+,\d{2})\s+([0-9.]+,\d{2})/gi;
+    let r; while((r=re.exec(flat))){
+      const desc=trimDesc129(r[2]);
+      if(desc && !/VALOR|TOTAL|DANFE/i.test(desc)) itens.push({desc,qtd:Math.round(parseBR129(r[3]))||1,valorUnit:parseBR129(r[4]),valorTotal:parseBR129(r[5]),origem:"NF"});
+    }
+    return {numero,data,total,fornecedor,cnpj,itens};
+  }
+
+  function itensAtuaisV129(){
+    return [...document.querySelectorAll("#itensBodyV100 tr")].map(tr=>({desc:tr.querySelector(".itemDesc")?.value?.trim()||"", codigo:tr.querySelector(".itemCodCatalogoV128")?.value?.trim()||""})).filter(i=>i.desc);
+  }
+
+  function aplicarItens129(itens, origem){
+    if(!itens || !itens.length) return false;
+    const normalizados=itens.map(it=>({
+      ...it,
+      codigoItemCatalogo: it.codigoItemCatalogo || it.codItem || it.codigo || it.cod || "",
+      desc: trimDesc129(it.desc||""),
+      qtd: Math.max(1, Number(it.qtd||1)||1),
+      valorUnit: Number(it.valorUnit||0) || ((Number(it.valorTotal||0))/(Number(it.qtd||1)||1)),
+      valorTotal: Number(it.valorTotal||0) || (Number(it.valorUnit||0)*(Number(it.qtd||1)||1))
+    })).filter(i=>i.desc);
+    if(!normalizados.length) return false;
+    if(typeof aplicarItensV100 === "function") aplicarItensV100(normalizados);
+    setTimeout(()=>{try{gerarBensV100(true); compararDocs();}catch(e){}},50);
+    return true;
+  }
+
+  function ajustarCategoriaPeloItemAtual129(){
+    const desc=itensAtuaisV129().map(i=>i.desc).join(" ");
+    if(!desc) return;
+    const [cp,cs]=inferirCategoria129(desc);
+    if(cp) aplicarCategoria129(cp,cs);
+  }
+
+  function setMsg129(id, txt, ok=false){
+    const el=document.getElementById(id); if(!el) return;
+    el.textContent=txt;
+    el.className="status-v100 "+(ok?"v129-ok":"v129-warn");
+  }
+
+  window.lerOFV100 = async function(){
+    const msg=document.getElementById("msgOFV100"); if(msg) msg.textContent="Lendo Ordem de Fornecimento...";
+    try{
+      const texto=await textoArquivo129("arqOFV100");
+      const of=parseOF129(texto);
+      if(of.numero) document.getElementById("ofNumeroV100").value=of.numero;
+      if(of.data) document.getElementById("ofDataV100").value=of.data;
+      if(of.total) document.getElementById("ofValorV100").value=fmt129(of.total);
+      if(of.fornecedor) document.getElementById("fornecedorV100").value=of.fornecedor;
+      if(of.cnpj) document.getElementById("cnpjV100").value=of.cnpj;
+      if(of.empenho) document.getElementById("ofEmpenhoV100").value=of.empenho;
+      const aplicou=aplicarItens129(of.itens,"OF");
+      ajustarCategoriaPeloItemAtual129();
+      compararDocs?.();
+      setMsg129("msgOFV100", `OF preenchida: ${of.numero||"-"} • ${of.data||"-"} • valor ${of.total?moeda129(of.total):"não identificado"} • itens ${of.itens?.length||0}${aplicou?" levados para a tabela":" — se não trouxe item, preencha manualmente ou envie PDF com texto legível"}.`, !!aplicou);
+    }catch(e){ alert("Erro ao ler OF: "+(e.message||e)); }
+  };
+
+  window.lerNEV100 = async function(){
+    if(document.getElementById("msgNEV100")) document.getElementById("msgNEV100").textContent="Lendo NE...";
+    try{
+      const texto=await textoArquivo129("arqNEV100");
+      const ne=parseNE129(texto);
+      if(ne.numero) document.getElementById("neNumeroV100").value=ne.numero;
+      if(ne.data) document.getElementById("neDataV100").value=ne.data;
+      if(ne.total) document.getElementById("neValorV100").value=fmt129(ne.total);
+      if(ne.catPrincipal) aplicarCategoria129(ne.catPrincipal, ne.catSecundaria);
+      else ajustarCategoriaPeloItemAtual129();
+      compararDocs?.();
+      setMsg129("msgNEV100", `NE preenchida: ${ne.numero||"-"} • ${ne.data||"-"} • valor ${ne.total?moeda129(ne.total):"não identificado"} • classificação ${(ne.catPrincipal||document.getElementById("catPrincV100")?.value||"-")} / ${(ne.catSecundaria||document.getElementById("catSecV100")?.value||"-")}.`, true);
+    }catch(e){ alert("Erro ao ler NE: "+(e.message||e)); }
+  };
+
+  window.lerNFV100 = async function(){
+    if(document.getElementById("msgNFV100")) document.getElementById("msgNFV100").textContent="Lendo NF...";
+    try{
+      const texto=await textoArquivo129("arqNFV100");
+      const nf=parseNF129(texto);
+      if(nf.numero) document.getElementById("nfNumeroV100").value=nf.numero;
+      if(nf.data) document.getElementById("nfDataV100").value=nf.data;
+      if(nf.total) document.getElementById("nfValorV100").value=fmt129(nf.total);
+      if(nf.fornecedor && !document.getElementById("fornecedorV100")?.value) document.getElementById("fornecedorV100").value=nf.fornecedor;
+      if(nf.cnpj && !document.getElementById("cnpjV100")?.value) document.getElementById("cnpjV100").value=nf.cnpj;
+      const jaTem=itensAtuaisV129().some(i=>i.desc);
+      if(nf.itens?.length && !jaTem) aplicarItens129(nf.itens,"NF");
+      ajustarCategoriaPeloItemAtual129();
+      compararDocs?.();
+      setMsg129("msgNFV100", `NF preenchida: ${nf.numero||"-"} • ${nf.data||"-"} • valor ${nf.total?moeda129(nf.total):"não identificado"}. ${nf.itens?.length&&!jaTem?"Itens importados da NF.":"Itens mantidos/priorizados pela OF."}`, true);
+    }catch(e){ alert("Erro ao ler NF: "+(e.message||e)); }
+  };
+
+  // Botão de reforço para a Paula: lê de novo os documentos na ordem correta e preenche tabela/classificação.
+  function instalarBotaoReprocessar129(){
+    const sec=document.querySelector("#itensBodyV100")?.closest(".lote-step-v100");
+    if(!sec || document.getElementById("btnReprocessarDocsV129")) return;
+    sec.querySelector(".actions-v100")?.insertAdjacentHTML("beforeend", `<button type="button" id="btnReprocessarDocsV129" onclick="reprocessarDocsV129()">Puxar itens e classificação dos documentos</button>`);
+    sec.insertAdjacentHTML("beforeend", `<div class="v129-base-local">Se a tabela não preencher após anexar OF/NE/NF, clique em “Puxar itens e classificação dos documentos”. O valor de entrada continua sendo a NF.</div>`);
+  }
+
+  window.reprocessarDocsV129 = async function(){
+    try{
+      if(document.getElementById("arqOFV100")?.files?.[0]) await lerOFV100();
+      if(document.getElementById("arqNEV100")?.files?.[0]) await lerNEV100();
+      if(document.getElementById("arqNFV100")?.files?.[0]) await lerNFV100();
+      ajustarCategoriaPeloItemAtual129();
+      compararDocs?.();
+    }catch(e){ alert("Erro ao puxar documentos: "+(e.message||e)); }
+  };
+
+  const abrirAnt129=window.abrirCadastro;
+  window.abrirCadastro=function(pat=null){
+    if(typeof abrirAnt129==="function") abrirAnt129(pat);
+    if(!pat){setTimeout(instalarBotaoReprocessar129,120); setTimeout(instalarBotaoReprocessar129,600);}
+  };
+
+  setInterval(()=>{if(document.getElementById("itensBodyV100")) instalarBotaoReprocessar129();}, 1200);
 })();
 
 </script>
@@ -31851,804 +32068,6 @@ function depAcumuladaTotalAteMesAnterior(){
   });
 
   setTimeout(forcePortalSession,20);
-})();
-</script>
-
-
-<script data-patrimonio-v130-ajustes-edicao>
-/* v130: nomenclatura "Início da requisição" e edição completa de todos os campos do bem. */
-</script>
-
-<script data-patrimonio-v134-correcao-edicao-tombo>
-/* v134: alteração de tombo salva pelo ID do bem, migra dados complementares e impede conflito com outro tombo. */
-</script>
-
-<script data-patrimonio-v132-ocr-of>
-(function(){
-  // v132 - OCR automático para PDFs/imagens digitalizados e leitura reforçada da Ordem de Fornecimento.
-  // O OCR só é acionado quando o PDF não possui texto utilizável.
-
-  let pdfLoaderV132 = null;
-  let ocrLoaderV132 = null;
-
-  function textoLimpoV132(v){
-    return String(v || "")
-      .replace(/\u00a0/g, " ")
-      .replace(/[ \t]+/g, " ")
-      .replace(/ *\n */g, "\n")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-  }
-
-  function semAcentoV132(v){
-    return String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-
-  function parseValorV132(v){
-    const s=String(v || "").replace(/R\$/gi, "").replace(/\s/g, "").replace(/[^0-9,.-]/g, "");
-    if(!s) return 0;
-    if(s.includes(",")) return Number(s.replace(/\./g, "").replace(",", ".")) || 0;
-    const pontos=(s.match(/\./g)||[]).length;
-    if(pontos>1) return Number(s.replace(/\./g, "")) || 0;
-    return Number(s) || 0;
-  }
-
-  function fmtV132(n){
-    return Number(n || 0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
-  }
-
-  function isoDataV132(v){
-    const m=String(v || "").match(/(\d{2})\s*[\/.\-_]\s*(\d{2})\s*[\/.\-_]\s*(\d{2,4})/);
-    if(!m) return "";
-    const ano=m[3].length===2 ? "20"+m[3] : m[3];
-    return `${ano}-${m[2]}-${m[1]}`;
-  }
-
-  function formatarCnpjV132(v){
-    const d=String(v || "").replace(/\D/g, "").slice(0,14);
-    if(d.length!==14) return String(v || "").trim();
-    return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
-  }
-
-  function formatarNFV132(v){
-    const d=String(v || "").replace(/\D/g, "");
-    if(!d) return "";
-    const n=d.slice(-9).padStart(9,"0");
-    return n.replace(/^(\d{3})(\d{3})(\d{3})$/, "$1.$2.$3");
-  }
-
-  function setStatusV132(id, texto, aviso=false){
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.textContent=texto;
-    el.classList.toggle("warn", !!aviso);
-  }
-
-  function carregarScriptV132(src, teste){
-    if(teste()) return Promise.resolve(true);
-    return new Promise((resolve,reject)=>{
-      const existente=[...document.scripts].find(s=>s.src===src);
-      if(existente){
-        const timer=setInterval(()=>{if(teste()){clearInterval(timer);resolve(true);}},100);
-        setTimeout(()=>{clearInterval(timer);teste()?resolve(true):reject(new Error("Biblioteca não carregada."));},15000);
-        return;
-      }
-      const s=document.createElement("script");
-      s.src=src;
-      s.async=true;
-      s.onload=()=>resolve(true);
-      s.onerror=()=>reject(new Error("Não foi possível carregar a biblioteca de leitura."));
-      document.head.appendChild(s);
-    });
-  }
-
-  async function garantirPdfV132(){
-    if(window.pdfjsLib) return true;
-    if(!pdfLoaderV132){
-      pdfLoaderV132=carregarScriptV132(
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
-        ()=>!!window.pdfjsLib
-      ).then(()=>{
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-        return true;
-      });
-    }
-    return pdfLoaderV132;
-  }
-
-  async function garantirOcrV132(){
-    if(window.Tesseract) return true;
-    if(!ocrLoaderV132){
-      ocrLoaderV132=carregarScriptV132(
-        "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js",
-        ()=>!!window.Tesseract
-      );
-    }
-    return ocrLoaderV132;
-  }
-
-  function textoPdfUtilV132(texto){
-    const t=semAcentoV132(texto).replace(/[^A-Za-z0-9]/g, "");
-    return t.length>=120;
-  }
-
-  async function extrairTextoPdfV132(file, msgId){
-    await garantirPdfV132();
-    const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
-    const partes=[];
-    for(let p=1;p<=pdf.numPages;p++){
-      const page=await pdf.getPage(p);
-      const tc=await page.getTextContent();
-      let linha="", pagina="";
-      for(const item of tc.items){
-        linha += (linha ? " " : "") + String(item.str || "");
-        if(item.hasEOL){pagina += linha.trim()+"\n";linha="";}
-      }
-      if(linha.trim()) pagina += linha.trim();
-      partes.push(pagina);
-    }
-    const texto=textoLimpoV132(partes.join("\n"));
-    if(textoPdfUtilV132(texto)) return {texto,ocr:false,paginas:pdf.numPages};
-
-    await garantirOcrV132();
-    const ocr=[];
-    const limite=Math.min(pdf.numPages, 6);
-    for(let p=1;p<=limite;p++){
-      setStatusV132(msgId,`Documento digitalizado: aplicando OCR na página ${p}/${limite}...`);
-      const page=await pdf.getPage(p);
-      const viewport=page.getViewport({scale:2.35});
-      const canvas=document.createElement("canvas");
-      canvas.width=Math.ceil(viewport.width);
-      canvas.height=Math.ceil(viewport.height);
-      const ctx=canvas.getContext("2d", {willReadFrequently:true});
-      await page.render({canvasContext:ctx,viewport}).promise;
-      const result=await window.Tesseract.recognize(canvas,"por",{
-        logger:m=>{
-          if(m.status==="recognizing text" && Number.isFinite(m.progress)){
-            setStatusV132(msgId,`OCR página ${p}/${limite}: ${Math.round(m.progress*100)}%`);
-          }
-        }
-      });
-      ocr.push(result?.data?.text || "");
-      canvas.width=1;canvas.height=1;
-    }
-    return {texto:textoLimpoV132(ocr.join("\n")),ocr:true,paginas:limite};
-  }
-
-  async function extrairTextoImagemV132(file,msgId){
-    await garantirOcrV132();
-    setStatusV132(msgId,"Imagem digitalizada: aplicando OCR...");
-    const result=await window.Tesseract.recognize(file,"por",{
-      logger:m=>{
-        if(m.status==="recognizing text" && Number.isFinite(m.progress)){
-          setStatusV132(msgId,`OCR da imagem: ${Math.round(m.progress*100)}%`);
-        }
-      }
-    });
-    return {texto:textoLimpoV132(result?.data?.text || ""),ocr:true,paginas:1};
-  }
-
-  async function extrairDocumentoV132(inputId,msgId){
-    const file=document.getElementById(inputId)?.files?.[0];
-    if(!file) throw new Error("Arquivo não anexado.");
-    const nome=String(file.name || "").toLowerCase();
-    if(file.type==="application/pdf" || nome.endsWith(".pdf")) return extrairTextoPdfV132(file,msgId);
-    if(/^image\//.test(file.type || "") || /\.(png|jpe?g|webp|bmp|tiff?)$/i.test(nome)) return extrairTextoImagemV132(file,msgId);
-    if(/^text\//.test(file.type || "")) return {texto:await file.text(),ocr:false,paginas:1};
-    throw new Error("Formato não suportado. Use PDF, JPG ou PNG.");
-  }
-
-  function parseNFV132(texto){
-    const raw=textoLimpoV132(texto);
-    const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
-    const topo=flat.split(/DESTINAT[ÁA]RIO|REMETENTE/i)[0] || flat.slice(0,2500);
-
-    let m=flat.match(/(?:NF-?e\s*)?(?:N[º°o.]|NÚMERO)\s*[:.-]?\s*([0-9.\s]{5,15})/i) ||
-          flat.match(/(?:FATURA\s*=\s*|Nº\s*)(\d{4,9})\b/i);
-    const numero=m ? formatarNFV132(m[1]) : "";
-
-    m=flat.match(/DATA\s+(?:DA\s+)?EMISS[ÃA]O[\s\S]{0,140}?(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i) ||
-      flat.match(/EMISS[ÃA]O[\s\S]{0,80}?(\d{2}\/\d{2}\/\d{4})/i);
-    const data=m ? isoDataV132(m[1]) : "";
-
-    let total=0;
-    const segTotal=flat.match(/VALOR\s+TOTAL\s+DA\s+NOTA([\s\S]{0,180}?)(?:TRANSPORTADOR|DADOS\s+DOS\s+PRODUTOS|$)/i);
-    if(segTotal){
-      const vals=[...segTotal[1].matchAll(/([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})/g)].map(x=>parseValorV132(x[1])).filter(x=>x>0);
-      if(vals.length) total=vals[vals.length-1];
-    }
-    if(!total){
-      m=flat.match(/VALOR\s+(?:ORIGINAL|L[IÍ]QUIDO)\s*=\s*([0-9.]+[,]\d{2})/i);
-      total=m ? parseValorV132(m[1]) : 0;
-    }
-
-    let fornecedor="";
-    m=topo.match(/([A-ZÀ-Ü0-9][A-ZÀ-Ü0-9 .&'\-/]{3,}?(?:LTDA|EIRELI|S\/A|S\.A\.|ME|EPP))\b/i);
-    if(m) fornecedor=textoLimpoV132(m[1]).replace(/^(?:IDENTIFICAÇÃO DO EMITENTE|EMITENTE)\s*/i,"").replace(/^[A-Z]\s+(?=[A-ZÀ-Ü])/i,"");
-
-    const cnpjs=[...topo.matchAll(/(?:CNPJ\s*[-:]?\s*)?((?:\d{2}[.\s]?\d{3}[.\s]?\d{3}[\/\s]?\d{4}[-\s]?\d{2})|(?:\d{14}))/gi)];
-    const cnpj=cnpjs.length ? formatarCnpjV132(cnpjs[0][1]) : "";
-
-    return {numero,data,total,fornecedor,cnpj,itens:[]};
-  }
-
-  function limparDescricaoOFV132(v){
-    let d=textoLimpoV132(v).replace(/\n/g," ");
-    d=d.replace(/^\s*(?:ITEM\s*)?\d+\s+/i,"");
-    d=d.replace(/^\s*\d{2,}\s+\d{1,}\s+/i,"");
-    d=d.replace(/\s+(?:QTDE|QUANTIDADE|PREÇO|VALOR\s+UNIT[ÁA]RIO|VALOR\s+TOTAL).*$/i,"");
-    d=d.replace(/\s+OBS(?:ERVA[CÇ][ÕO]ES?)?\s*:.*$/i,"");
-    d=d.replace(/\s+MARCA\s*:.*$/i,"");
-    const ateUnidade=d.match(/^([\s\S]*?\bUNIDADE\b)/i);
-    if(ateUnidade) d=ateUnidade[1];
-    return d.replace(/\s+/g," ").replace(/^[-–—:;,.\s]+|[-–—:;,\s]+$/g,"").trim();
-  }
-
-  function moedasLinhaV132(v){
-    return [...String(v || "").matchAll(/\b\d{1,3}(?:\.\d{3})*(?:,\d{2,4})\b/g)].map(m=>({txt:m[0],index:m.index}));
-  }
-
-  function parseBlocoItemOFV132(bloco){
-    let s=textoLimpoV132(bloco).replace(/\n/g," ").replace(/\s+/g," ").trim();
-    if(!s || /TOTAL\s+DA\s+ORDEM|SUBTOTAL|VALOR\s+GLOBAL|VALOR\s+TOTAL\s+GERAL/i.test(s)) return null;
-    const valores=moedasLinhaV132(s);
-    if(valores.length<2) return null;
-    const vuTok=valores[valores.length-2], vtTok=valores[valores.length-1];
-    const valorUnit=parseValorV132(vuTok.txt), valorTotal=parseValorV132(vtTok.txt);
-    if(!(valorUnit>0) || !(valorTotal>0)) return null;
-
-    let prefix=s.slice(0,vuTok.index).trim();
-    let codCat="",codItem="";
-    let cm=prefix.match(/^\s*(\d{2,})\s+(\d{1,})\s+/);
-    if(cm){codCat=cm[1];codItem=cm[2];prefix=prefix.slice(cm[0].length);}
-    else{
-      cm=prefix.match(/^\s*(\d{2,})\s+/);
-      if(cm){codItem=cm[1];prefix=prefix.slice(cm[0].length);}
-    }
-
-    let qtd=0;
-    const qm=prefix.match(/(?:(\bUN(?:D|IDADE)?\b|\bP[CÇ]\b|\bPAR\b)\s*)?(\d+(?:[.,]\d{1,4})?)\s*$/i);
-    if(qm){
-      qtd=parseValorV132(qm[2]);
-      prefix=prefix.slice(0,qm.index).trim();
-      if(qm[1] && /UN/i.test(qm[1])) prefix=(prefix+" UNIDADE").trim();
-    }
-    if(!(qtd>0)){
-      const calculada=valorTotal/valorUnit;
-      if(calculada>=0.5 && calculada<=100000 && Math.abs(calculada-Math.round(calculada))<0.08) qtd=Math.round(calculada);
-    }
-    if(!(qtd>0)) qtd=1;
-
-    const desc=limparDescricaoOFV132(prefix);
-    if(desc.length<4) return null;
-    return {codCat,codItem,codigoItemCatalogo:codItem||codCat,desc,qtd:Math.round(qtd)||1,valorUnit,valorTotal,origem:"OF"};
-  }
-
-  function extrairItensOFV132(raw){
-    const linhas=String(raw || "").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    let inicio=linhas.findIndex(l=>/DESCRI[CÇ][ÃA]O.*(?:QTDE|QUANTIDADE)|(?:QTDE|QUANTIDADE).*DESCRI[CÇ][ÃA]O/i.test(semAcentoV132(l)));
-    if(inicio<0) inicio=linhas.findIndex(l=>/ITEM|C[ÓO]DIGO.*DESCRI[CÇ][ÃA]O/i.test(l));
-    if(inicio<0) inicio=0;
-    const itens=[];
-    let acumulado="";
-    for(let i=inicio+1;i<linhas.length;i++){
-      const l=linhas[i];
-      if(/TOTAL\s+DA\s+ORDEM|ASSINATURA|OBSERVA[CÇ][ÕO]ES|DADOS\s+BANC[ÁA]RIOS/i.test(l)){
-        const ultimo=parseBlocoItemOFV132(acumulado);if(ultimo) itens.push(ultimo);break;
-      }
-      acumulado += (acumulado ? " " : "") + l;
-      if(moedasLinhaV132(acumulado).length>=2){
-        const item=parseBlocoItemOFV132(acumulado);
-        if(item){itens.push(item);acumulado="";}
-      }
-    }
-    if(acumulado){const item=parseBlocoItemOFV132(acumulado);if(item) itens.push(item);}
-
-    if(!itens.length){
-      const flat=textoLimpoV132(raw).replace(/\n/g," ");
-      const re=/(?:^|\s)(\d{2,})\s+(\d{1,})\s+(.{5,}?)\s+(\d+(?:[.,]\d{1,4})?)\s+(\d{1,3}(?:\.\d{3})*,\d{2,4})\s+(\d{1,3}(?:\.\d{3})*,\d{2})(?=\s+\d{2,}\s+\d{1,}|\s+TOTAL\s+DA\s+ORDEM|$)/gi;
-      let m;
-      while((m=re.exec(flat))){
-        const item=parseBlocoItemOFV132(`${m[1]} ${m[2]} ${m[3]} ${m[4]} ${m[5]} ${m[6]}`);
-        if(item) itens.push(item);
-      }
-    }
-
-    const vistos=new Set();
-    return itens.filter(i=>{
-      const k=[i.codigoItemCatalogo,semAcentoV132(i.desc).toLowerCase(),i.qtd,i.valorUnit,i.valorTotal].join("|");
-      if(vistos.has(k)) return false;vistos.add(k);return true;
-    });
-  }
-
-  function parseOFV132(texto){
-    const raw=textoLimpoV132(texto);
-    const flat=raw.replace(/\n/g," ").replace(/\s+/g," ");
-    let m=flat.match(/ORDEM\s+DE\s+FORNECIMENTO(?:\s+N[º°o.]?)?\s*[:.-]?\s*([A-Z0-9./-]{2,25})/i) ||
-          flat.match(/\bOF\s*N[º°o.]?\s*[:.-]?\s*([A-Z0-9./-]{2,25})/i);
-    const numero=m ? m[1].replace(/[;,:]+$/g,"") : "";
-
-    m=flat.match(/FORNECEDOR\s*[:.-]\s*(.+?)\s+(?:CNPJ|CPF)\s*[:.-]?\s*([0-9.\/-]{11,18})/i);
-    let fornecedor=m ? textoLimpoV132(m[1]) : "";
-    let cnpj=m ? formatarCnpjV132(m[2]) : "";
-    if(!cnpj){const c=flat.match(/CNPJ\s*[:.-]?\s*([0-9.\/-]{14,18})/i);if(c) cnpj=formatarCnpjV132(c[1]);}
-    if(!fornecedor){const f=flat.match(/(?:RAZ[ÃA]O\s+SOCIAL|NOME\s+DO\s+FORNECEDOR)\s*[:.-]\s*(.+?)(?=\s+CNPJ|\s+ENDERE[CÇ]O)/i);if(f) fornecedor=textoLimpoV132(f[1]);}
-
-    m=flat.match(/(?:TOTAL\s+DA\s+ORDEM|VALOR\s+(?:TOTAL|GLOBAL)(?:\s+DA\s+OF)?)\s*[:.-]?\s*(?:R\$\s*)?([0-9.]+,\d{2})/i);
-    const total=m ? parseValorV132(m[1]) : 0;
-    m=flat.match(/DATA\s+(?:DE\s+)?EMISS[ÃA]O\s*[:.-]?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i);
-    const data=m ? isoDataV132(m[1]) : "";
-    m=flat.match(/(?:EMPENHO|NOTA\s+DE\s+EMPENHO)(?:\s+N[º°o.]?)?\s*[:.-]?\s*(20\d{2}\s*NE\s*\d+)/i);
-    const empenho=m ? m[1].replace(/\s/g,"").toUpperCase() : "";
-    const itens=extrairItensOFV132(raw);
-    return {numero,fornecedor,cnpj,total,data,empenho,itens};
-  }
-
-  function aplicarItensComCodigosV132(itens){
-    if(typeof window.aplicarItensV100==="function") window.aplicarItensV100(itens);
-    const aplicar=()=>{
-      const rows=[...document.querySelectorAll("#itensBodyV100 tr")];
-      rows.forEach((tr,i)=>{
-        const item=itens[i] || {};
-        const codigo=item.codigoItemCatalogo || item.codItem || item.codCat || "";
-        tr.dataset.codCatalogo=codigo;
-        let inp=tr.querySelector(".itemCodCatalogoV128");
-        if(!inp && tr.children.length){
-          const td=document.createElement("td");
-          td.className="v128-td-codigo";
-          td.innerHTML=`<input class="itemCodCatalogoV128 v128-codigo-input" placeholder="Código do item">`;
-          tr.insertBefore(td,tr.children[1]||null);
-          inp=td.querySelector("input");
-        }
-        if(inp && codigo) inp.value=codigo;
-      });
-      if(typeof window.gerarBensV100==="function") window.gerarBensV100(true);
-      if(typeof window.compararDocs==="function") window.compararDocs();
-    };
-    setTimeout(aplicar,50);
-    setTimeout(aplicar,350);
-  }
-
-  const lerNFAnteriorV132=window.lerNFV100;
-  window.lerNFV100=async function(){
-    try{
-      setStatusV132("msgNFV100","Lendo Nota Fiscal...");
-      const extraido=await extrairDocumentoV132("arqNFV100","msgNFV100");
-      const nf=parseNFV132(extraido.texto);
-      if(nf.numero) document.getElementById("nfNumeroV100").value=nf.numero;
-      if(nf.data) document.getElementById("nfDataV100").value=nf.data;
-      if(nf.total) document.getElementById("nfValorV100").value=fmtV132(nf.total);
-      if(nf.fornecedor) document.getElementById("fornecedorV100").value=nf.fornecedor;
-      if(nf.cnpj) document.getElementById("cnpjV100").value=nf.cnpj;
-      if(nf.itens?.length) aplicarItensComCodigosV132(nf.itens);
-      const modo=extraido.ocr?"OCR aplicado":"texto do PDF";
-      setStatusV132("msgNFV100",`NF preenchida (${modo}): ${nf.numero||"número não identificado"} • ${nf.data||"data não identificada"} • ${nf.total?"R$ "+fmtV132(nf.total):"valor não identificado"}.${!nf.itens?.length?" Os itens continuarão sendo priorizados pela Ordem de Fornecimento.":""}`,!nf.numero||!nf.total);
-      if(typeof window.compararDocs==="function") window.compararDocs();
-    }catch(e){
-      console.error("Leitura OCR NF v132:",e);
-      if(typeof lerNFAnteriorV132==="function"){
-        try{return await lerNFAnteriorV132();}catch(_e){}
-      }
-      setStatusV132("msgNFV100","Não foi possível ler a NF: "+(e.message||e),true);
-      alert("Não foi possível ler a Nota Fiscal. "+(e.message||e));
-    }
-  };
-
-  const lerOFAnteriorV132=window.lerOFV100;
-  window.lerOFV100=async function(){
-    try{
-      setStatusV132("msgOFV100","Lendo Ordem de Fornecimento...");
-      const extraido=await extrairDocumentoV132("arqOFV100","msgOFV100");
-      const of=parseOFV132(extraido.texto);
-      if(of.numero) document.getElementById("ofNumeroV100").value=of.numero;
-      if(of.data) document.getElementById("ofDataV100").value=of.data;
-      if(of.total) document.getElementById("ofValorV100").value=fmtV132(of.total);
-      if(of.fornecedor) document.getElementById("fornecedorV100").value=of.fornecedor;
-      if(of.cnpj) document.getElementById("cnpjV100").value=of.cnpj;
-      if(of.empenho) document.getElementById("ofEmpenhoV100").value=of.empenho;
-      if(of.itens?.length) aplicarItensComCodigosV132(of.itens);
-      const modo=extraido.ocr?"OCR aplicado":"texto do PDF";
-      setStatusV132("msgOFV100",`OF preenchida (${modo}): ${of.numero||"número não identificado"} • ${of.data||"data não identificada"} • ${of.total?"R$ "+fmtV132(of.total):"valor não identificado"} • ${of.itens.length} item(ns) levado(s) para “Itens diferentes da aquisição”.`,!of.itens.length);
-      if(typeof window.compararDocs==="function") window.compararDocs();
-    }catch(e){
-      console.error("Leitura OCR OF v132:",e);
-      if(typeof lerOFAnteriorV132==="function"){
-        try{return await lerOFAnteriorV132();}catch(_e){}
-      }
-      setStatusV132("msgOFV100","Não foi possível ler a OF: "+(e.message||e),true);
-      alert("Não foi possível ler a Ordem de Fornecimento. "+(e.message||e));
-    }
-  };
-
-  window.extrairDocumentoOCRV132=extrairDocumentoV132;
-  window.parseOFV132=parseOFV132;
-  window.parseNFV132=parseNFV132;
-})();
-
-</script>
-
-
-<style>
-/* v133 — Depreciação acumulada de exercícios anteriores e data de início da requisição */
-#depreciacao .dep-v133{table-layout:auto!important;min-width:1600px!important;width:max-content!important}
-#depreciacao .dep-v133 th,#depreciacao .dep-v133 td{padding:8px 7px!important;vertical-align:middle}
-#depreciacao .dep-v133 th:nth-child(1),#depreciacao .dep-v133 td:nth-child(1){min-width:78px}
-#depreciacao .dep-v133 th:nth-child(2),#depreciacao .dep-v133 td:nth-child(2){min-width:260px;max-width:340px;white-space:normal!important}
-#depreciacao .dep-v133 th:nth-child(3),#depreciacao .dep-v133 td:nth-child(3){min-width:104px;white-space:nowrap}
-#depreciacao .dep-v133 th:nth-child(4),#depreciacao .dep-v133 td:nth-child(4),
-#depreciacao .dep-v133 th:nth-child(5),#depreciacao .dep-v133 td:nth-child(5),
-#depreciacao .dep-v133 th:nth-child(7),#depreciacao .dep-v133 td:nth-child(7),
-#depreciacao .dep-v133 th:nth-child(8),#depreciacao .dep-v133 td:nth-child(8){min-width:102px;white-space:nowrap}
-#depreciacao .dep-v133 th:nth-child(6),#depreciacao .dep-v133 td:nth-child(6){min-width:62px;white-space:nowrap}
-#depreciacao .dep-v133 .dep-month{min-width:66px;white-space:nowrap}
-#depreciacao .dep-v133 .num{text-align:right;white-space:nowrap}
-</style>
-<script>
-(function(){
-  const MESES_V133=["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
-
-  function isoV133(v){
-    if(!v || v==='-') return '';
-    const s=String(v).trim();
-    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
-    const m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
-    return m ? `${m[3]}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}` : '';
-  }
-  function dataBRV133(v){
-    const s=isoV133(v); if(!s) return '-';
-    const [a,m,d]=s.split('-'); return `${d}/${m}/${a}`;
-  }
-  function idxV133(ano,mes){return Number(ano)*12+Number(mes)}
-  function refV133(v){
-    const s=isoV133(v); if(!s) return null;
-    const [a,m,d]=s.split('-').map(Number); return {ano:a,mes:m-1,dia:d,iso:s};
-  }
-  function proximoMesV133(v){
-    const r=refV133(v); if(!r) return '';
-    const d=new Date(r.ano,r.mes+1,1);
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
-  }
-  function inicioRequisicaoEfetivoV133(b){
-    const aq=isoV133(b?.aquisicao);
-    let ini=isoV133(b?.inicio);
-    if(!ini && aq) ini=proximoMesV133(aq);
-    if(aq && ini){
-      const ra=refV133(aq),ri=refV133(ini);
-      if(ra&&ri&&ra.ano===ri.ano&&ra.mes===ri.mes&&(ri.dia!==1||aq===ini)) ini=proximoMesV133(aq);
-    }
-    return ini||aq||'';
-  }
-  function taxaV133(b){
-    try{return Number(taxaNumero(b?.taxa)||0)}catch(e){return Number(String(b?.taxa||'0').replace('%','').replace(',','.'))/100||0}
-  }
-  function baseV133(b){return Math.max(0,Number(b?.valor||0)-Number(b?.residual||0))}
-  function mensalBrutoV133(b){return Math.round(baseV133(b)*taxaV133(b)/12*100)/100}
-  function depreciavelV133(b){return b && b.situacao!=='Baixado' && b.depreciavel!==false && b.categoriaSecundaria!=='Obras de arte'}
-  function inicioIdxV133(b){const r=refV133(inicioRequisicaoEfetivoV133(b));return r?idxV133(r.ano,r.mes):null}
-
-  function depAcumExerciciosAnterioresV133(b,ano){
-    if(!depreciavelV133(b)) return 0;
-    const base=baseV133(b),mensal=mensalBrutoV133(b),ini=inicioIdxV133(b);
-    const informado=Math.max(0,Number(b?.depAcum||0));
-    if(!base) return 0;
-    if(ini===null) return Math.min(base,informado);
-    const meses=Math.max(0,idxV133(ano,0)-ini);
-    const calculado=Math.round(mensal*meses*100)/100;
-    // O saldo informado é preservado quando for maior; a data impede que bens antigos fiquem zerados.
-    return Math.min(base,Math.max(informado,calculado));
-  }
-  function parcelasExercicioV133(b,ano,ateMes){
-    const valores=[];
-    const base=baseV133(b),mensal=mensalBrutoV133(b),ini=inicioIdxV133(b);
-    let consumido=depAcumExerciciosAnterioresV133(b,ano);
-    for(let m=0;m<=ateMes;m++){
-      const atual=idxV133(ano,m);
-      let v=0;
-      if(depreciavelV133(b)&&(ini===null||atual>=ini)&&consumido<base){
-        v=Math.min(mensal,Math.max(0,base-consumido));
-        v=Math.round(v*100)/100;
-      }
-      valores.push(v); consumido=Math.round((consumido+v)*100)/100;
-    }
-    return valores;
-  }
-  function existeAteV133(b,mes,ano){
-    const ini=inicioIdxV133(b);
-    return ini===null || idxV133(ano,mes)>=ini;
-  }
-  function setTxtV133(id,val){const el=document.getElementById(id);if(el)el.textContent=val}
-  function setValV133(id,val){const el=document.getElementById(id);if(el)el.value=String(val)}
-  function moedaV133(v){try{return moeda(Number(v||0))}catch(e){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}}
-  function garantirBarraV133(wrap){
-    if(!wrap)return;
-    document.querySelectorAll('#topScrollDep,#depTopScrollV79,#depTopScrollV80,#depreciacao .top-scroll-dep,#depreciacao .dep-top-scroll-v79').forEach(el=>el.remove());
-    let top=document.getElementById('depTopScrollV133');
-    if(!top){
-      top=document.createElement('div');top.id='depTopScrollV133';top.style.cssText='overflow-x:auto;overflow-y:hidden;height:16px;margin:2px 0 10px;';top.innerHTML='<div style="height:1px"></div>';
-      wrap.parentNode.insertBefore(top,wrap);
-      top.addEventListener('scroll',()=>{wrap.scrollLeft=top.scrollLeft});
-      wrap.addEventListener('scroll',()=>{top.scrollLeft=wrap.scrollLeft});
-    }
-    const inner=top.firstElementChild;if(inner)inner.style.width=Math.max(wrap.scrollWidth,wrap.clientWidth)+'px';
-  }
-
-  window.depAcumExerciciosAnterioresV133=depAcumExerciciosAnterioresV133;
-  window.renderDepreciacao=function(){
-    const mes=Number(mesSelecionado),ano=Number(anoSelecionado);
-    setValV133('mesDep',mes);setValV133('anoDep',ano);
-    const todos=typeof deduplicarBens==='function'?deduplicarBens(bens||[]):[...(bens||[])];
-    const base=todos.filter(b=>b.situacao!=='Baixado'&&existeAteV133(b,mes,ano));
-    const dados=base.map(b=>{
-      const meses=parcelasExercicioV133(b,ano,mes);
-      const anterior=depAcumExerciciosAnterioresV133(b,ano);
-      const anoTotal=Math.round(meses.reduce((s,v)=>s+v,0)*100)/100;
-      const atual=Math.max(Number(b.residual||0),Math.round((Number(b.valor||0)-anterior-anoTotal)*100)/100);
-      return {b,meses,anterior,anoTotal,atual};
-    });
-    const totalBase=dados.reduce((s,x)=>s+baseV133(x.b),0);
-    const totalMes=dados.reduce((s,x)=>s+(x.meses[mes]||0),0);
-    const totalAno=dados.reduce((s,x)=>s+x.anoTotal,0);
-    setTxtV133('baseDepTotal',moedaV133(totalBase));setTxtV133('valorDepMesInput',moedaV133(totalMes));setTxtV133('totalAnoDep',moedaV133(totalAno));setTxtV133('qtdItensDep',String(dados.length));
-    setTxtV133('depBaseTotal',moedaV133(totalBase));setTxtV133('depValorMes',moedaV133(totalMes));setTxtV133('depTotalAno',moedaV133(totalAno));setTxtV133('depItensListados',String(dados.length));
-    const status=document.getElementById('statusDep');if(status&&typeof statusCompetenciaAtual==='function')status.value=statusCompetenciaAtual();
-    const wrap=document.querySelector('#depreciacao .table-wrap');if(!wrap)return;
-    const mesesVis=MESES_V133.slice(0,mes+1);
-    const linhas=dados.length?dados.map(({b,meses,anterior,anoTotal,atual})=>`<tr>
-      <td><strong>${b.pat||'-'}</strong></td>
-      <td>${b.desc||'-'}</td>
-      <td>${dataBRV133(b.inicio||inicioRequisicaoEfetivoV133(b))}</td>
-      <td class="num">${moedaV133(Number(b.valor||0))}</td>
-      <td class="num">${moedaV133(Number(b.residual||0))}</td>
-      <td>${b.taxa||'-'}</td>
-      <td class="num"><strong>${moedaV133(anterior)}</strong></td>
-      <td class="num">${moedaV133(baseV133(b))}</td>
-      ${meses.map((v,i)=>`<td class="num dep-month">${idxV133(ano,i)<(inicioIdxV133(b)??-Infinity)?'-':moedaV133(v)}</td>`).join('')}
-      <td class="num"><strong>${moedaV133(anoTotal)}</strong></td>
-      <td class="num"><strong>${moedaV133(atual)}</strong></td>
-    </tr>`).join(''):`<tr><td colspan="${10+mesesVis.length}" class="empty">Nenhum item depreciável na competência selecionada.</td></tr>`;
-    wrap.innerHTML=`<table class="dep-v133"><thead><tr>
-      <th>Nº<br>Patrim.</th><th>Descrição</th><th>Início da<br>requisição</th><th>Valor<br>Aquisição</th><th>Residual</th><th>Taxa</th>
-      <th>Depr. Acum.<br>até 31/12/${ano-1}</th><th>Valor a<br>Depreciar</th>
-      ${mesesVis.map(m=>`<th class="dep-month">${m}</th>`).join('')}<th>Total<br>Ano</th><th>Valor<br>Atualizado</th>
-    </tr></thead><tbody>${linhas}</tbody></table>`;
-    garantirBarraV133(wrap);
-  };
-  const renderTudoAnteriorV133=window.renderTudo;
-  window.renderTudo=function(){renderTudoAnteriorV133();try{window.renderDepreciacao()}catch(e){console.warn('Falha ao renderizar depreciação v133',e)}};
-  window.addEventListener('resize',()=>setTimeout(()=>garantirBarraV133(document.querySelector('#depreciacao .table-wrap')),120));
-})();
-</script>
-
-<script data-patrimonio-v138-exclusao-selecionada>
-(function(){
-  const selecionados = window.__bensSelecionadosV137 || new Set();
-  window.__bensSelecionadosV137 = selecionados;
-
-  function texto(v){ return String(v ?? '').trim(); }
-  function chaveBem(b){ return b?.id ? `id:${b.id}` : `pat:${texto(b?.pat)}`; }
-  function escaparAtributo(v){ return texto(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function todosBens(){ return Array.isArray(window.bens) ? window.bens : (typeof bens !== 'undefined' && Array.isArray(bens) ? bens : []); }
-  function localizarPorPat(pat){ return todosBens().find(b=>texto(b.pat)===texto(pat)); }
-  function clienteSupabaseV138(){
-    try{
-      if(typeof supabaseClient !== 'undefined' && supabaseClient) return supabaseClient;
-    }catch(e){}
-    return window.supabaseClient || null;
-  }
-
-  function rotuloExcluir(qtd){
-    if(!qtd) return 'Excluir bens selecionados';
-    return qtd===1 ? 'Excluir 1 bem selecionado' : `Excluir ${qtd} bens selecionados`;
-  }
-
-  function garantirBotoes(){
-    const filtros = document.querySelector('#bens .filters.bens-filters');
-    if(!filtros) return;
-    document.getElementById('selecaoResumoV137')?.remove();
-
-    let excluir=document.getElementById('btnExcluirSelecionadosV137');
-    if(!excluir){
-      excluir=document.createElement('button');
-      excluir.id='btnExcluirSelecionadosV137';
-      excluir.type='button';
-      excluir.setAttribute('data-edit-action','');
-      excluir.textContent=rotuloExcluir(0);
-      excluir.onclick=()=>{
-        if(typeof podeEditar==='function' && !podeEditar()){
-          if(typeof avisarSemPermissao==='function') avisarSemPermissao();
-          return;
-        }
-        window.excluirBensSelecionadosV138();
-      };
-      filtros.appendChild(excluir);
-    }
-
-    let limpar=document.getElementById('btnLimparSelecaoV137');
-    if(!limpar){
-      limpar=document.createElement('button');
-      limpar.id='btnLimparSelecaoV137';
-      limpar.type='button';
-      limpar.className='secondary';
-      limpar.textContent='Limpar seleção';
-      limpar.onclick=()=>{ selecionados.clear(); atualizarTabelaSelecao(); };
-      filtros.appendChild(limpar);
-    }
-  }
-
-  function atualizarControles(){
-    const qtd=selecionados.size;
-    const btn=document.getElementById('btnExcluirSelecionadosV137');
-    const limpar=document.getElementById('btnLimparSelecaoV137');
-    if(btn){ btn.disabled=!qtd; btn.textContent=rotuloExcluir(qtd); }
-    if(limpar) limpar.disabled=!qtd;
-
-    const checks=[...document.querySelectorAll('#tabelaBens .pat-select-v137')];
-    const master=document.getElementById('selecionarPaginaV137');
-    if(master){
-      const marcados=checks.filter(c=>c.checked).length;
-      master.checked=checks.length>0 && marcados===checks.length;
-      master.indeterminate=marcados>0 && marcados<checks.length;
-    }
-  }
-
-  function adicionarSelecaoNaTabela(){
-    garantirBotoes();
-    const tbody=document.getElementById('tabelaBens');
-    const table=tbody?.closest('table');
-    if(!tbody || !table) return;
-
-    const colgroup=table.querySelector('colgroup');
-    if(colgroup && !colgroup.querySelector('.pat-select-col-v137')){
-      const col=document.createElement('col');
-      col.className='pat-select-col-v137';
-      colgroup.insertBefore(col,colgroup.firstChild);
-    }
-
-    const head=table.querySelector('thead tr');
-    if(head && !head.querySelector('#selecionarPaginaV137')){
-      const th=document.createElement('th');
-      th.className='pat-select-col-v137';
-      th.title='Selecionar todos os bens visíveis nesta página';
-      th.innerHTML='<input id="selecionarPaginaV137" class="pat-select-v137" type="checkbox" aria-label="Selecionar todos desta página">';
-      head.insertBefore(th,head.firstChild);
-      th.querySelector('input').addEventListener('change',e=>{
-        document.querySelectorAll('#tabelaBens .pat-select-v137').forEach(c=>{
-          c.checked=e.target.checked;
-          const key=c.dataset.key;
-          if(e.target.checked) selecionados.add(key); else selecionados.delete(key);
-        });
-        atualizarControles();
-      });
-    }
-
-    [...tbody.querySelectorAll('tr')].forEach(tr=>{
-      if(tr.querySelector('.pat-select-v137')) return;
-      if(tr.querySelector('.empty')){
-        const td=tr.querySelector('td');
-        if(td) td.colSpan=Math.max(Number(td.colSpan||12),13);
-        return;
-      }
-      const pat=tr.querySelector('td:nth-child(2) strong')?.textContent?.trim();
-      const b=localizarPorPat(pat);
-      if(!b) return;
-      const key=chaveBem(b);
-      const td=document.createElement('td');
-      td.className='pat-select-col-v137';
-      td.innerHTML=`<input class="pat-select-v137" type="checkbox" data-key="${escaparAtributo(key)}" aria-label="Selecionar bem ${escaparAtributo(b.pat)}">`;
-      const check=td.querySelector('input');
-      check.checked=selecionados.has(key);
-      check.addEventListener('change',()=>{
-        if(check.checked) selecionados.add(key); else selecionados.delete(key);
-        atualizarControles();
-      });
-      tr.insertBefore(td,tr.firstChild);
-    });
-    atualizarControles();
-  }
-
-  function atualizarTabelaSelecao(){
-    document.querySelectorAll('#tabelaBens .pat-select-v137').forEach(c=>c.checked=selecionados.has(c.dataset.key));
-    atualizarControles();
-  }
-
-  async function apagarEmLotes(client, campo, valores){
-    const removidos=[];
-    for(let i=0;i<valores.length;i+=100){
-      const lote=valores.slice(i,i+100);
-      const {data,error}=await client.from('bens_patrimoniais').delete().in(campo,lote).select('id,numero_patrimonial');
-      if(error) throw error;
-      if(Array.isArray(data)) removidos.push(...data);
-    }
-    return removidos;
-  }
-
-  async function verificarExclusao(client, ids, patsSemId){
-    for(let i=0;i<ids.length;i+=100){
-      const {data,error}=await client.from('bens_patrimoniais').select('id').in('id',ids.slice(i,i+100));
-      if(error) throw error;
-      if(data?.length) throw new Error('Alguns bens continuam no Supabase. Verifique a permissão de exclusão da tabela bens_patrimoniais.');
-    }
-    for(let i=0;i<patsSemId.length;i+=100){
-      const {data,error}=await client.from('bens_patrimoniais').select('numero_patrimonial').in('numero_patrimonial',patsSemId.slice(i,i+100));
-      if(error) throw error;
-      if(data?.length) throw new Error('Alguns tombos continuam no Supabase. Verifique a permissão de exclusão da tabela bens_patrimoniais.');
-    }
-  }
-
-  function limparCaches(pats){
-    try{
-      const cache=JSON.parse(localStorage.getItem('bensExtSGP_v95')||'{}')||{};
-      pats.forEach(p=>delete cache[texto(p)]);
-      localStorage.setItem('bensExtSGP_v95',JSON.stringify(cache));
-      if(typeof window.bensExtCacheV95==='object' && window.bensExtCacheV95){
-        pats.forEach(p=>delete window.bensExtCacheV95[texto(p)]);
-      }
-    }catch(e){ console.warn('Não foi possível limpar o cache complementar dos bens excluídos:',e); }
-  }
-
-  window.excluirBensSelecionadosV138=async function(){
-    const itens=todosBens().filter(b=>selecionados.has(chaveBem(b)));
-    if(!itens.length){ alert('Selecione pelo menos um bem para excluir.'); return; }
-    const palavra=itens.length===1?'bem selecionado':'bens selecionados';
-    const amostra=itens.slice(0,6).map(b=>`${b.pat} • ${b.desc||'Sem descrição'}`).join('\n');
-    const restante=itens.length>6?`\n... e mais ${itens.length-6} bem(ns).`:'';
-    if(!confirm(`Excluir definitivamente ${itens.length} ${palavra}?\n\n${amostra}${restante}\n\nDepois você poderá cadastrá-los novamente.`)) return;
-
-    const btn=document.getElementById('btnExcluirSelecionadosV137');
-    try{
-      if(btn){btn.disabled=true;btn.textContent='Excluindo...';}
-      if(typeof confirmarPermissaoTotal==='function') await confirmarPermissaoTotal();
-      const client=clienteSupabaseV138();
-      if(!client) throw new Error('A conexão com o Supabase ainda não foi iniciada. Atualize a página com Ctrl + F5 e entre novamente.');
-
-      const ids=[...new Set(itens.filter(b=>b.id!==null&&b.id!==undefined&&texto(b.id)).map(b=>b.id))];
-      const patsSemId=[...new Set(itens.filter(b=>b.id===null||b.id===undefined||!texto(b.id)).map(b=>texto(b.pat)).filter(Boolean))];
-      const pats=[...new Set(itens.map(b=>texto(b.pat)).filter(Boolean))];
-
-      await apagarEmLotes(client,'id',ids);
-      await apagarEmLotes(client,'numero_patrimonial',patsSemId);
-      await verificarExclusao(client,ids,patsSemId);
-
-      try{
-        for(let i=0;i<pats.length;i+=100){
-          const {error}=await client.from('bens_patrimoniais_ext').delete().in('numero_patrimonial',pats.slice(i,i+100));
-          if(error) console.warn('Complementos não removidos da base:',error);
-        }
-      }catch(e){ console.warn('Não foi possível limpar os complementos antigos:',e); }
-
-      const chaves=new Set(itens.map(chaveBem));
-      const restantes=todosBens().filter(b=>!chaves.has(chaveBem(b)));
-      try{ bens=restantes; }catch(e){ window.bens=restantes; }
-      window.bens=restantes;
-      limparCaches(pats);
-      selecionados.clear();
-      if(typeof salvarLocal==='function') salvarLocal();
-      if(typeof renderTudo==='function') renderTudo();
-      else if(typeof renderTabela==='function') renderTabela();
-      alert(itens.length===1 ? '1 bem excluído com sucesso.' : `${itens.length} bens excluídos com sucesso.`);
-    }catch(e){
-      console.error(e);
-      alert('Erro ao excluir os bens selecionados: '+(e?.message||JSON.stringify(e)));
-      if(typeof sincronizarDoSupabase==='function'){
-        try{ await sincronizarDoSupabase(false); if(typeof renderTudo==='function') renderTudo(); }catch(syncError){ console.warn(syncError); }
-      }
-    }finally{
-      atualizarControles();
-    }
-  };
-
-  const renderAnterior=window.renderTabela;
-  window.renderTabela=function(){
-    if(typeof renderAnterior==='function') renderAnterior();
-    adicionarSelecaoNaTabela();
-  };
-  try{ renderTabela=window.renderTabela; }catch(e){}
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    garantirBotoes();
-    setTimeout(adicionarSelecaoNaTabela,250);
-  });
-  setTimeout(adicionarSelecaoNaTabela,700);
 })();
 </script>
 </body>

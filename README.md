@@ -1,3 +1,13 @@
+TRANCELIM v196 — Encerramento: Anexo III do FERDT e nova aba Justificativas
+
+- Anexo III do FERDT liberado para gerar PDF, Excel e ZIP a partir dos modelos oficiais enviados.
+- Conta corrente 000569495151-0 tratada em uma única página, sem aplicação financeira.
+- Removida a limitação que informava que o pacote estava configurado somente para o FET.
+- Mantida a dispensa do relatório contábil quando todos os extratos aplicáveis estiverem zerados.
+- Nova aba Justificativas para emissão do Anexo VI em PDF e Word, com UG, competência, demonstrativo, data, local e texto.
+- Histórico de justificativas por UG e competência, com editar, baixar e excluir.
+- Patrimônio, Prestação de Contas, portal e dados existentes preservados.
+
 TRANCELIM v195 — Encerramento: NUP e barra superior corrigidos
 
 # TRANCELIM v193

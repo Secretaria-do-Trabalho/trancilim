@@ -1,0 +1,17 @@
+TRANCELIM v197 — 05/08/2026
+
+ENCERRAMENTO MENSAL v42
+- Corrigido o fechamento do Anexo II para todas as Unidades Gestoras.
+- O salvamento agora é idempotente: atualiza o fechamento da mesma UG/competência sem bloquear em confirmação inconsistente.
+- O histórico do Anexo II reconhece registros antigos por ID, código ou sigla da UG.
+- Após o fechamento, a área de anexar o PDF assinado aparece para SET, FET, FIMPC e FERDT.
+- Incluído seletor global de Unidade Gestora no cabeçalho, antes do ano e mês.
+- Ao escolher a UG global, Anexos I, II e III, Conferência, Justificativas e Processos iniciam nessa UG; cada tela continua permitindo troca manual.
+
+PATRIMÔNIO
+- Atualizado com o pacote enviado UPLOAD_GITHUB_ULTIMA_VERSAO_v129(1).zip.
+- Preservadas a integração com o portal, sessão, perfil, foto, permissões, navegação e favicon.
+- Incluído o script script_supabase_v129_conferencia_base.sql do pacote enviado.
+
+PRESTAÇÃO DE CONTAS
+- Não alterada.
