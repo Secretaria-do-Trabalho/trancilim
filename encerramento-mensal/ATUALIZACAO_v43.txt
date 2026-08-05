@@ -1,0 +1,6 @@
+Encerramento Mensal v43 - Ajustes no Anexo III
+
+- referência do PDF com posição/fonte corrigidas;
+- data do extrato reposicionada;
+- valores zerados sem sobreposição visual;
+- ZIP com compatibilidade melhorada para extração.

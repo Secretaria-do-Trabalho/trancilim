@@ -1,0 +1,9 @@
+TRANCELIM v199 - Ajustes no Encerramento Mensal (Anexo III)
+
+Correções aplicadas:
+- ajustado o PDF do Anexo III para evitar diferença de fonte na referência;
+- reposicionado o campo de referência para não ficar sobre a linha;
+- reposicionado o campo de data do extrato;
+- ampliada a limpeza das células antes de escrever os valores, evitando zeros/pontuações sobrepostos;
+- removida a limitação do ZIP a uma única UG no gerador base;
+- ZIP do Anexo III gerado em modo STORE, com arquivos gravados como binários para melhorar compatibilidade na extração.
