@@ -1,0 +1,8 @@
+TRANCELIM v192 — Ajustes do Encerramento Mensal
+
+- Documento assinado apenas no Anexo II.
+- Removida a área de Anexo I assinado.
+- Data do Anexo II preenchida automaticamente com a data atual local.
+- Correção da quebra de linha e das margens do texto no PDF do Anexo II.
+- Percentual ajustado para contar apenas 1 anexo assinado: o Anexo II.
+- Patrimônio, Prestação de Contas e demais módulos preservados.
