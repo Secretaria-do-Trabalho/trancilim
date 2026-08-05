@@ -1,0 +1,8 @@
+TRANCELIM v209
+
+Patrimônio v136:
+- bens sem item de despesa passaram a ser listados em Pendências;
+- incluídas pendências de nota fiscal, CNPJ, ordem de compra/fornecimento e valor de aquisição;
+- incluído filtro por tipo de pendência;
+- incluído resumo clicável das principais pendências;
+- lista usa a mesma base da competência do relatório Depreciação por Grupo.
