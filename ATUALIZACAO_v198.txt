@@ -1,0 +1,9 @@
+TRANCELIM v198
+
+Atualização realizada em 05/08/2026.
+
+- Sistema de Gestão Patrimonial atualizado para a versão v130 enviada pelo usuário.
+- Leitura reforçada de Ordem de Fornecimento, Nota de Empenho e Nota Fiscal incorporada.
+- Encerramento Mensal v42 preservado integralmente.
+- Prestação de Contas preservada integralmente.
+- Sessão, perfil, foto, permissões e navegação pelo portal preservados.

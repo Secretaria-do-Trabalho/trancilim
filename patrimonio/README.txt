@@ -1,27 +1,21 @@
 Sistema de Gestão Patrimonial - SGP
-Versão: v129 Leitura Paula/Docs
+Versão: v130 Leitura reforçada OF/NE/NF
 
-Base: v128.
+Base: v129.
 
 Correções:
-- A leitura do cadastro por lote foi reforçada para não depender de cache/localStorage de outro computador.
-- Corrigido caso em que no computador da Paula os documentos eram lidos, mas os itens e a classificação não iam para a tabela.
-- OF agora usa leitura por linhas do PDF e tenta puxar:
-  código do item catálogo;
-  descrição;
-  quantidade;
-  preço unitário;
-  valor total;
-  fornecedor;
-  CNPJ;
-  empenho citado.
-- NE agora reforça número, data, valor e classificação contábil.
-- Para ar condicionado/split/BTU, classifica como:
-  Máquinas, aparelhos e equipamentos / Máquinas e equipamentos energéticos.
+- OF preenche a etapa 2: código do item catálogo, descrição, quantidade, preço unitário e valor total.
+- NE preenche a etapa 3: categoria principal e categoria secundária/item de despesa.
+- Reconhece 50 - APARELHOS E EQUIPAMENTOS DE COMUNICAÇÃO (IP 1947).
 - NF continua sendo a base do valor de entrada/incorporação.
-- NE global e OF com valor diferente continuam permitidas com justificativa.
-- Adicionado botão: “Puxar itens e classificação dos documentos”.
-- Mantidos login, layout e demais rotinas.
+- Mantém botão Puxar itens e classificação dos documentos.
+- Login preservado e sem olhinho de senha.
 
-Rode também:
-script_supabase_v129_conferencia_base.sql
+Atualização v130B: corrige OF com descrição quebrada antes/depois do código do item, testada para os 6 itens do PDF enviado.
+
+Integração TRANCELIM v198:
+- sessão e permissões do portal preservadas;
+- perfil e foto por usuário preservados;
+- retorno ao portal e dashboard preservados;
+- favicon unificado;
+- versão funcional do Patrimônio mantida como v130.

@@ -222,3 +222,7 @@ Atualização v188: Encerramento Mensal v32 contabilizado e exclusão selecionad
 ## v194
 - Conferência: coluna curta "Código" adicionada antes do nome dos relatórios.
 - Códigos cadastrados conforme relação enviada pelo usuário.
+
+## Atualização v198 — Patrimônio v130
+
+O módulo `patrimonio/` foi atualizado com a versão v130 fornecida pelo usuário. Os módulos `encerramento-mensal/` e `prestacao-contas/` foram preservados.
