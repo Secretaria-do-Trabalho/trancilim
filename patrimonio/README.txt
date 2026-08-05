@@ -1,7 +1,9 @@
-Sistema de Gestão Patrimonial v133
+Sistema de Gestão Patrimonial v134
 
-- Mantém as funções da v132 para leitura de NF, NE, Ordem de Fornecimento e Ordem de Compra.
-- Inclui janela central de progresso no salvamento em lote.
-- Mostra o item atual e a contagem de itens confirmados no banco.
-- Ao concluir, exibe a quantidade salva e botão OK para voltar ao cadastro.
+- Mantém a leitura de NF, NE, Ordem de Fornecimento e Ordem de Compra.
+- Corrige o erro "find is not a function" no salvamento em lote.
+- Mostra a contagem de itens confirmados no banco de dados.
+- Ao final, oferece os botões "Concluir" e "Voltar ao cadastro".
+- Organiza os campos com CNPJ antes do fornecedor.
+- Sugere CNPJs já usados e preenche automaticamente o fornecedor selecionado.
 - Scripts do Supabase permanecem na pasta do módulo.

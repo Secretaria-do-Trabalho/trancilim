@@ -1,0 +1,9 @@
+TRANCELIM v206
+
+- Patrimônio atualizado para v134.
+- Corrigido erro ao salvar lote: "find is not a function".
+- Progresso passa a contar cada item confirmado no banco.
+- Confirmação final com os botões "Concluir" e "Voltar ao cadastro".
+- CNPJ aparece antes do fornecedor.
+- CNPJ já cadastrado apresenta sugestões e preenche automaticamente o fornecedor selecionado.
+- Encerramento Mensal v47 e Prestação de Contas preservados.

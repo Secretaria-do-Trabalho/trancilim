@@ -19386,8 +19386,8 @@ function depAcumuladaTotalAteMesAnterior(){
           </div>
         </div>
         <div class="grid-v100 two" style="margin-top:12px">
-          <label><span>Fornecedor</span><input id="fornecedorV100"></label>
           <label><span>CNPJ</span><input id="cnpjV100"></label>
+          <label><span>Fornecedor</span><input id="fornecedorV100"></label>
         </div>
         <div id="conferenciaV100" class="status-v100 warn">Aguardando leitura dos documentos.</div>
       </div>
@@ -26067,9 +26067,7 @@ function depAcumuladaTotalAteMesAnterior(){
       await sincronizarDoSupabase(true);
       renderTudo();
 
-      document.getElementById("modalCadastro")?.classList.add("hidden");
       alert(`Lote salvo sem duplicar: ${criados} criado(s), ${atualizados} atualizado(s). Documentos únicos por tipo.`);
-      viewById("bens");
     }catch(e){
       console.error(e);
       alert("Erro ao salvar lote: " + (e.message || e));
@@ -26873,9 +26871,7 @@ function depAcumuladaTotalAteMesAnterior(){
       await carregarExtSupabaseV95();
       renderTudo();
 
-      document.getElementById("modalCadastro")?.classList.add("hidden");
       alert(`Lote salvo sem duplicar: ${criados} criado(s), ${atualizados} atualizado(s). Documentos únicos por tipo.`);
-      viewById("bens");
     }catch(e){
       console.error(e);
       alert("Erro ao salvar lote: " + (e.message || e));
@@ -32509,7 +32505,8 @@ function depAcumuladaTotalAteMesAnterior(){
   const salvarExtAnteriorV131 = window.salvarExtSupabaseV95;
   window.salvarExtSupabaseV95 = async function(ext){
     const pat = String(ext?.numero_patrimonial || '');
-    const b = (window.bens || bens || []).find(x=>String(x.pat)===pat || String(x.numero_patrimonial)===pat);
+    const listaBensV131 = Array.isArray(window.bens) ? window.bens : ((typeof bens !== 'undefined' && Array.isArray(bens)) ? bens : []);
+    const b = listaBensV131.find(x=>String(x.pat)===pat || String(x.numero_patrimonial)===pat);
     const descAtual = document.getElementById('cadDesc')?.value || b?.desc || b?.descricao || '';
     const ajustado = {...(ext || {})};
     ajustado.categoriaSecundaria = categoriaSecundariaCorreta(descAtual, ajustado.categoriaSecundaria);
@@ -32519,7 +32516,7 @@ function depAcumuladaTotalAteMesAnterior(){
 
   const renderTudoAnteriorV131 = window.renderTudo;
   window.renderTudo = function(){
-    try{ (window.bens || bens || []).forEach(corrigirBemV131); }catch(e){}
+    try{ const lista = Array.isArray(window.bens) ? window.bens : ((typeof bens !== 'undefined' && Array.isArray(bens)) ? bens : []); lista.forEach(corrigirBemV131); }catch(e){}
     return typeof renderTudoAnteriorV131 === 'function' ? renderTudoAnteriorV131() : undefined;
   };
   try{ renderTudo = window.renderTudo; }catch(e){}
@@ -32591,6 +32588,6 @@ function depAcumuladaTotalAteMesAnterior(){
   setTimeout(migrarCategoriasV131, 1800);
 })();
 </script>
-<script src="assets/patrimonio_v133_save_progress.js?v=133"></script>
+<script src="assets/patrimonio_v134_save_progress_supplier.js?v=134"></script>
 </body>
 </html>
