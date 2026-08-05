@@ -1,0 +1,9 @@
+TRANCELIM v195
+
+Encerramento Mensal:
+- A primeira coluna de Processos agora é NUP.
+- O NUP pode ser informado e editado no cadastro do processo.
+- A Unidade Gestora permanece em coluna própria.
+- A barra superior da Conferência foi refeita com indicador visível e arrastável.
+
+Demais módulos preservados.

@@ -1,3 +1,12 @@
+TRANCELIM - Sistema de Encerramento Mensal v40
+
+Ajustes da v40:
+- A primeira coluna do Controle de Processos foi corrigida para NUP.
+- O NUP agora possui campo próprio no cadastro e pode ser editado.
+- A Unidade Gestora permanece em coluna separada.
+- A pesquisa de processos também localiza pelo NUP.
+- A barra de rolagem superior da Conferência foi refeita e fica visível, com controle arrastável.
+
 TRANCELIM - Sistema de Encerramento Mensal v36
 
 Ajustes da v36:

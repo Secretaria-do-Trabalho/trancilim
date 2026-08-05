@@ -1,3 +1,5 @@
+TRANCELIM v195 — Encerramento: NUP e barra superior corrigidos
+
 # TRANCELIM v193
 
 - Encerramento Mensal atualizado para a v38.
