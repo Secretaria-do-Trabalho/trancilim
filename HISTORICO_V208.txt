@@ -1,0 +1,10 @@
+TRANCELIM v208
+
+Patrimônio v135:
+- corrigida a navegação acidental ao rolar a aba Pendências Patrimoniais;
+- restauradas seleção individual, seleção da página e exclusão em lote;
+- incluída coluna Data de cadastro;
+- incluída ordenação por mais recentes, mais antigos e número patrimonial;
+- a lista inicia pelos itens mais recentes para facilitar a conferência dos últimos cadastros;
+- mantida paginação de 25, 50 e 100 itens e total geral visível;
+- removido novamente o botão Atualizar Banco da faixa do Cadastro de Bens.

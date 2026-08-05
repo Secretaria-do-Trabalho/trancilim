@@ -227,7 +227,17 @@ window.editJustification=function(id){const x=justificationList().find(v=>v.id==
 function justificationData(requireText=true){const ug=selectedUg(),r=state.responsibles.find(x=>x.ugId===ug?.id),text=document.getElementById('just-text').value.trim();if(!r){toast('Cadastre a pessoa responsável dentro da UG.');return null}if(requireText&&!text){toast('Preencha o texto da justificativa.');return null}return{id:document.getElementById('just-edit-id').value||'',item:document.getElementById('just-document').value,reference:formatRef(confRef()),ug,person:r,text,location:document.getElementById('just-location').value.trim()||'Fortaleza-CE',date:document.getElementById('just-date').value,dateLong:dateLongPt(document.getElementById('just-date').value)}}
 function saveJustificationData(d){const list=justificationList(),id=d.id||uid('just'),record={id,item:d.item,reference:d.reference,text:d.text,location:d.location,date:d.date,dateLong:d.dateLong,ugId:d.ug.id,updatedAt:new Date().toISOString(),createdAt:list.find(x=>x.id===id)?.createdAt||new Date().toISOString()},idx=list.findIndex(x=>x.id===id);if(idx>=0)list[idx]=record;else list.push(record);document.getElementById('just-edit-id').value=id;persist();renderConference();return record}
 function justificationFilename(ext){return `Anexo VI - Termo de Justificativa para as Inconformidades.${ext}`}
-function dataFromRecord(x){const ug=state.ugs.find(u=>u.id===x.ugId)||selectedUg(),person=state.responsibles.find(r=>r.ugId===ug?.id);if(!ug||!person)return null;return{id:x.id,item:x.item,reference:x.reference,ug,person,text:x.text,location:x.location,date:x.date,dateLong:x.dateLong||dateLongPt(x.date)}}
+function normalizeJustificationItem(value){
+ const raw=String(value??'').trim();
+ if(JUSTIFICATION_ITEMS.some(([k])=>k===raw))return raw;
+ const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[–—]/g,'-').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
+ const target=norm(raw);
+ const exact=JUSTIFICATION_ITEMS.find(([,label])=>norm(label)===target);
+ if(exact)return exact[0];
+ const partial=JUSTIFICATION_ITEMS.find(([,label])=>{const n=norm(label);return target&&((target.length>8&&n.includes(target))||(n.length>8&&target.includes(n)))});
+ return partial?partial[0]:raw;
+}
+function dataFromRecord(x){const ug=state.ugs.find(u=>u.id===x.ugId)||selectedUg(),person=state.responsibles.find(r=>r.ugId===ug?.id);if(!ug||!person)return null;return{id:x.id,item:normalizeJustificationItem(x.item),reference:x.reference,ug,person,text:x.text,location:x.location,date:x.date,dateLong:x.dateLong||dateLongPt(x.date)}}
 async function buildJustificationWordBytes(d){
  const zip=await JSZip.loadAsync(window.TRANCILIM_JUSTIFICATION_TEMPLATE,{base64:true});
  let xml=await zip.file('word/document.xml').async('string');
@@ -244,11 +254,13 @@ async function buildJustificationWordBytes(d){
   '{{DATE_LONG}}':d.dateLong,
   '{{SIGNATURE_ROLE}}':d.person.signatureRole
  };
+ const selectedItem=normalizeJustificationItem(d.item);
  for(const [k,labelRaw] of JUSTIFICATION_ITEMS){
   const label=String(labelRaw).replace(' - ',' – ').replace(/DEA's/g,'DEA’s');
-  vals['{{MARK_'+k+'}}']=k===d.item?'X':'';
-  vals['{{NORMAL_'+k+'}}']=k===d.item?'':label;
-  vals['{{SELECTED_'+k+'}}']=k===d.item?label:'';
+  const selected=k===selectedItem;
+  vals['{{MARK_'+k+'}}']=selected?'X':'';
+  vals['{{NORMAL_'+k+'}}']=selected?'':label;
+  vals['{{SELECTED_'+k+'}}']=selected?label:'';
  }
  for(const [k,v] of Object.entries(vals))xml=xml.split(k).join(wordXml(v));
  zip.file('word/document.xml',xml);
@@ -259,28 +271,40 @@ function makePdf(objects,catalog,pagesObj){const parts=[new TextEncoder().encode
 function buildJustificationPdfBytes(d){
  const W=595.28,H=841.89,img=b64ToBytes(TRANCILIM_ASSETS.logoJpeg),objects=[null],add=o=>(objects.push(o),objects.length-1),catalog=add(''),pagesObj=add(''),fontR=add('<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman /Encoding /WinAnsiEncoding >>'),fontB=add('<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold /Encoding /WinAnsiEncoding >>'),imgObj=add({dict:`<< /Type /XObject /Subtype /Image /Width ${TRANCILIM_ASSETS.logoWidth} /Height ${TRANCILIM_ASSETS.logoHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.length} >>`,data:img});
  let c='0 G 0 g\n';
- const text=(v,x,y,size,bold=false,align='left')=>{v=String(v??'');const w=pdfTextWidth(v,size,bold);if(align==='center')x-=w/2;else if(align==='right')x-=w;c+=`BT /${bold?'FB':'FR'} ${Number(size).toFixed(2)} Tf 1 0 0 1 ${Number(x).toFixed(2)} ${Number(y).toFixed(2)} Tm (${pdfStr(v)}) Tj ET\n`};
- const richWords=runs=>{const out=[];for(const r of runs){const chunks=String(r.text??'').trim().split(/\s+/).filter(Boolean);for(const w of chunks)out.push({w,b:!!r.bold})}return out};
- const wrapMixed=(words,max,size)=>{const lines=[];let line=[],width=0;const sw=pdfTextWidth(' ',size,false);for(const it of words){const ww=pdfTextWidth(it.w,size,it.b);if(line.length&&width+sw+ww>max){lines.push(line);line=[];width=0}if(line.length)width+=sw;line.push(it);width+=ww}if(line.length)lines.push(line);return lines};
- const drawMixed=(runs,x,y,max,size,lh,justify=true)=>{const lines=wrapMixed(richWords(runs),max,size),sw=pdfTextWidth(' ',size,false);lines.forEach((line,i)=>{const wordsWidth=line.reduce((a,it)=>a+pdfTextWidth(it.w,size,it.b),0),last=i===lines.length-1,gap=line.length>1&&justify&&!last?(max-wordsWidth)/(line.length-1):sw;let px=x;line.forEach((it,j)=>{text(it.w,px,y-i*lh,size,it.b);px+=pdfTextWidth(it.w,size,it.b)+(j<line.length-1?gap:0)})});return lines.length};
- const wrapPlain=(value,max,size)=>{const paras=String(value??'').split(/\r?\n/),all=[];for(let pi=0;pi<paras.length;pi++){const words=paras[pi].trim().split(/\s+/).filter(Boolean),lines=[];let line=[],width=0,sw=pdfTextWidth(' ',size,false);for(const w of words){const ww=pdfTextWidth(w,size,false);if(line.length&&width+sw+ww>max){lines.push(line);line=[];width=0}if(line.length)width+=sw;line.push(w);width+=ww}if(line.length)lines.push(line);if(!lines.length)lines.push([]);all.push(...lines.map((words,i)=>({words,last:i===lines.length-1})));if(pi<paras.length-1)all.push({words:[],last:true})}return all};
- const drawPlain=(value,x,y,max,size,lh,justify=true)=>{const lines=wrapPlain(value,max,size),sw=pdfTextWidth(' ',size,false);lines.forEach((ln,i)=>{const wordsWidth=ln.words.reduce((a,w)=>a+pdfTextWidth(w,size,false),0),gap=ln.words.length>1&&justify&&!ln.last?(max-wordsWidth)/(ln.words.length-1):sw;let px=x;ln.words.forEach((w,j)=>{text(w,px,y-i*lh,size,false);px+=pdfTextWidth(w,size,false)+(j<ln.words.length-1?gap:0)})});return lines.length};
+ // pdfTextWidth converte px para pontos. O fator abaixo recompõe a largura real usada pelo Times no PDF.
+ const measure=(v,size,bold=false)=>pdfTextWidth(String(v??''),size,bold)*(4/3);
+ const text=(v,x,y,size,bold=false,align='left')=>{v=String(v??'');const w=measure(v,size,bold);if(align==='center')x-=w/2;else if(align==='right')x-=w;c+=`BT /${bold?'FB':'FR'} ${Number(size).toFixed(2)} Tf 1 0 0 1 ${Number(x).toFixed(2)} ${Number(y).toFixed(2)} Tm (${pdfStr(v)}) Tj ET\n`};
+ const wrapWords=(value,max,size,bold=false)=>{const words=String(value??'').trim().split(/\s+/).filter(Boolean),lines=[];let line='';for(const word of words){const candidate=line?line+' '+word:word;if(line&&measure(candidate,size,bold)>max){lines.push(line);line=word}else line=candidate}if(line)lines.push(line);return lines.length?lines:['']};
+ const wrapParagraphs=(value,max,size)=>{const out=[];const paragraphs=String(value??'').split(/\r?\n/);paragraphs.forEach((para,pi)=>{const lines=wrapWords(para,max,size,false);lines.forEach((line,i)=>out.push({line,last:i===lines.length-1}));if(pi<paragraphs.length-1)out.push({line:'',last:true})});return out};
+ const drawParagraph=(value,x,y,max,size,lh)=>{const lines=wrapParagraphs(value,max,size);lines.forEach((ln,i)=>text(ln.line,x,y-i*lh,size,false));return lines.length};
+ const wrapRuns=(runs,max,size)=>{const tokens=[];for(const run of runs){const words=String(run.text??'').trim().split(/\s+/).filter(Boolean);for(const word of words)tokens.push({word,bold:!!run.bold})}const lines=[];let current=[],width=0;const space=measure(' ',size,false);for(const token of tokens){const ww=measure(token.word,size,token.bold);if(current.length&&width+space+ww>max){lines.push(current);current=[];width=0}if(current.length)width+=space;current.push(token);width+=ww}if(current.length)lines.push(current);return lines};
+ const drawRuns=(runs,x,y,max,size,lh)=>{const lines=wrapRuns(runs,max,size),space=measure(' ',size,false);lines.forEach((line,i)=>{let px=x;line.forEach((token,j)=>{text(token.word,px,y-i*lh,size,token.bold);px+=measure(token.word,size,token.bold)+(j<line.length-1?space:0)})});return lines.length};
+ const selectedItem=normalizeJustificationItem(d.item);
  c+=`q 102 0 0 63 ${((W-102)/2).toFixed(2)} 754 cm /Im1 Do Q\n`;
  text('Anexo VI da IN nº 47/2025',W/2,731,12,true,'center');
  text('Termo de Justificativa para as Inconformidades',W/2,704,11,false,'center');
  text('Referência: '+d.reference,W/2,688,11,false,'center');
- let y=682,x=85.15,rowH=12.4,w0=17.55,w1=407.65;c+='0.65 w\n';
- for(const [key,labelRaw] of JUSTIFICATION_ITEMS){const label=String(labelRaw).replace(' - ',' – ').replace(/DEA's/g,'DEA’s'),selected=key===d.item;c+=`${x.toFixed(2)} ${(y-rowH).toFixed(2)} ${w0.toFixed(2)} ${rowH.toFixed(2)} re S\n${(x+w0).toFixed(2)} ${(y-rowH).toFixed(2)} ${w1.toFixed(2)} ${rowH.toFixed(2)} re S\n`;if(selected)text('X',x+w0/2,y-9.1,8,true,'center');text(label,x+w0+3.6,y-9.1,8.2,selected);y-=rowH}
+ let y=682,x=64,rowH=12.4,w0=18,w1=449;c+='0.65 w\n';
+ for(const [key,labelRaw] of JUSTIFICATION_ITEMS){
+  const label=String(labelRaw).replace(' - ',' – ').replace(/DEA's/g,'DEA’s'),selected=key===selectedItem;
+  c+=`${x.toFixed(2)} ${(y-rowH).toFixed(2)} ${w0.toFixed(2)} ${rowH.toFixed(2)} re S\n${(x+w0).toFixed(2)} ${(y-rowH).toFixed(2)} ${w1.toFixed(2)} ${rowH.toFixed(2)} re S\n`;
+  if(selected)text('X',x+w0/2,y-9.1,8.2,true,'center');
+  text(label,x+w0+3.5,y-9.1,8.15,selected);
+  y-=rowH;
+ }
  text('Obs.: Marcar com “X” uma única opção em cada termo de justificativa.',x,y-10.5,8.5);
  const personRuns=[{text:'Eu,'},{text:d.person.name+',',bold:true},{text:d.person.role+','},{text:d.person.registration+',',bold:true},{text:'CPF'},{text:d.person.cpf+',',bold:true},{text:'lotado(a) na UG'},{text:d.ug.code+' – '+d.ug.name+',',bold:true},{text:'apresento para os devidos fins a(s) justificativa(s) para a(s) inconformidade(s) constatada(s) no documento marcado acima.'}];
- const personY=y-31,personLines=drawMixed(personRuns,x,personY,425.2,10,11.55,true);
- let justFont=9.4,justLh=10.35,justLines=wrapPlain(d.text,417.2,justFont);while(justLines.length>11&&justFont>7.4){justFont-=.25;justLh=justFont+1;justLines=wrapPlain(d.text,417.2,justFont)}
- const boxTop=personY-personLines*11.55-7,boxH=Math.max(65,justLines.length*justLh+20);
- c+=`${x.toFixed(2)} ${(boxTop-boxH).toFixed(2)} 425.20 ${boxH.toFixed(2)} re S\n`;
- text('Justificativa(s) para a(s) Inconformidade(s) Constatada(s):',W/2,boxTop-10.2,8.5,false,'center');
- drawPlain(d.text,x+4,boxTop-23,417.2,justFont,justLh,true);
- const dateY=boxTop-boxH-14;text(`${d.location}, ${d.dateLong}.`,x,dateY,10);
- text(d.person.name,W/2,dateY-28,10.5,true,'center');text(d.person.signatureRole,W/2,dateY-42,10.5,true,'center');
+ const personY=y-30,personLines=drawRuns(personRuns,x,personY,467,9.4,11.2);
+ let justFont=9.2,justLh=10.8,justLines=wrapParagraphs(d.text,459,justFont);
+ while(justLines.length>10&&justFont>7.8){justFont-=.2;justLh=justFont+1.4;justLines=wrapParagraphs(d.text,459,justFont)}
+ const boxTop=personY-personLines*11.2-8,boxH=Math.max(66,justLines.length*justLh+21);
+ c+=`${x.toFixed(2)} ${(boxTop-boxH).toFixed(2)} 467.00 ${boxH.toFixed(2)} re S\n`;
+ text('Justificativa(s) para a(s) Inconformidade(s) Constatada(s):',W/2,boxTop-10.5,8.5,false,'center');
+ drawParagraph(d.text,x+5,boxTop-23,457,justFont,justLh);
+ const dateY=boxTop-boxH-14;
+ text(`${d.location}, ${d.dateLong}.`,x,dateY,9.8);
+ text(d.person.name,W/2,dateY-29,10.5,true,'center');
+ text(d.person.signatureRole,W/2,dateY-43,10.5,true,'center');
  const contentBytes=new Uint8Array(cp1252(c)),content=add({dict:`<< /Length ${contentBytes.length} >>`,data:contentBytes}),page=add(`<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /FR ${fontR} 0 R /FB ${fontB} 0 R >> /XObject << /Im1 ${imgObj} 0 R >> >> /Contents ${content} 0 R >>`);objects[catalog]=`<< /Type /Catalog /Pages ${pagesObj} 0 R >>`;objects[pagesObj]=`<< /Type /Pages /Count 1 /Kids [${page} 0 R] >>`;return makePdf(objects,catalog,pagesObj)
 }
 

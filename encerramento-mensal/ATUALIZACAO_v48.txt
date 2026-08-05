@@ -1,0 +1,5 @@
+Encerramento Mensal v48 - Anexo VI
+
+- Word: X e negrito no demonstrativo selecionado;
+- PDF: texto sem sobreposição e distribuição corrigida;
+- compatibilidade com justificativas antigas que armazenaram o nome do demonstrativo em vez da chave interna.
