@@ -16537,6 +16537,8 @@ function depAcumuladaTotalAteMesAnterior(){
     "Máquinas, aparelhos e equipamentos": [
       "Aparelhos e equipamentos de comunicação",
       "Aparelhos e equipamentos de informática",
+      "Aparelhos e utensílios domésticos",
+      "Máquinas, utensílios e equipamentos diversos",
       "Máquinas e equipamentos energéticos",
       "Máquinas, ferramentas e utensílios de oficina",
       "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
@@ -17819,6 +17821,8 @@ function depAcumuladaTotalAteMesAnterior(){
     "Máquinas, aparelhos e equipamentos": [
       "Aparelhos e equipamentos de comunicação",
       "Aparelhos e equipamentos de informática",
+      "Aparelhos e utensílios domésticos",
+      "Máquinas, utensílios e equipamentos diversos",
       "Máquinas e equipamentos energéticos",
       "Máquinas, ferramentas e utensílios de oficina",
       "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
@@ -18342,6 +18346,8 @@ function depAcumuladaTotalAteMesAnterior(){
     "Máquinas, aparelhos e equipamentos": [
       "Aparelhos e equipamentos de comunicação",
       "Aparelhos e equipamentos de informática",
+      "Aparelhos e utensílios domésticos",
+      "Máquinas, utensílios e equipamentos diversos",
       "Máquinas e equipamentos energéticos",
       "Máquinas, ferramentas e utensílios de oficina",
       "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
@@ -18955,6 +18961,8 @@ function depAcumuladaTotalAteMesAnterior(){
     "Máquinas, aparelhos e equipamentos": [
       "Aparelhos e equipamentos de comunicação",
       "Aparelhos e equipamentos de informática",
+      "Aparelhos e utensílios domésticos",
+      "Máquinas, utensílios e equipamentos diversos",
       "Máquinas e equipamentos energéticos",
       "Máquinas, ferramentas e utensílios de oficina",
       "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
@@ -22131,6 +22139,8 @@ function depAcumuladaTotalAteMesAnterior(){
     "Máquinas, aparelhos e equipamentos": [
       "Aparelhos e equipamentos de comunicação",
       "Aparelhos e equipamentos de informática",
+      "Aparelhos e utensílios domésticos",
+      "Máquinas, utensílios e equipamentos diversos",
       "Máquinas e equipamentos energéticos",
       "Máquinas, ferramentas e utensílios de oficina",
       "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
@@ -27525,6 +27535,7 @@ function depAcumuladaTotalAteMesAnterior(){
       const salvo = await salvarBemSupabase(item);
       item.id = salvo.id;
 
+      // Os dados contábeis essenciais são confirmados antes de liberar a tela.
       await salvarExtSupabaseV95({
         numero_patrimonial: item.pat,
         notaEmpenho: ne,
@@ -27535,7 +27546,8 @@ function depAcumuladaTotalAteMesAnterior(){
         cnpj
       });
 
-      const uploads = [
+      // Captura os arquivos agora, mas faz o envio depois, sem manter a tela presa em “Salvando...”.
+      const uploadsConfig = [
         ["manualFotoV122","foto_principal","fotos-bens"],
         ["manualFotoEtiquetaV122","foto_etiqueta","etiquetas-patrimoniais"],
         ["manualNFDocV122","nota_fiscal","documentos-siafe"],
@@ -27543,21 +27555,47 @@ function depAcumuladaTotalAteMesAnterior(){
         ["manualOFDocV122","ordem_fornecimento","documentos-siafe"],
         ["manualTermoV122","termo_responsabilidade","documentos-siafe"]
       ];
+      const uploadsPendentes = uploadsConfig.map(([id,tipo,bucket])=>({
+        tipo,
+        bucket,
+        file: document.getElementById(id)?.files?.[0] || null
+      })).filter(x=>x.file);
 
-      for(const [id,tipo,bucket] of uploads){
-        const arq = await arquivoBase64V122(id);
-        if(arq) await salvarAnexoBemSupabase(item.id, tipo, bucket, arq);
-      }
-
-      await colapsarAnexosDuplicados122();
-      await sincronizarDoSupabase(true);
-      await carregarExtSupabaseV95();
+      // O bem já está confirmado no Supabase: atualiza a lista local e libera imediatamente a Paula.
+      const itemLocal = {...(existente || {}), ...item, id: salvo.id};
+      upsertBemLocal(itemLocal);
+      salvarLocal();
       renderTudo();
-
-      alert("Item salvo/atualizado sem duplicar.");
       document.getElementById("modalCadastro")?.classList.add("hidden");
       editandoPatrimonio = null;
       viewById("bens");
+      if(btn){ btn.disabled = false; btn.textContent = "Salvar item"; }
+      alert("Item salvo no banco com sucesso. Os documentos, quando houver, continuarão sendo enviados sem travar a tela.");
+
+      // Anexos, limpeza e recarga completa passam a ocorrer em segundo plano.
+      Promise.resolve().then(async()=>{
+        try{
+          if(uploadsPendentes.length && typeof setStatusBanco === "function") setStatusBanco("Banco: enviando documentos...", "ok");
+          for(const up of uploadsPendentes){
+            const arq = await new Promise((resolve,reject)=>{
+              const r = new FileReader();
+              r.onload = ()=>resolve({nome:up.file.name,tipo:up.file.type,tamanho:up.file.size,dados:r.result});
+              r.onerror = reject;
+              r.readAsDataURL(up.file);
+            });
+            await salvarAnexoBemSupabase(item.id, up.tipo, up.bucket, arq);
+          }
+          if(uploadsPendentes.length) await colapsarAnexosDuplicados122();
+          await sincronizarDoSupabase(true);
+          await carregarExtSupabaseV95();
+          renderTudo();
+          if(typeof setStatusBanco === "function") setStatusBanco("Banco: conectado", "ok");
+        }catch(bgError){
+          console.error("O bem foi salvo, mas houve falha na finalização em segundo plano:", bgError);
+          if(typeof setStatusBanco === "function") setStatusBanco("Bem salvo; documento pendente", "off");
+          alert("O item foi salvo no banco, mas algum documento ou atualização da tela não terminou. Atualize a página e confira os anexos.");
+        }
+      });
     }catch(e){
       console.error(e);
       alert("Erro ao salvar item: " + (e.message || e));
@@ -28363,14 +28401,27 @@ function depAcumuladaTotalAteMesAnterior(){
         cnpj
       });
 
-      await sincronizarDoSupabase(true);
-      await carregarExtSupabaseV95();
+      const itemLocal = {...(existente || {}), ...item, id: salvo.id};
+      upsertBemLocal(itemLocal);
+      salvarLocal();
       renderTudo();
-
-      alert("Item manual salvo/atualizado sem duplicar.");
       document.getElementById("modalCadastro")?.classList.add("hidden");
       editandoPatrimonio = null;
       viewById("bens");
+      if(btn){ btn.disabled = false; btn.textContent = "Salvar item"; }
+      alert("Item manual salvo no banco com sucesso.");
+
+      // A recarga integral da base ocorre depois, sem prender o botão da Paula.
+      Promise.resolve().then(async()=>{
+        try{
+          await sincronizarDoSupabase(true);
+          await carregarExtSupabaseV95();
+          renderTudo();
+          if(typeof setStatusBanco === "function") setStatusBanco("Banco: conectado", "ok");
+        }catch(bgError){
+          console.warn("O item foi salvo, mas a recarga automática demorou ou falhou:", bgError);
+        }
+      });
     }catch(e){
       console.error(e);
       alert("Erro ao salvar item manual: " + (e.message || e));
@@ -31509,6 +31560,8 @@ function depAcumuladaTotalAteMesAnterior(){
     "Máquinas, aparelhos e equipamentos": [
       "Aparelhos e equipamentos de comunicação",
       "Aparelhos e equipamentos de informática",
+      "Aparelhos e utensílios domésticos",
+      "Máquinas, utensílios e equipamentos diversos",
       "Máquinas e equipamentos energéticos",
       "Máquinas, ferramentas e utensílios de oficina",
       "Aparelhos, equipamentos e utensílios médicos, odontológicos, laboratoriais e hospitalares",
@@ -31592,7 +31645,8 @@ function depAcumuladaTotalAteMesAnterior(){
   function inferirCategoria129(txt){
     const s=upper129(txt);
     if(/MOBILIARIO|SOFA|CADEIRA|MESA|ARMARIO|GAVETEIRO|ESTANTE|LONGARINA|POLTRONA|BALCAO/.test(s)) return ["Móveis e utensílios","Mobiliário em geral"];
-    if(/AR CONDICIONADO|CONDICIONADOR|SPLIT|BTU|INVERTER|REFRIGERADOR|BEBEDOURO|FREEZER|VENTILADOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Máquinas e equipamentos energéticos"];
+    if(/AR CONDICIONADO|CONDICIONADOR|SPLIT|BTU|INVERTER|BEBEDOURO|VENTILADOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Máquinas, utensílios e equipamentos diversos"];
+    if(/REFRIGERADOR|GELADEIRA|FREEZER|FRIGOBAR|MICRO-ONDAS|CAFETEIRA/.test(s)) return ["Máquinas, aparelhos e equipamentos","Aparelhos e utensílios domésticos"];
     if(/INFORMATICA|COMPUTADOR|NOTEBOOK|MONITOR|IMPRESSORA|SCANNER|TABLET|NOBREAK|SERVIDOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Aparelhos e equipamentos de informática"];
     if(/TELEFONE|COMUNICACAO|COMUNICAÇÃO|RADIO|RÁDIO|ROTEADOR|SWITCH|MODEM|CENTRAL TELEFONICA/.test(s)) return ["Máquinas, aparelhos e equipamentos","Aparelhos e equipamentos de comunicação"];
     if(/SEGURANCA|SEGURANÇA|CAMERA|CÂMERA|ALARME|EXTINTOR/.test(s)) return ["Máquinas, aparelhos e equipamentos","Equipamentos de proteção, segurança e socorro"];
@@ -31883,7 +31937,8 @@ function depAcumuladaTotalAteMesAnterior(){
   async function carregarPdf130(){if(window.pdfjsLib)return true; await new Promise((res,rej)=>{let s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s);}); if(window.pdfjsLib)window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; return !!window.pdfjsLib;}
   async function textoArquivo130(id){const f=document.getElementById(id)?.files?.[0]; if(!f)throw new Error('Selecione o arquivo primeiro.'); const nome=f.name||''; if(f.type==='application/pdf'||nome.toLowerCase().endsWith('.pdf')){await carregarPdf130(); const pdf=await window.pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise; const pages=[]; for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p); const tc=await page.getTextContent(); const arr=tc.items.map(it=>({str:String(it.str||'').trim(),x:it.transform?.[4]||0,y:it.transform?.[5]||0})).filter(i=>i.str); const linhas=[]; for(const it of arr.sort((a,b)=>Math.abs(b.y-a.y)>3?b.y-a.y:a.x-b.x)){let ln=linhas.find(l=>Math.abs(l.y-it.y)<3.5); if(!ln){ln={y:it.y,itens:[]};linhas.push(ln)} ln.itens.push(it)} const byLine=linhas.sort((a,b)=>b.y-a.y).map(l=>l.itens.sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ')).join('\n'); pages.push(byLine+'\n'+arr.map(i=>i.str).join(' '));} return limpa130(pages.join('\n'));} if(/^text\//.test(f.type||''))return limpa130(await f.text()); return nome.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');}
   function trimDesc130(d){d=limpa130(d).replace(/\s*OBS\s*:\s*null\.?/ig,'').replace(/\s*MARCA\s*:.*/i,'').replace(/\s*\(A\)\s*/g,' ').replace(/\s{2,}/g,' ').trim(); const m=d.match(/^(.+?\b(?:UNIDADE|UNIDADES|UND|UNID)\b)/i); if(m)d=m[1]; return d.replace(/\s+(?:NCM|NCMSH|CST|CFOP|UN|QTD|LR\.?|UNIT|TOTAL).*/i,'').trim();}
-  function inferirCat130(txt){const s=upper130(txt); if(/\b50\s*-\s*APARELHOS\s+E\s+EQUIPAMENTOS\s+DE\s+COMUNICACAO/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de comunicação']; if(/\b42\s*-\s*MOBILIARIO\s+EM\s+GERAL/.test(s))return ['Móveis e utensílios','Mobiliário em geral']; if(/INFORMATICA|COMPUTADOR|NOTEBOOK|IMPRESSORA|MONITOR/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de informática']; if(/CAIXA DE SOM|MICROFONE|TRIPE|PEDESTAL|LAPELA|COMUNICACAO|COMUNICAÇÃO|AUDIO|SOM|BLUETOOTH|TELEFONE/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de comunicação']; if(/AR CONDICIONADO|SPLIT|BTU|INVERTER/.test(s))return ['Máquinas, aparelhos e equipamentos','Máquinas e equipamentos energéticos']; if(/MOBILIARIO|SOFA|CADEIRA|MESA|ARMARIO/.test(s))return ['Móveis e utensílios','Mobiliário em geral']; if(/EQUIPAMENTOS E MATERIAL PERMANENTE|MATERIAL PERMANENTE/.test(s))return ['Máquinas, aparelhos e equipamentos','Outros aparelhos, máquinas e equipamentos']; return ['',''];}
+  function inferirCat130(txt){const s=upper130(txt); if(/\b50\s*-\s*APARELHOS\s+E\s+EQUIPAMENTOS\s+DE\s+COMUNICACAO/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de comunicação']; if(/\b42\s*-\s*MOBILIARIO\s+EM\s+GERAL/.test(s))return ['Móveis e utensílios','Mobiliário em geral']; if(/INFORMATICA|COMPUTADOR|NOTEBOOK|IMPRESSORA|MONITOR/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de informática']; if(/CAIXA DE SOM|MICROFONE|TRIPE|PEDESTAL|LAPELA|COMUNICACAO|COMUNICAÇÃO|AUDIO|SOM|BLUETOOTH|TELEFONE/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de comunicação']; if(/AR CONDICIONADO|SPLIT|BTU|INVERTER|BEBEDOURO|VENTILADOR/.test(s))return ['Máquinas, aparelhos e equipamentos','Máquinas, utensílios e equipamentos diversos'];
+  if(/REFRIGERADOR|GELADEIRA|FREEZER|FRIGOBAR|MICRO-ONDAS|CAFETEIRA/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e utensílios domésticos']; if(/MOBILIARIO|SOFA|CADEIRA|MESA|ARMARIO/.test(s))return ['Móveis e utensílios','Mobiliário em geral']; if(/EQUIPAMENTOS E MATERIAL PERMANENTE|MATERIAL PERMANENTE/.test(s))return ['Máquinas, aparelhos e equipamentos','Outros aparelhos, máquinas e equipamentos']; return ['',''];}
   function aplicarCat130(cp,cs){let p=document.getElementById('catPrincV100'),s=document.getElementById('catSecV100'); if(!p||!s||!cp)return; if(![...p.options].some(o=>o.value===cp))p.insertAdjacentHTML('beforeend',`<option value="${esc130(cp)}">${esc130(cp)}</option>`); p.value=cp; if(typeof atualizarSecV100==='function')atualizarSecV100(); if(cs&&![...s.options].some(o=>o.value===cs))s.insertAdjacentHTML('beforeend',`<option value="${esc130(cs)}">${esc130(cs)}</option>`); if(cs)s.value=cs; try{gerarBensV100(false)}catch(e){} }
   function linhasItensOF130(txt){let linhas=limpa130(txt).split(/\n+/).map(l=>limpa130(l)).filter(Boolean); let ini=linhas.findIndex(l=>/C[ÓO]D\.?.*CAT.*C[ÓO]D\.?.*ITEM.*DESCRI/i.test(l)); if(ini<0)ini=0; let fim=linhas.findIndex((l,i)=>i>ini && /TOTAL\s+DA\s+ORDEM|OBSERVA[ÇC][ÕO]ES|DATA\s+DE\s+EMISS/i.test(l)); if(fim<0)fim=linhas.length; linhas=linhas.slice(ini+1,fim); const rows=[]; let pending=[],cur=null; const start=/^\s*(\d{4,10})\s+([0-9]+(?:\.[0-9]+)?)\s+(.*)$/; function flush(){if(!cur)return; rows.push({codigoItemCatalogo:cur.codCat,codCat:cur.codCat,codItem:cur.codItem,desc:trimDesc130([...pending,cur.desc,...cur.cont].join(' ')),qtd:cur.qtd,valorUnit:cur.valorUnit,valorTotal:cur.valorTotal,origem:'OF'}); pending=[]; cur=null;} for(let l of linhas){if(!l||/C[ÓO]D\.?.*CAT|DESCRI[ÇC][ÃA]O DO ITEM|QTDE|PRE[ÇC]O|VALOR TOTAL/i.test(l))continue; let st=l.match(start); if(st){flush(); let rest=st[3], vals=valores130(rest), qtd=1,valorUnit=0,valorTotal=0,desc=rest; if(vals.length){valorTotal=parseBR130(vals[vals.length-1]); valorUnit=vals.length>=2?parseBR130(vals[vals.length-2]):valorTotal; let idx=rest.lastIndexOf(vals[0]); let before=idx>=0?rest.slice(0,idx):rest; let qm=before.match(/(?:^|\s)(\d{1,4})\s*$/); if(qm){qtd=Number(qm[1])||1; desc=before.slice(0,before.length-qm[1].length).trim()}else desc=before.trim();} cur={codCat:st[1],codItem:st[2],desc,cont:[],qtd,valorUnit,valorTotal};} else {if(cur)cur.cont.push(l); else pending.push(l)}} flush(); return rows.filter(r=>r.desc&&r.valorTotal>0);}
   function parseOF130(txt){const raw=limpa130(txt), flat=raw.replace(/\n/g,' ').replace(/\s+/g,' '); let m=flat.match(/ORDEM\s+DE\s+FORNECIMENTO\s+N[º°o]?\s*([0-9]+\/\d{4})/i)||flat.match(/\bN[º°o]?\s*([0-9]+\/\d{4})\b/i)||flat.match(/\b([0-9]{1,4}\/20\d{2})\b/); const numero=m?m[1]:''; m=flat.match(/DATA\s+DE\s+EMISS[ÃA]O\s*:?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i); const data=m?iso130(m[1]):''; m=flat.match(/FORNECEDOR\s*:?\s*(.+?)\s+CNPJ\s*:?\s*([0-9./-]{14,18})/i); const fornecedor=m?limpa130(m[1]):''; const cnpj=m?m[2]:(flat.match(/CNPJ\s*:?\s*([0-9./-]{14,18})/i)?.[1]||''); m=flat.match(/TOTAL\s+DA\s+ORDEM\s*(?:R\$\s*)?([0-9.]+,\d{2})/i); let total=m?parseBR130(m[1]):0; if(!total){let vals=valores130(flat); if(vals.length)total=parseBR130(vals[vals.length-1])} m=flat.match(/Referente\s+ao\s+Empenho\s+n[ºo]?\s*:?\s*(20\d{2}NE\d{3,})/i)||flat.match(/\b(20\d{2}NE\d{3,})\b/i); const empenho=m?m[1].toUpperCase():''; let itens=linhasItensOF130(raw); if(!itens.length){let re=/\b(\d{4,10})\s+([0-9]+(?:\.[0-9]+)?)\s+(.{10,}?)\s+(\d{1,4})\s+([0-9.]+,\d{2})\s+(?:R\$\s*)?([0-9.]+,\d{2})/gi,r; while((r=re.exec(flat)))itens.push({codigoItemCatalogo:r[1],codCat:r[1],codItem:r[2],desc:trimDesc130(r[3]),qtd:Number(r[4])||1,valorUnit:parseBR130(r[5]),valorTotal:parseBR130(r[6]),origem:'OF'});} return {numero,data,total,fornecedor,cnpj,empenho,itens};}
@@ -31917,7 +31972,8 @@ function depAcumuladaTotalAteMesAnterior(){
   async function pdfText130b(id){const f=document.getElementById(id)?.files?.[0]; if(!f)throw new Error('Selecione o arquivo primeiro.'); if(f.type==='application/pdf'||/\.pdf$/i.test(f.name||'')){if(!window.pdfjsLib){await new Promise((res,rej)=>{let s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)}); window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'} const pdf=await window.pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise; let pages=[]; for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p), tc=await page.getTextContent(); const arr=tc.items.map(it=>({str:String(it.str||'').trim(),x:it.transform?.[4]||0,y:it.transform?.[5]||0})).filter(i=>i.str); const lines=[]; for(const it of arr.sort((a,b)=>Math.abs(b.y-a.y)>3?b.y-a.y:a.x-b.x)){let ln=lines.find(l=>Math.abs(l.y-it.y)<3.5); if(!ln){ln={y:it.y,itens:[]};lines.push(ln)} ln.itens.push(it)} pages.push(lines.sort((a,b)=>b.y-a.y).map(l=>l.itens.sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ')).join('\n')+'\n'+arr.map(i=>i.str).join(' '))} return l130(pages.join('\n'))} return l130(await f.text())}
   function trimD130(d){d=flat130(d).replace(/\s*OBS\s*:\s*null\.?/ig,'').replace(/\s*MARCA\s*:.*/i,'').replace(/\s*\(A\)\s*/g,' '); let m=d.match(/^(.+?\b(?:UNIDADE|UNIDADES|UND|UNID)\b)/i); if(m)d=m[1]; return flat130(d)}
   function prodStart130(t){let m=flat130(t).match(/\b(CAIXA DE SOM|TRIPE|MICROFONE|SUPORTE PARA MICROFONE|AR CONDICIONADO|CENTRAL DE AR|SOFA|ARMARIO|CADEIRA|MESA)\b.*$/i); return m?m[0]:''}
-  function inferCat130b(t){const s=up130(t); if(/\b50\s*-\s*APARELHOS\s+E\s+EQUIPAMENTOS\s+DE\s+COMUNICACAO/.test(s)||/CAIXA DE SOM|MICROFONE|TRIPE|PEDESTAL|LAPELA|COMUNICACAO|SOM|AUDIO|BLUETOOTH/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de comunicação']; if(/\b42\s*-\s*MOBILIARIO|SOFA|ARMARIO|CADEIRA|MESA/.test(s))return ['Móveis e utensílios','Mobiliário em geral']; if(/AR CONDICIONADO|SPLIT|BTU/.test(s))return ['Máquinas, aparelhos e equipamentos','Máquinas e equipamentos energéticos']; if(/INFORMATICA|COMPUTADOR|IMPRESSORA|MONITOR/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de informática']; return ['','']}
+  function inferCat130b(t){const s=up130(t); if(/\b50\s*-\s*APARELHOS\s+E\s+EQUIPAMENTOS\s+DE\s+COMUNICACAO/.test(s)||/CAIXA DE SOM|MICROFONE|TRIPE|PEDESTAL|LAPELA|COMUNICACAO|SOM|AUDIO|BLUETOOTH/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de comunicação']; if(/\b42\s*-\s*MOBILIARIO|SOFA|ARMARIO|CADEIRA|MESA/.test(s))return ['Móveis e utensílios','Mobiliário em geral']; if(/AR CONDICIONADO|SPLIT|BTU|BEBEDOURO|VENTILADOR/.test(s))return ['Máquinas, aparelhos e equipamentos','Máquinas, utensílios e equipamentos diversos'];
+  if(/REFRIGERADOR|GELADEIRA|FREEZER|FRIGOBAR|MICRO-ONDAS|CAFETEIRA/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e utensílios domésticos']; if(/INFORMATICA|COMPUTADOR|IMPRESSORA|MONITOR/.test(s))return ['Máquinas, aparelhos e equipamentos','Aparelhos e equipamentos de informática']; return ['','']}
   function setCat130b(cp,cs){let p=document.getElementById('catPrincV100'),s=document.getElementById('catSecV100'); if(!p||!s||!cp)return; if(![...p.options].some(o=>o.value===cp))p.insertAdjacentHTML('beforeend',`<option value="${esc130b(cp)}">${esc130b(cp)}</option>`); p.value=cp; if(typeof atualizarSecV100==='function')atualizarSecV100(); if(cs&&![...s.options].some(o=>o.value===cs))s.insertAdjacentHTML('beforeend',`<option value="${esc130b(cs)}">${esc130b(cs)}</option>`); if(cs)s.value=cs; try{gerarBensV100(false)}catch(e){}}
   function itensOF130b(txt){let f=flat130(txt); let m=f.match(/C[ÓO]D\.?.*?VALOR TOTAL(.*?)(?:TOTAL\s+DA\s+ORDEM)/i); let sec=m?m[1]:f; let starts=[...sec.matchAll(/\b(\d{4,10})\s+([0-9]+(?:\.[0-9]+)?)\s+/g)]; if(!starts.length)return []; let next=sec.slice(0,starts[0].index); let rows=[]; for(let i=0;i<starts.length;i++){let st=starts[i], cod=st[1], item=st[2], seg=sec.slice(st.index+st[0].length, i+1<starts.length?starts[i+1].index:sec.length); let r=seg.match(/^(.*?)\s*(\d{1,4})\s+([0-9.]+,\d{2})\s+(?:R\$\s*)?([0-9.]+,\d{2})(.*)$/i); if(!r)continue; let before=r[1], qtd=Number(r[2])||1, vu=br130(r[3]), vt=br130(r[4]), tail=r[5]||''; let desc=flat130(next+' '+before); let descEnded=/\b(UNIDADE|UNIDADES|UND|UNID)\b\s*$/i.test(desc); let tailUnit=tail.match(/^(.+?\b(?:UNIDADE|UNIDADES|UND|UNID)\b)(.*)$/i); if(!descEnded && tailUnit){desc=flat130(desc+' '+tailUnit[1]); next=prodStart130(tailUnit[2])} else {next=prodStart130(tail)||tail} rows.push({codigoItemCatalogo:cod,codCat:cod,codItem:item,desc:trimD130(desc),qtd,valorUnit:vu,valorTotal:vt,origem:'OF'})} return rows.filter(x=>x.desc&&x.valorTotal>0)}
   function parseOF130b(txt){let raw=l130(txt), f=flat130(txt); let m=f.match(/ORDEM\s+DE\s+FORNECIMENTO\s+N[º°o]?\s*([0-9]+\/\d{4})/i)||f.match(/\bN[º°o]?\s*([0-9]+\/\d{4})\b/i)||f.match(/\b([0-9]{1,4}\/20\d{2})\b/); let numero=m?m[1]:''; m=f.match(/DATA\s+DE\s+EMISS[ÃA]O\s*:?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i); let data=m?iso130b(m[1]):''; m=f.match(/FORNECEDOR\s*:?\s*(.+?)\s+CNPJ\s*:?\s*([0-9./-]{14,18})/i); let fornecedor=m?l130(m[1]):'', cnpj=m?m[2]:(f.match(/CNPJ\s*:?\s*([0-9./-]{14,18})/i)?.[1]||''); m=f.match(/TOTAL\s+DA\s+ORDEM\s*(?:R\$\s*)?([0-9.]+,\d{2})/i); let total=m?br130(m[1]):0; m=f.match(/Referente\s+ao\s+Empenho\s+n[ºo]?\s*:?\s*(20\d{2}NE\d{3,})/i)||f.match(/\b(20\d{2}NE\d{3,})\b/i); return {numero,data,total,fornecedor,cnpj,empenho:m?m[1].toUpperCase():'',itens:itensOF130b(raw)}}
@@ -32134,6 +32190,130 @@ function depAcumuladaTotalAteMesAnterior(){
   });
 
   setTimeout(forcePortalSession,20);
+})();
+</script>
+
+<script data-trancelim-patrimonio-v131>
+(function(){
+  // v131 - salvamento responsivo e correção segura da classificação secundária.
+  const removerAcentos = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+
+  function categoriaSecundariaCorreta(desc, atual){
+    const d = removerAcentos(desc);
+    const a = removerAcentos(atual);
+    if(!/ENERGETIC/.test(a)) return atual || '';
+    if(/AR CONDICIONADO|CONDICIONADOR|SPLIT|BTU|BEBEDOURO|VENTILADOR/.test(d)){
+      if(/MOVEL|PORTATIL/.test(d)) return 'Aparelhos e utensílios domésticos';
+      return 'Máquinas, utensílios e equipamentos diversos';
+    }
+    if(/REFRIGERADOR|GELADEIRA|FREEZER|FRIGOBAR|MICRO-ONDAS|CAFETEIRA/.test(d)){
+      return 'Aparelhos e utensílios domésticos';
+    }
+    return atual || '';
+  }
+
+  function corrigirBemV131(b){
+    if(!b) return false;
+    const correta = categoriaSecundariaCorreta(b.desc || b.descricao, b.categoriaSecundaria);
+    if(correta && correta !== b.categoriaSecundaria){
+      b.categoriaSecundaria = correta;
+      return true;
+    }
+    return false;
+  }
+
+  // Toda leitura e todo salvamento passam pela classificação corrigida.
+  const aplicarExtAnteriorV131 = window.aplicarExtNoBemV95;
+  window.aplicarExtNoBemV95 = function(b){
+    const r = typeof aplicarExtAnteriorV131 === 'function' ? aplicarExtAnteriorV131(b) : b;
+    corrigirBemV131(r || b);
+    return r || b;
+  };
+  try{ aplicarExtNoBemV95 = window.aplicarExtNoBemV95; }catch(e){}
+
+  const salvarExtAnteriorV131 = window.salvarExtSupabaseV95;
+  window.salvarExtSupabaseV95 = async function(ext){
+    const pat = String(ext?.numero_patrimonial || '');
+    const b = (window.bens || bens || []).find(x=>String(x.pat)===pat || String(x.numero_patrimonial)===pat);
+    const descAtual = document.getElementById('cadDesc')?.value || b?.desc || b?.descricao || '';
+    const ajustado = {...(ext || {})};
+    ajustado.categoriaSecundaria = categoriaSecundariaCorreta(descAtual, ajustado.categoriaSecundaria);
+    return typeof salvarExtAnteriorV131 === 'function' ? salvarExtAnteriorV131(ajustado) : undefined;
+  };
+  try{ salvarExtSupabaseV95 = window.salvarExtSupabaseV95; }catch(e){}
+
+  const renderTudoAnteriorV131 = window.renderTudo;
+  window.renderTudo = function(){
+    try{ (window.bens || bens || []).forEach(corrigirBemV131); }catch(e){}
+    return typeof renderTudoAnteriorV131 === 'function' ? renderTudoAnteriorV131() : undefined;
+  };
+  try{ renderTudo = window.renderTudo; }catch(e){}
+
+  // Evita consultar o perfil novamente em cada clique de salvar.
+  const confirmarAnteriorV131 = window.confirmarPermissaoTotal || (typeof confirmarPermissaoTotal === 'function' ? confirmarPermissaoTotal : null);
+  let perfilEmCacheV131 = null;
+  let perfilValidoAteV131 = 0;
+  let consultaPerfilV131 = null;
+  window.confirmarPermissaoTotal = async function(){
+    const agora = Date.now();
+    if(perfilEmCacheV131 && agora < perfilValidoAteV131) return perfilEmCacheV131;
+    if(consultaPerfilV131) return consultaPerfilV131;
+    if(typeof confirmarAnteriorV131 !== 'function') return null;
+    consultaPerfilV131 = Promise.resolve(confirmarAnteriorV131()).then(perfil=>{
+      perfilEmCacheV131 = perfil;
+      perfilValidoAteV131 = Date.now() + 5 * 60 * 1000;
+      return perfil;
+    }).finally(()=>{ consultaPerfilV131 = null; });
+    return consultaPerfilV131;
+  };
+  try{ confirmarPermissaoTotal = window.confirmarPermissaoTotal; }catch(e){}
+
+  // Corrige em lote somente os bens domésticos/diversos que estavam marcados como energéticos.
+  async function migrarCategoriasV131(){
+    if(sessionStorage.getItem('patrimonio_categoria_v131_ok') === '1') return;
+    const lista = window.bens || (typeof bens !== 'undefined' ? bens : []);
+    if(!Array.isArray(lista) || !lista.length) return;
+    const alterados = lista.filter(corrigirBemV131);
+    if(!alterados.length){
+      sessionStorage.setItem('patrimonio_categoria_v131_ok','1');
+      return;
+    }
+
+    try{
+      const cache = JSON.parse(localStorage.getItem('bensExtSGP_v95') || '{}');
+      alterados.forEach(b=>{
+        const key = String(b.pat || b.numero_patrimonial || '').replace(/\D/g,'') || String(b.pat || '');
+        cache[key] = {...(cache[key] || {}), categoriaSecundaria:b.categoriaSecundaria};
+      });
+      localStorage.setItem('bensExtSGP_v95', JSON.stringify(cache));
+    }catch(e){}
+
+    try{
+      const {data:{session}} = await supabaseClient.auth.getSession();
+      if(session?.user){
+        const payloads = alterados.map(b=>({
+          numero_patrimonial:String(b.pat || b.numero_patrimonial || ''),
+          nota_empenho:b.notaEmpenho || null,
+          categoria_principal:b.categoriaPrincipal || null,
+          categoria_secundaria:b.categoriaSecundaria || null,
+          depreciavel:b.depreciavel !== false,
+          fornecedor:b.fornecedor || null,
+          cnpj:b.cnpj || null,
+          atualizado_em:new Date().toISOString()
+        })).filter(x=>x.numero_patrimonial);
+        if(payloads.length){
+          const {error} = await supabaseClient.from('bens_patrimoniais_ext').upsert(payloads,{onConflict:'numero_patrimonial'});
+          if(error) throw error;
+        }
+      }
+      sessionStorage.setItem('patrimonio_categoria_v131_ok','1');
+      window.renderTudo?.();
+    }catch(e){
+      console.warn('A classificação foi corrigida na tela, mas a atualização em lote ficou pendente:', e);
+    }
+  }
+
+  setTimeout(migrarCategoriasV131, 1800);
 })();
 </script>
 </body>

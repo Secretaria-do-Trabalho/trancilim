@@ -1,0 +1,9 @@
+TRANCELIM v202
+
+Atualizado somente o Sistema de Gestão Patrimonial para a v131.
+
+- salvamento responsivo para a conta da Paula e demais usuários;
+- item confirmado no banco libera a tela imediatamente;
+- anexos e sincronização integral seguem em segundo plano;
+- classificação secundária de ar-condicionado e eletrodomésticos corrigida;
+- Encerramento Mensal v45 e Prestação de Contas preservados.

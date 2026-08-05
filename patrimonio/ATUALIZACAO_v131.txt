@@ -1,0 +1,13 @@
+Sistema de Gestão Patrimonial v131
+
+1. Salvamento mais rápido:
+- a tela é liberada assim que o bem e seus dados contábeis essenciais são confirmados no Supabase;
+- anexos e recarga completa continuam em segundo plano;
+- a consulta de permissão fica em cache por 5 minutos;
+- deixa de bloquear o botão enquanto toda a base é baixada novamente.
+
+2. Categoria contábil secundária:
+- incluídas as opções "Aparelhos e utensílios domésticos" e "Máquinas, utensílios e equipamentos diversos";
+- ar-condicionado split, bebedouro e ventilador deixam de ser classificados automaticamente como equipamentos energéticos;
+- refrigerador, geladeira, freezer, frigobar, micro-ondas e cafeteira passam para aparelhos e utensílios domésticos;
+- a categoria "Máquinas e equipamentos energéticos" permanece para itens realmente destinados à geração/condicionamento de energia.
