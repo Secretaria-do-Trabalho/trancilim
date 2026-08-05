@@ -1,0 +1,9 @@
+TRANCELIM v167 — publicação no GitHub Pages
+
+1. Extraia este ZIP.
+2. No repositório do TRANCELIM, substitua os arquivos antigos por todos os arquivos extraídos.
+3. Confirme que o arquivo index.html está na raiz do repositório.
+4. Envie/commit as alterações para a branch publicada pelo GitHub Pages.
+5. Aguarde a atualização e abra o site usando Ctrl + F5.
+
+Novo módulo: /encerramento-mensal/index.html

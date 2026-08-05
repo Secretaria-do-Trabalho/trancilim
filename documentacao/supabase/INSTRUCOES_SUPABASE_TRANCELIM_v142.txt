@@ -1,0 +1,21 @@
+TRANCELIM v142 — PASSO A PASSO
+
+1. No Supabase, abra SQL Editor.
+2. Clique em New query ou use a aba que já está aberta.
+3. Apague o texto antigo da consulta.
+4. Abra o arquivo SCRIPT_SUPABASE_TRANCELIM_v142.sql.
+5. Copie todo o conteúdo e cole no SQL Editor.
+6. Clique em Run.
+7. Ao terminar, confira o resultado da consulta final.
+8. Publique no GitHub os arquivos do ZIP UPLOAD_GITHUB_TRANCELIM_v142.zip.
+9. Use Ctrl + F5 no navegador após a publicação.
+
+IMPORTANTE
+- David precisa existir em Authentication > Users com o e-mail:
+  david.alcantara@trabalho.ce.gov.br
+- Se David já existir, o script o transforma em administrador do portal.
+- Se Paula já existir no Auth, o script registra a solicitação pendente dela.
+- Se Paula ainda não existir em Authentication > Users, ela deverá clicar novamente em
+  “Solicitar cadastro” na tela inicial após a v142 ser publicada.
+- A senha fica no Supabase Auth e não é gravada na tabela public.usuarios_perfis.
+- O sininho aparece somente para o administrador autenticado e mostra os perfis pendentes.

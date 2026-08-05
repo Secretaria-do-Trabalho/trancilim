@@ -1,0 +1,17 @@
+TRANCELIM v204
+
+ENCERRAMENTO MENSAL v46
+- Anexo III do FERDT zerado preserva os valores e o layout do modelo oficial.
+- Somente a referência e a data final do mês são substituídas.
+- Novo arquivo de correção com cache próprio para evitar carregamento da versão anterior.
+
+GESTÃO PATRIMONIAL v133
+- Janela central de progresso durante o salvamento em lote.
+- Contagem 0/total até total/total.
+- Exibição do tombo e da descrição do item em salvamento.
+- Ao concluir, mostra quantidade salva e botão OK para voltar ao Cadastro de Bens.
+- A tela pode ser liberada assim que o último item for confirmado, mesmo que a sincronização final continue.
+
+ORGANIZAÇÃO
+- Removidos arquivos acumulados ATUALIZACAO_vXXX.txt.
+- Documentação e scripts gerais organizados em /documentacao.
