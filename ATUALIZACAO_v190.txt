@@ -1,0 +1,10 @@
+TRANCELIM v190
+
+Encerramento Mensal atualizado para v35:
+- percentual por item individual;
+- fechamento dos Anexos I e II;
+- conta corrente e aplicação na mesma linha do Anexo III;
+- PDFs, Excels, extratos, justificativas e documentos complementares contados separadamente;
+- processos concluídos somente quando contabilizados.
+
+Patrimônio v138 e Prestação de Contas preservados.

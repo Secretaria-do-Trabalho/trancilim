@@ -184,3 +184,12 @@ Atualização v180: Sistema de Gestão Patrimonial integrado na versão v128, pr
 Atualização v187/v134: correção do salvamento do tombo na edição completa; migração dos dados complementares para o novo número patrimonial; validação de tombo duplicado; retorno à lista de bens após salvar.
 
 Atualização v188: Encerramento Mensal v32 contabilizado e exclusão selecionada no Patrimônio.
+
+
+## v190 — Encerramento Mensal v35
+- Percentual por UG recalculado por item individual.
+- Fechamentos dos Anexos I e II contam separadamente.
+- Anexo III agrupa conta corrente e aplicação na mesma linha e conta cada PDF/extrato e a conclusão da conferência.
+- Na Conferência, PDF e Excel contam separadamente; justificativas e documentos complementares também contam individualmente.
+- Processos somente pontuam como concluídos quando estão contabilizados.
+- Patrimônio v138 e Prestação de Contas foram preservados sem alterações.
