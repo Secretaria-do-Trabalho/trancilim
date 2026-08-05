@@ -1,0 +1,10 @@
+Gestão Patrimonial v132
+
+- Importação aceita Ordem de Fornecimento e Ordem de Compra.
+- Código do catálogo pode ser lido como única coluna numérica antes da descrição.
+- Descrição limitada até a palavra UNIDADE.
+- Quantidade, preço unitário e total aceitam 2 ou 4 casas decimais.
+- Total geral reconhecido pelos títulos usados em OF e OC.
+- Data de emissão reconhecida.
+- OCR automático em documento escaneado ou imagem quando necessário.
+- Nota Fiscal prioriza sempre o campo Valor total da nota.

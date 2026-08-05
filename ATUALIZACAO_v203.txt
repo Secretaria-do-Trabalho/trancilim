@@ -1,0 +1,14 @@
+TRANCELIM v203 - Gestão Patrimonial v132
+
+Atualizações no cadastro por importação:
+- o mesmo campo aceita Ordem de Fornecimento ou Ordem de Compra;
+- leitura do código do catálogo mesmo quando não existe uma segunda coluna de código do item;
+- descrição capturada até UNIDADE/UNIDADES/UND/UNID;
+- leitura de quantidade, preço unitário e valor total com 2 ou 4 casas decimais;
+- leitura do Total da Ordem de Compra/Serviço, Total da Ordem de Compra, Total da Ordem de Fornecimento ou Total da Ordem;
+- leitura da data de emissão da OF/OC;
+- OCR automático para PDFs escaneados e imagens quando a leitura normal não encontra os campos principais;
+- Nota Fiscal prioriza o campo VALOR TOTAL DA NOTA; total dos produtos fica apenas como último recurso;
+- preservadas as otimizações de salvamento e as correções de classificação da v131.
+
+Encerramento Mensal e Prestação de Contas não foram alterados.

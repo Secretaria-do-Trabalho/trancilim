@@ -31989,6 +31989,281 @@ function depAcumuladaTotalAteMesAnterior(){
 
 </script>
 
+<script>
+(function(){
+  // v132 - Ordem de Fornecimento OU Ordem de Compra + leitura reforçada da NF.
+  const $132=id=>document.getElementById(id);
+  const clean132=v=>String(v||'').replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').replace(/\s+\n/g,'\n').replace(/\n\s+/g,'\n').trim();
+  const flat132=v=>clean132(v).replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+  const upper132=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+  const esc132=v=>String(v??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+  function parseMoney132(v){
+    let s=String(v||'').replace(/R\$/gi,'').replace(/\s/g,'').replace(/[^0-9,.-]/g,'');
+    if(!s)return 0;
+    const comma=s.lastIndexOf(','), dot=s.lastIndexOf('.');
+    if(comma>dot){s=s.replace(/\./g,'').replace(',','.');}
+    else if(dot>comma && comma>=0){s=s.replace(/,/g,'');}
+    else if(comma>=0){s=s.replace(/\./g,'').replace(',','.');}
+    return Number(s)||0;
+  }
+  function parseQty132(v){const n=parseMoney132(v);return n>0?n:1;}
+  function fmt132(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function money132(n){try{return moeda(n)}catch(e){return 'R$ '+fmt132(n);}}
+  function iso132(v){
+    const s=String(v||'').replace(/\s/g,'');
+    let m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if(m)return `${m[3]}-${m[2]}-${m[1]}`;
+    m=s.match(/^(\d{2})\/(\d{2})\/(\d{2})$/); if(m)return `20${m[3]}-${m[2]}-${m[1]}`;
+    return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:'';
+  }
+  function trimDescription132(v){
+    let d=flat132(v)
+      .replace(/\s*OBS(?:ERVA[CÇ][AÃ]O)?\s*:\s*null\.?/ig,'')
+      .replace(/\s*MARCA\s*:.*/i,'')
+      .replace(/\s*MODELO\s*:.*/i,'')
+      .replace(/\s*FABRICANTE\s*:.*/i,'')
+      .replace(/\s*\(A\)\s*/g,' ')
+      .trim();
+    const unit=d.match(/^(.+?\b(?:UNIDADE|UNIDADES|UND|UNID)\b\.?)/i);
+    if(unit)d=unit[1];
+    return d.replace(/\s{2,}/g,' ').trim();
+  }
+  function moneyTokens132(v){
+    return [...String(v||'').matchAll(/(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2,4}|[0-9]+,\d{2,4}|[0-9]+\.\d{2,4})/g)].map(m=>m[1]);
+  }
+  function orderType132(text){return /ORDEM\s+DE\s+COMPRA/i.test(text)?'OC':'OF';}
+  function orderItems132(text){
+    const raw=clean132(text), flat=flat132(text);
+    let section=flat;
+    const startHeader=flat.search(/C[ÓO]D(?:IGO)?\.?\s*(?:DO\s*)?CAT[ÁA]LOGO|COD\.?\s*CATALOGO|DESCRI[CÇ][AÃ]O\s+DO\s+ITEM/i);
+    if(startHeader>=0)section=flat.slice(startHeader);
+    const endMatch=section.search(/TOTAL\s+DA\s+ORDEM\s+DE\s+(?:COMPRA(?:\/SERVI[CÇ]O)?|FORNECIMENTO)|TOTAL\s+DA\s+ORDEM|DOTA[CÇ][AÃ]O\s+OR[CÇ]AMENT[ÁA]RIA|PARA\s+USO\s+DO\s+[ÓO]RG[AÃ]O/i);
+    if(endMatch>0)section=section.slice(0,endMatch);
+
+    // Cada item começa pelo código do catálogo. Aceita documento com ou sem uma segunda coluna de código do item.
+    const starts=[...section.matchAll(/(?:^|\s)(\d{5,10})(?=\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g)];
+    if(!starts.length){
+      // PDF pode colocar um segundo código numérico logo depois do catálogo.
+      starts.push(...section.matchAll(/(?:^|\s)(\d{5,10})\s+(\d{1,10}(?:\.\d+)?)\s+(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])/g));
+    }
+    const rows=[];
+    for(let i=0;i<starts.length;i++){
+      const st=starts[i], code=st[1], second=st[2]||'';
+      const from=(st.index||0)+st[0].length;
+      const to=i+1<starts.length?(starts[i+1].index||section.length):section.length;
+      let segment=section.slice(from,to).trim();
+      // QTD, preço unitário e total ficam no final do bloco do item; aceita 2 ou 4 casas decimais.
+      const valueMatch=segment.match(/^(.*?)(\d{1,6}(?:[.,]\d{1,4})?)\s+([0-9]{1,3}(?:\.[0-9]{3})*,\d{2,4}|[0-9]+,\d{2,4})\s+([0-9]{1,3}(?:\.[0-9]{3})*,\d{2,4}|[0-9]+,\d{2,4})(?:\s|$)/i);
+      if(!valueMatch)continue;
+      const desc=trimDescription132(valueMatch[1]);
+      const qtd=parseQty132(valueMatch[2]);
+      const valorUnit=parseMoney132(valueMatch[3]);
+      const valorTotal=parseMoney132(valueMatch[4]);
+      if(!desc||!valorTotal)continue;
+      rows.push({
+        codigoItemCatalogo:code,
+        codCat:code,
+        codItem:second,
+        desc,
+        qtd,
+        valorUnit:valorUnit||valorTotal/qtd,
+        valorTotal,
+        origem:orderType132(flat)
+      });
+    }
+
+    // Alternativa por linhas: código numa linha e descrição/valores em linhas seguintes.
+    if(!rows.length){
+      const lines=raw.split(/\n+/).map(clean132).filter(Boolean);
+      let current=null;
+      const flush=()=>{
+        if(!current)return;
+        const joined=flat132(current.parts.join(' '));
+        const vals=moneyTokens132(joined);
+        const tail=joined.match(/^(.*?)(\d{1,6}(?:[.,]\d{1,4})?)\s+([0-9.]+,\d{2,4})\s+([0-9.]+,\d{2,4})(?:\s|$)/i);
+        if(tail){
+          const desc=trimDescription132(tail[1]);
+          const qtd=parseQty132(tail[2]),vu=parseMoney132(tail[3]),vt=parseMoney132(tail[4]);
+          if(desc&&vt)rows.push({codigoItemCatalogo:current.code,codCat:current.code,codItem:'',desc,qtd,valorUnit:vu||vt/qtd,valorTotal:vt,origem:orderType132(flat)});
+        }else if(vals.length>=2){
+          const vt=parseMoney132(vals.at(-1)),vu=parseMoney132(vals.at(-2));
+          const firstValue=joined.lastIndexOf(vals[vals.length-2]);
+          const before=firstValue>=0?joined.slice(0,firstValue):joined;
+          const qm=before.match(/(\d{1,6}(?:[.,]\d{1,4})?)\s*$/);
+          const qtd=qm?parseQty132(qm[1]):1;
+          const desc=trimDescription132(qm?before.slice(0,qm.index):before);
+          if(desc&&vt)rows.push({codigoItemCatalogo:current.code,codCat:current.code,codItem:'',desc,qtd,valorUnit:vu||vt/qtd,valorTotal:vt,origem:orderType132(flat)});
+        }
+        current=null;
+      };
+      for(const line of lines){
+        if(/TOTAL\s+DA\s+ORDEM|DOTA[CÇ][AÃ]O\s+OR[CÇ]AMENT[ÁA]RIA|PARA\s+USO\s+DO\s+[ÓO]RG[AÃ]O/i.test(line)){flush();break;}
+        const sm=line.match(/^\s*(\d{5,10})(?:\s+(\d{1,10}(?:\.\d+)?))?\s*(.*)$/);
+        if(sm && !/C[ÓO]D|CAT[ÁA]LOGO/i.test(line)){
+          flush();current={code:sm[1],parts:[sm[3]||'']};
+        }else if(current){current.parts.push(line);}
+      }
+      flush();
+    }
+    return rows;
+  }
+  function parseOrder132(text){
+    const raw=clean132(text), flat=flat132(text), type=orderType132(flat);
+    let m=flat.match(/ORDEM\s+DE\s+(?:FORNECIMENTO|COMPRA(?:\/SERVI[CÇ]O)?)\s+(?:N[º°O.]|NÚMERO|NUMERO)\s*:?-?\s*([0-9A-Z./-]{3,})/i);
+    const numero=m?m[1]:'';
+    m=flat.match(/DATA\s+(?:DE\s+)?EMISS[AÃ]O\s*:?-?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{2,4})/i);
+    const data=m?iso132(m[1]):'';
+    m=flat.match(/FORNECEDOR\s*:?-?\s*(.+?)\s+CNPJ\s*:?-?\s*([0-9./-]{14,18})/i);
+    const fornecedor=m?clean132(m[1]):'';
+    const cnpj=m?m[2]:(flat.match(/CNPJ\s*:?-?\s*([0-9./-]{14,18})/i)?.[1]||'');
+    const totalPatterns=[
+      /TOTAL\s+DA\s+ORDEM\s+DE\s+COMPRA(?:\/SERVI[CÇ]O)?\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i,
+      /TOTAL\s+DA\s+ORDEM\s+DE\s+FORNECIMENTO\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i,
+      /TOTAL\s+DA\s+ORDEM\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i
+    ];
+    let total=0;for(const re of totalPatterns){m=flat.match(re);if(m){total=parseMoney132(m[1]);break;}}
+    const itens=orderItems132(raw);
+    if(!total&&itens.length)total=itens.reduce((s,i)=>s+Number(i.valorTotal||0),0);
+    m=flat.match(/(?:REFERENTE\s+AO\s+)?EMPENHO\s+(?:N[º°O.]|NÚMERO|NUMERO)?\s*:?-?\s*(20\d{2}NE\d{3,})/i)||flat.match(/\b(20\d{2}NE\d{3,})\b/i);
+    return {tipo:type,numero,data,total,fornecedor,cnpj,empenho:m?m[1].toUpperCase():'',itens};
+  }
+  function valueAfterLabel132(flat,labelRegex){
+    const m=labelRegex.exec(flat);if(!m)return 0;
+    const slice=flat.slice(m.index+m[0].length,m.index+m[0].length+140);
+    const val=slice.match(/(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2,4}|[0-9]+,\d{2,4})/);
+    return val?parseMoney132(val[1]):0;
+  }
+  function parseNF132(text){
+    const flat=flat132(text);
+    let m=flat.match(/NF-?E\s*(?:N[º°O.]|NÚMERO|NUMERO)?\s*:?-?\s*([0-9.]{3,})/i)||flat.match(/N[º°O.]\s*:?-?\s*([0-9.]{3,})\s*S[ÉE]RIE/i);
+    const numero=m?m[1].replace(/\.+$/,''):'';
+    m=flat.match(/DATA\s+(?:DA\s+)?EMISS[AÃ]O\s*:?-?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i)||flat.match(/EMISS[AÃ]O\s*:?-?\s*(\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4})/i);
+    const data=m?iso132(m[1]):'';
+    let total=0;
+    const direct=[
+      /VALOR\s+TOTAL\s+DA\s+NOTA\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i,
+      /V\.\s*TOTAL\s+DA\s+NOTA\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i,
+      /TOTAL\s+DA\s+NOTA\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i
+    ];
+    for(const re of direct){m=flat.match(re);if(m){total=parseMoney132(m[1]);break;}}
+    if(!total)total=valueAfterLabel132(flat,/VALOR\s+TOTAL\s+DA\s+NOTA/i);
+    if(!total)total=valueAfterLabel132(flat,/V\.\s*TOTAL\s+DA\s+NOTA/i);
+    // Só usa total dos produtos como último recurso; a prioridade é sempre “Valor total da nota”.
+    if(!total){m=flat.match(/VALOR\s+TOTAL\s+DOS\s+PRODUTOS\s*:?-?\s*(?:R\$\s*)?([0-9.]+,\d{2,4})/i);if(m)total=parseMoney132(m[1]);}
+    const cnpj=flat.match(/\b(\d{2}[.]?\d{3}[.]?\d{3}\/\d{4}-?\d{2})\b/)?.[1]||'';
+    let fornecedor='';
+    const fm=flat.match(/(?:EMITENTE|RAZ[AÃ]O\s+SOCIAL)\s*:?-?\s*(.+?)(?:\s+CNPJ|\s+INSCRI[CÇ][AÃ]O|\s+ENDERE[CÇ]O)/i);
+    if(fm)fornecedor=clean132(fm[1]);
+    return {numero,data,total,fornecedor,cnpj};
+  }
+  async function ensurePdf132(){
+    if(window.pdfjsLib)return true;
+    await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+    if(window.pdfjsLib)window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    return !!window.pdfjsLib;
+  }
+  async function ensureOCR132(){
+    if(window.Tesseract)return true;
+    await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+    return !!window.Tesseract;
+  }
+  async function ocrSource132(source){
+    await ensureOCR132();
+    const result=await window.Tesseract.recognize(source,'por',{logger:()=>{}});
+    return clean132(result?.data?.text||'');
+  }
+  async function extractDocument132(id,kind){
+    const file=$132(id)?.files?.[0];if(!file)throw new Error('Selecione o arquivo primeiro.');
+    const isPdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name||'');
+    const isImage=/^image\//.test(file.type||'')||/\.(png|jpe?g|webp)$/i.test(file.name||'');
+    if(isImage)return ocrSource132(file);
+    if(!isPdf)return clean132(await file.text());
+    await ensurePdf132();
+    const pdf=await window.pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+    const pages=[],pageObjs=[];
+    for(let p=1;p<=pdf.numPages;p++){
+      const page=await pdf.getPage(p);pageObjs.push(page);
+      const tc=await page.getTextContent();
+      const arr=tc.items.map(it=>({str:String(it.str||'').trim(),x:it.transform?.[4]||0,y:it.transform?.[5]||0})).filter(i=>i.str);
+      const lines=[];
+      for(const it of arr.sort((a,b)=>Math.abs(b.y-a.y)>3?b.y-a.y:a.x-b.x)){
+        let ln=lines.find(l=>Math.abs(l.y-it.y)<3.5);if(!ln){ln={y:it.y,itens:[]};lines.push(ln)}ln.itens.push(it);
+      }
+      pages.push(lines.sort((a,b)=>b.y-a.y).map(l=>l.itens.sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ')).join('\n'));
+    }
+    let text=clean132(pages.join('\n'));
+    const useful=kind==='order'?(/ORDEM\s+DE\s+(?:FORNECIMENTO|COMPRA)/i.test(text)&&(/CAT[ÁA]LOGO|DESCRI[CÇ][AÃ]O\s+DO\s+ITEM/i.test(text))):(/VALOR\s+TOTAL\s+DA\s+NOTA/i.test(text));
+    if(useful)return text;
+    // PDF escaneado ou texto fragmentado: OCR somente quando a leitura normal não encontrou os campos principais.
+    const ocr=[];
+    for(let i=0;i<Math.min(pageObjs.length,4);i++){
+      const page=pageObjs[i],viewport=page.getViewport({scale:2.1}),canvas=document.createElement('canvas');
+      canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+      await page.render({canvasContext:canvas.getContext('2d',{willReadFrequently:true}),viewport}).promise;
+      ocr.push(await ocrSource132(canvas));
+    }
+    return clean132(text+'\n'+ocr.join('\n'));
+  }
+  function applyItems132(items){
+    const arr=(items||[]).map(x=>({...x,desc:trimDescription132(x.desc),qtd:Number(x.qtd||1)||1,valorUnit:Number(x.valorUnit||0)||Number(x.valorTotal||0)/(Number(x.qtd||1)||1),valorTotal:Number(x.valorTotal||0)||Number(x.valorUnit||0)*(Number(x.qtd||1)||1)})).filter(x=>x.desc&&x.valorTotal>0);
+    if(!arr.length)return false;
+    if(typeof aplicarItensV100==='function')aplicarItensV100(arr);
+    setTimeout(()=>{try{gerarBensV100(true);compararDocs?.()}catch(e){}},80);
+    return true;
+  }
+  function setMessage132(id,text,ok){const el=$132(id);if(el){el.textContent=text;el.className='status-v100 '+(ok?'v129-ok':'v129-warn');}}
+  function updateOrderLabels132(){
+    const file=$132('arqOFV100');if(!file)return;
+    const card=file.closest('.doc-card-v100')||file.closest('.lote-card-v100')||file.parentElement?.parentElement;
+    if(card){
+      const h=card.querySelector('h4');if(h)h.textContent='Ordem de Fornecimento / Ordem de Compra';
+      const labels=[...card.querySelectorAll('label span')];
+      labels.forEach(span=>{
+        if(/Anexar OF/i.test(span.textContent))span.textContent='Anexar OF ou OC';
+        else if(/Número da OF/i.test(span.textContent))span.textContent='Número da OF/OC';
+        else if(/Data de emissão da OF/i.test(span.textContent))span.textContent='Data de emissão da OF/OC';
+        else if(/Valor da OF/i.test(span.textContent))span.textContent='Valor total da OF/OC';
+      });
+    }
+  }
+  window.lerOFV100=async function(){
+    try{
+      setMessage132('msgOFV100','Lendo Ordem de Fornecimento/Compra...',false);
+      const order=parseOrder132(await extractDocument132('arqOFV100','order'));
+      if(order.numero)$132('ofNumeroV100').value=order.numero;
+      if(order.data)$132('ofDataV100').value=order.data;
+      if(order.total)$132('ofValorV100').value=fmt132(order.total);
+      if(order.fornecedor)$132('fornecedorV100').value=order.fornecedor;
+      if(order.cnpj)$132('cnpjV100').value=order.cnpj;
+      if(order.empenho)$132('ofEmpenhoV100').value=order.empenho;
+      const ok=applyItems132(order.itens);
+      compararDocs?.();
+      const label=order.tipo==='OC'?'Ordem de Compra':'Ordem de Fornecimento';
+      setMessage132('msgOFV100',`${label} preenchida: ${order.numero||'-'} • ${order.data||'-'} • total ${order.total?money132(order.total):'não identificado'} • ${order.itens.length} item(ns) com código, quantidade, preço unitário e total.`,ok);
+    }catch(e){alert('Erro ao ler Ordem de Fornecimento/Compra: '+(e.message||e));}
+  };
+  window.lerNFV100=async function(){
+    try{
+      setMessage132('msgNFV100','Lendo Nota Fiscal e procurando “Valor total da nota”...',false);
+      const nf=parseNF132(await extractDocument132('arqNFV100','nf'));
+      if(nf.numero)$132('nfNumeroV100').value=nf.numero;
+      if(nf.data)$132('nfDataV100').value=nf.data;
+      if(nf.total)$132('nfValorV100').value=fmt132(nf.total);
+      if(nf.fornecedor&&!$132('fornecedorV100')?.value)$132('fornecedorV100').value=nf.fornecedor;
+      if(nf.cnpj&&!$132('cnpjV100')?.value)$132('cnpjV100').value=nf.cnpj;
+      compararDocs?.();
+      setMessage132('msgNFV100',`NF preenchida: ${nf.numero||'-'} • ${nf.data||'-'} • valor total da nota ${nf.total?money132(nf.total):'não identificado'}.`,!!nf.total);
+    }catch(e){alert('Erro ao ler Nota Fiscal: '+(e.message||e));}
+  };
+  const openPrev132=window.abrirCadastro;
+  window.abrirCadastro=function(pat=null){
+    if(typeof openPrev132==='function')openPrev132(pat);
+    if(!pat){setTimeout(updateOrderLabels132,100);setTimeout(updateOrderLabels132,500);}
+  };
+  window.__PAT_V132_TEST__={parseOrder132,parseNF132,orderItems132};
+  setInterval(()=>{if($132('arqOFV100'))updateOrderLabels132();},1200);
+})();
+</script>
+
 <script data-trancilim-patrimonio-integration>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2';
