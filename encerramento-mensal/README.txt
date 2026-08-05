@@ -30,3 +30,6 @@ PRESERVADO
 - Perfil, foto, login único e retorno ao portal.
 
 Os dados ficam armazenados localmente no navegador. Exporte o backup periodicamente.
+
+
+Versão v38: processos compactados no rito do SUITE; cópia somente do cumprimento à assinatura; quebras de linha preservadas; barra superior; Anexo III permite dispensa do SIAFE quando extratos estão zerados e exclusão individual dos PDFs contábeis.

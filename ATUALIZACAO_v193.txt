@@ -1,0 +1,19 @@
+TRANCELIM v193 — Encerramento Mensal v38
+
+PROCESSOS
+- Nova grade compacta: Nº da Unidade Gestora, Unidade Gestora, Competência, Assunto do processo, Observação, WhatsApp e despacho, Situação e Ações.
+- WhatsApp e despacho agrupados na mesma coluna.
+- Despacho com Visualizar, PDF e Word; WhatsApp apenas com Copiar WhatsApp.
+- Retirados da tela o prazo SEFAZ, situação do despacho, fonte, alinhamento, destinatário, data de conclusão e observação final.
+- Edição mantém situação e observação.
+- Quebras de linha preservadas na visualização, PDF, Word e cópia.
+- Copiar despacho envia somente de “Senhora Coordenadora,” até nome e cargo, sem processo, assunto ou data.
+- Barra horizontal superior na tabela.
+
+ANEXO III
+- Quando todos os extratos aplicáveis estiverem zerados, o relatório da contabilidade pode ficar sem anexo.
+- A contabilidade é assumida como R$ 0,00 para a conciliação desse caso.
+- Cada PDF da contabilidade anexado aparece com botão Excluir.
+- A exclusão limpa os dados contábeis quando não restar nenhum PDF.
+
+Demais módulos e dados preservados.

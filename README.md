@@ -1,3 +1,15 @@
+# TRANCELIM v193
+
+- Encerramento Mensal atualizado para a v38.
+- Processos reorganizados conforme o rito do SUITE: número e identificação da UG, competência, assunto do processo, assunto do despacho, observação, WhatsApp, data e texto do despacho e situação.
+- Removidos da tela: prazo SEFAZ, situação/fonte/alinhamento/destinatário do despacho, data de conclusão e observação final.
+- WhatsApp e despacho agrupados na mesma coluna, apenas com botões de ação.
+- Cópia do despacho leva somente “Senhora Coordenadora,”, corpo e assinatura, preservando todas as quebras de linha.
+- Barra de rolagem superior adicionada à tabela de Processos.
+- Anexo III permite concluir sem PDF da contabilidade quando todos os extratos aplicáveis estiverem zerados.
+- PDFs da contabilidade podem ser excluídos individualmente.
+- Patrimônio v138 e Prestação de Contas foram preservados.
+
 # TRANCELIM v184
 
 - Sistema de Gestão Patrimonial atualizado para a v133.
@@ -193,3 +205,8 @@ Atualização v188: Encerramento Mensal v32 contabilizado e exclusão selecionad
 - Na Conferência, PDF e Excel contam separadamente; justificativas e documentos complementares também contam individualmente.
 - Processos somente pontuam como concluídos quando estão contabilizados.
 - Patrimônio v138 e Prestação de Contas foram preservados sem alterações.
+
+
+## v194
+- Conferência: coluna curta "Código" adicionada antes do nome dos relatórios.
+- Códigos cadastrados conforme relação enviada pelo usuário.
