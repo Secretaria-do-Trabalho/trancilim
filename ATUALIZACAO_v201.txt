@@ -1,0 +1,7 @@
+TRANCELIM v201 - Correção visual definitiva do Anexo III do FERDT
+
+- O PDF zerado do FERDT passa a preservar integralmente os valores e a tipografia do modelo oficial.
+- O sistema não reescreve os campos R$ 0,00 quando toda a conciliação está zerada.
+- A referência é substituída como uma linha completa, em Times New Roman regular e na posição original.
+- A data final da competência é substituída apenas no espaço da data, sem atingir linhas ou textos vizinhos.
+- Corrigidos valores cortados, sobrepostos e deslocados.

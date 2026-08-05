@@ -143,10 +143,24 @@ function buildFerdtPdf(account){
  const width=(v,size,bold=false)=>pdfTextWidth(String(v??''),size,bold);
  const textTop=(v,x,baselineTop,size,bold=false,align='left',color='#000000')=>{v=String(v??'');let tx=x,w=width(v,size,bold);if(align==='center')tx-=w/2;else if(align==='right')tx-=w;c+=`${rgb(color)} rg BT /${bold?'FB':'FR'} ${Number(size).toFixed(2)} Tf 1 0 0 1 ${tx.toFixed(2)} ${(H-baselineTop).toFixed(2)} Tm (${pdfStr(v)}) Tj ET 0 g\n`};
 const writeCell=(v,x0,top,x1,bottom,size=5.35,bold=false,color='#000000')=>{v=String(v??'');whiteTop(x0-0.2,top-0.15,x1+0.2,bottom+0.15,.05);const left=x0+2.8,rightEdge=x1-3.6,available=Math.max(4,rightEdge-left),measured=width(v,size,bold),fitted=measured<=available?size:Math.max(4,size*(available/measured)),baseline=(top+bottom)/2+fitted*.26,clipX=left-.3,clipY=H-bottom+.6,clipW=Math.max(1,rightEdge-left+.6),clipH=Math.max(1,bottom-top-1.2);c+=`q ${clipX.toFixed(2)} ${clipY.toFixed(2)} ${clipW.toFixed(2)} ${clipH.toFixed(2)} re W n\n`;textTop(v,rightEdge,baseline,fitted,bold,'right',color);c+='Q\n'};
- if(ref!=='2026-06'){const rb=tpl.refbox;whiteTop(rb[0]-1.4,rb[1]-2.0,rb[2]+1.4,rb[3]+2.0,.05);textTop(formatRef(ref),rb[0]-.4,rb[3]+.6,9.1,true,'left');const db=tpl.datebox;whiteTop(db[0]-1.2,db[1]-1.4,db[2]+1.6,db[3]+1.4,.05);textTop(a3EndDate(ref),db[0]+.2,db[3]+.65,6.2,true,'left')}
- if(statementRow)writeCell(a3PdfMoney(statement),debitRight,statementRow.top,creditRight,statementRow.bottom,5.35,false);
- sourceRows.forEach((rr,i)=>writeCell(a3PdfMoney(sources[i]?.value||0),debitLeft,rr.top,debitRight,rr.bottom,5.35,false));
- if(totalRow){writeCell(a3PdfMoney(accounting),debitLeft,totalRow.top,debitRight,totalRow.bottom,5.05,true);writeCell(a3PdfMoney(statement),debitRight,totalRow.top,creditRight,totalRow.bottom,5.05,true);writeCell(a3PdfMoney(difference),creditRight,totalRow.top,right,totalRow.bottom,5.05,true,Math.abs(difference)>=.005?'#d00000':'#000000')}
+ const zeroTemplate=Math.abs(accounting)<.005&&Math.abs(statement)<.005&&Math.abs(difference)<.005&&sources.every(s=>Math.abs(Number(s?.value||0))<.005);
+ if(ref!=='2026-06'){
+  const rb=tpl.refbox,refText='Referência: '+formatRef(ref);
+  // Apaga a linha completa da referência antiga e a recompõe na mesma fonte/posição do modelo oficial.
+  whiteTop(rb[0]-45.70,rb[1]-1.73,rb[2]+1.31,rb[3]+1.01,.05);
+  textTop(refText,rb[2],rb[3]-2.14,9,false,'right');
+  const db=tpl.datebox;
+  // Substitui somente a data do histórico, preservando o restante da linha original.
+  whiteTop(db[0]-1.05,db[1]-.65,db[2]+1.05,db[3]+.85,.05);
+  textTop(a3EndDate(ref),db[2],db[3]-1.00,6,false,'right');
+ }
+ // Quando o FERDT está integralmente zerado, os valores oficiais já fazem parte do modelo.
+ // Não os reescreve para evitar sobreposição, cortes e mudança de tipografia.
+ if(!zeroTemplate){
+  if(statementRow)writeCell(a3PdfMoney(statement),debitRight,statementRow.top,creditRight,statementRow.bottom,5.35,false);
+  sourceRows.forEach((rr,i)=>writeCell(a3PdfMoney(sources[i]?.value||0),debitLeft,rr.top,debitRight,rr.bottom,5.35,false));
+  if(totalRow){writeCell(a3PdfMoney(accounting),debitLeft,totalRow.top,debitRight,totalRow.bottom,5.05,true);writeCell(a3PdfMoney(statement),debitRight,totalRow.top,creditRight,totalRow.bottom,5.05,true);writeCell(a3PdfMoney(difference),creditRight,totalRow.top,right,totalRow.bottom,5.05,true,Math.abs(difference)>=.005?'#d00000':'#000000')}
+ }
  const contentBytes=new Uint8Array(cp1252(c)),content=add({dict:`<< /Length ${contentBytes.length} >>`,data:contentBytes}),page=add(`<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /FR ${fontR} 0 R /FB ${fontB} 0 R >> /XObject << /BG ${imgObj} 0 R >> >> /Contents ${content} 0 R >>`);
  objects[catalog]=`<< /Type /Catalog /Pages ${pagesObj} 0 R >>`;objects[pagesObj]=`<< /Type /Pages /Count 1 /Kids [${page} 0 R] >>`;
  const parts=[new TextEncoder().encode('%PDF-1.4\n%âãÏÓ\n')],offset=[0];let len=parts[0].length;

@@ -1,0 +1,5 @@
+Encerramento Mensal v45 - Anexo III FERDT conforme modelo oficial
+
+- Preservação dos zeros originais quando a conta está integralmente zerada.
+- Referência e data posicionadas conforme o modelo oficial.
+- Sem valores cortados ou sobrepostos.
