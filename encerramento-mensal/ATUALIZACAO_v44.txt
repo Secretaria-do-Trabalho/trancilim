@@ -1,0 +1,3 @@
+Encerramento Mensal v44 - Anexo III da SET
+
+A SET passa a gerar o Anexo III padrão zerado, sem considerar as contas cadastradas, sem relatório contábil e sem extratos. O PDF e o Excel atualizam a referência automaticamente.

@@ -1,0 +1,8 @@
+TRANCELIM v200 - Anexo III da SET
+
+- A UG SET não utiliza as contas bancárias cadastradas no Anexo III, pois são contas do Tesouro/SEFAZ e não pertencem à SET.
+- Para a SET, o Anexo III é emitido sempre no modelo padrão zerado.
+- Não exige relatório da contabilidade nem extratos bancários.
+- PDF e Excel seguem os modelos oficiais enviados, com atualização automática da referência e da data final da competência.
+- ZIP da SET contém um PDF de uma página e o Excel padrão.
+- No percentual da SET, o Anexo III exige somente a conclusão da conferência, sem criar pendências de contabilidade ou extratos.
