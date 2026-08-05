@@ -1,0 +1,9 @@
+TRANCELIM v191
+
+Atualização exclusiva do Sistema de Encerramento Mensal para v36.
+
+- Anexo I e Anexo II: anexação da versão assinada após fechar a UG.
+- Identificação automática da assinatura eletrônica do SUITE.
+- Cada anexo assinado validado conta como um item no percentual da UG.
+- Preservada a contagem por item da v35.
+- Patrimônio v138 e Prestação de Contas foram preservados sem alterações.

@@ -1,3 +1,13 @@
+TRANCELIM - Sistema de Encerramento Mensal v36
+
+Ajustes da v36:
+- Fechamento do Anexo I e do Anexo II libera uma área para anexar a versão assinada.
+- Leitura automática da assinatura eletrônica do SUITE, com signatário e código de validação quando localizados.
+- Anexo I assinado e Anexo II assinado valem 1 item cada no percentual da UG.
+- Arquivo sem assinatura identificada fica marcado e não pontua.
+- Mantida a contagem por item da v35, incluindo documentos, extratos, conferências, justificativas, anexos e processos contabilizados.
+- Mantida a união de conta corrente e aplicação na mesma linha do Anexo III.
+
 TRANCELIM - Sistema de Encerramento Mensal v35
 
 ATUALIZAÇÃO DO PERCENTUAL POR ITEM
