@@ -1,4 +1,4 @@
-Sistema de Encerramento Mensal v46
+Sistema de Encerramento Mensal v47
 
 - Corrige o Anexo III zerado do FERDT.
 - Usa o modelo oficial sem reescrever os valores R$ 0,00.

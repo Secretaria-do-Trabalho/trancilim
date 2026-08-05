@@ -1,10 +1,10 @@
-# TRANCELIM v204
+# TRANCELIM v205
 
 Pacote integrado para publicação no GitHub Pages.
 
 ## Módulos
 - Gestão Patrimonial v133
-- Encerramento Mensal v46
+- Encerramento Mensal v47
 - Prestação de Contas CG preservada
 
 ## Ajustes desta versão

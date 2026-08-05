@@ -1,0 +1,14 @@
+TRANCELIM v205
+
+Encerramento Mensal - Anexo VI / Justificativas:
+- Word reconstruído no padrão oficial enviado;
+- PDF ajustado para usar a mesma organização, margens, tipografia e proporções do Word;
+- tabela centralizada e mais estreita, conforme o modelo;
+- demonstrativo escolhido marcado com X e título em negrito;
+- identificação do responsável com destaques em negrito;
+- texto da justificativa dentro do quadro, com alinhamento justificado;
+- data e assinatura reposicionadas;
+- ambos os arquivos permanecem em uma única página para os textos usuais;
+- quebras de linha digitadas na justificativa são preservadas no Word e no PDF.
+
+Patrimônio e Prestação de Contas preservados sem alteração.
