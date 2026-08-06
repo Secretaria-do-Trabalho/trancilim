@@ -1,0 +1,12 @@
+ENCERRAMENTO MENSAL v51 — DATAS DE REFERÊNCIA DOS RELATÓRIOS VIII E IX
+
+Alterações realizadas:
+- Relatório VIII (011296): a data de referência deve ser o último dia do mês situado 2 meses antes da competência do encerramento.
+- Relatório IX (010635): a data de referência deve ser o último dia do mês situado 4 meses antes da competência do encerramento.
+- Para a competência julho/2026, o sistema espera:
+  * Relatório VIII: 31/05/2026.
+  * Relatório IX: 31/03/2026.
+- A regra é calculada automaticamente para todas as competências, inclusive viradas de ano e meses com 28, 29, 30 ou 31 dias.
+- A conferência foi reforçada no PDF e no Excel.
+- Quando uma data diferente for localizada, o sistema passa a sinalizar divergência.
+- Demais módulos e funcionalidades foram preservados.
