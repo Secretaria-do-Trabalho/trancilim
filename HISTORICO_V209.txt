@@ -6,3 +6,6 @@ Patrimônio v136:
 - incluído filtro por tipo de pendência;
 - incluído resumo clicável das principais pendências;
 - lista usa a mesma base da competência do relatório Depreciação por Grupo.
+
+v210 (06/08/2026)
+- Encerramento Mensal atualizado para v49: justificativas por relatório, documentos complementares, upload assinado e conferência de assinatura.

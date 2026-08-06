@@ -280,6 +280,9 @@ html,body{max-width:100%;overflow-x:hidden}.app,.main,.content,.page,.conf-layou
 .a3-accounting-files{display:flex;flex-direction:column;gap:7px;margin-top:9px}.a3-accounting-file{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border:1px solid #cfe0e5;border-radius:10px;background:#fff;font-size:12px}.a3-accounting-file span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.a3-accounting-file .btn{flex:0 0 auto}.a3-zero-exemption{display:block;margin-top:6px;padding:7px 9px;border-radius:9px;background:#e5f7eb;color:#087c39;font-weight:700;font-size:12px}
 @media(max-width:900px){.workflow-kpis-compact{grid-template-columns:1fr!important}}
 
+
+/* Encerramento v49 — justificativas vinculadas e assinatura */
+.just-signed-box{margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);display:grid;gap:7px;width:100%}.just-signed-status{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.just-signed-status small{color:var(--muted)}.just-signed-file{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.generated-justifications-complementary{display:grid;gap:8px;margin-bottom:10px}.generated-just-title{font-size:12px;font-weight:800;color:var(--navy);padding:7px 0;border-bottom:1px solid var(--border)}.btn.warning{background:#fff7db;border-color:#efc968;color:#725400}.btn.warning:hover{background:#ffefb5}
 </style>
 
 <style data-trancelim-v190-progress>
@@ -649,6 +652,7 @@ function exportPdf2(){const d=declarationData(true);if(!d)return;if(!d.date)retu
 function exportPdf(){const ref=document.getElementById('report-ref').value,rows=linesForUg(document.getElementById('report-ug').value,ref);downloadBytes(buildPdf(rows,ref),'application/pdf',FILE_BASE+'.pdf');toast('PDF gerado no modelo oficial.')}function exportBackup(){downloadBytes(new TextEncoder().encode(JSON.stringify(state,null,2)),'application/json','TRANCILIM_encerramento_backup.json')}
 initMonths();setDeclarationDateToday();renderAll();
 </script><script src="assets/justification_template.js?v=205"></script><script src="assets/conference.js?v=205"></script><script src="assets/workflow.js"></script><script src="assets/encerramento_v38_patch.js"></script><script src="assets/encerramento_v40_patch.js"></script><script src="assets/encerramento_v41_patch.js"></script><script src="assets/encerramento_v42_patch.js"></script><script src="assets/encerramento_v44_set_anexo3.js"></script><script src="assets/encerramento_v46_ferdt_zero.js?v=46"></script>
+<script src="assets/encerramento_v49_justificativas_assinadas.js?v=49"></script>
 <script data-trancelim-profile-v177>
 (function(){
   const SESSION_KEY='trancilim_portal_session_v2',DEFAULT_PHOTO='assets/david-profile.png';

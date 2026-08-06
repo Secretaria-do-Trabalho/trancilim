@@ -1,0 +1,11 @@
+Encerramento Mensal v49 - Justificativas e documentos assinados
+
+- Mantidos os relatórios existentes sem alteração de layout;
+- Incluído botão "Cadastrar justificativa" nos Anexos I, II e III;
+- Mantido botão "Justificar" em cada relatório da aba Conferência;
+- Justificativas vinculadas ao relatório e exibidas também em Documentos Complementares;
+- Opções de visualizar, editar, gerar Word e gerar PDF preservadas;
+- Incluído upload do documento assinado da justificativa;
+- Incluída conferência manual da assinatura, seguindo a lógica do Anexo II;
+- Exibição dos estados: documento pendente, aguardando conferência e assinatura conferida;
+- No Word/PDF, a alternativa selecionada continua marcada com X e em negrito (regra da v48 preservada).
