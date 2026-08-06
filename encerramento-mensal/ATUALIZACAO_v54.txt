@@ -1,0 +1,19 @@
+TRANCELIM — Encerramento Mensal v54
+
+AJUSTES REALIZADOS
+
+1. Relatórios VIII e IX — data de referência visível
+- A data calculada aparece ao lado do nome do relatório na grade de conferência.
+- Para a competência 07/2026:
+  • Relatório VIII - Consignações intempestivas (31/05/2026)
+  • Relatório IX - Suprimento de fundos inconsistentes (31/03/2026)
+
+2. Leitura da data dentro do PDF e do Excel
+- Reforçada a leitura de “Data de Referência”, “Referência”, “Data Base” e “Período de Referência”.
+- Quando o relatório não traz o rótulo de forma legível, o sistema procura todas as datas do documento e reconhece a data esperada para o relatório.
+- Datas de impressão/emissão não são usadas como referência.
+
+3. Cache
+- Atualizado o identificador do conference.js para v215, evitando que o navegador mantenha a versão anterior.
+
+Todos os demais módulos e ajustes anteriores foram preservados.

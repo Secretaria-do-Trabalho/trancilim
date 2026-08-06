@@ -63,8 +63,44 @@ function checkByCategory(entry,category){const checks=[];if(entry.pdf?.checks)ch
 function overall(def,entry){if(entry.manualOk)return{status:'ok',text:'OK manual'};if(!entry.pdf)return{status:'pending',text:'Aguardando PDF'};if(def.needsExcel&&!entry.excel)return{status:'pending',text:'Aguardando Excel'};const checks=[...(entry.pdf?.checks||[]),...(entry.excel?.checks||[])];const w=worst(checks.map(x=>x.status));return w==='ok'?{status:'ok',text:'Tudo certo'}:w==='warn'?{status:'warn',text:'Atenção'}:w==='error'?{status:'error',text:'Divergência encontrada'}:{status:'pending',text:'Aguardando'}}
 function referenceEnd(ref){const [y,m]=ref.split('-').map(Number);return new Date(y,m,0)}
 function shiftReferenceDate(ref,offset){const [y,m]=ref.split('-').map(Number),d=new Date(y,m-1+offset+1,0);return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`}
-function extractSpecificReference(text){const raw=String(text||'').replace(/\u00a0/g,' ').replace(/[：]/g,':').replace(/[／]/g,'/');const patterns=[/Data\s+de\s+Refer[eê]ncia\s*:?\s*(\d{2}\s*[\/-]\s*\d{2}\s*[\/-]\s*\d{4})/i,/Refer[eê]ncia\s*:?\s*(\d{2}\s*[\/-]\s*\d{2}\s*[\/-]\s*\d{4})/i];for(const p of patterns){const m=raw.match(p);if(m)return m[1].replace(/\s/g,'').replace(/-/g,'/')}return''}
-function specificReferenceCheck(def,text){if(!def.referenceOffset)return null;const expected=shiftReferenceDate(confRef(),def.referenceOffset),found=extractSpecificReference(text);return{category:'competencia',status:found===expected?'ok':found?'error':'warn',detail:found===expected?`Data de referência específica ${found} correta`:`Data de referência específica encontrada: ${found||'não localizada'}; esperada para a competência selecionada: ${expected}`}}
+function normalizeFullDate(value){const m=String(value||'').match(/(\d{1,2})\s*[\/-]\s*(\d{1,2})\s*[\/-]\s*(\d{4})/);return m?`${String(Number(m[1])).padStart(2,'0')}/${String(Number(m[2])).padStart(2,'0')}/${m[3]}`:''}
+function extractSpecificReference(text,expected=''){
+  const raw=String(text||'')
+    .replace(/\u00a0/g,' ')
+    .replace(/[\u200B-\u200D\uFEFF]/g,'')
+    .replace(/[：]/g,':')
+    .replace(/[／]/g,'/')
+    .replace(/[–—]/g,'-');
+  const flat=raw.replace(/\s+/g,' ').trim();
+  const patterns=[
+    /Data\s+(?:de\s+)?Refer[eê]ncia\s*:?\s*(\d{1,2}\s*[\/-]\s*\d{1,2}\s*[\/-]\s*\d{4})/i,
+    /Refer[eê]ncia\s*:?\s*(\d{1,2}\s*[\/-]\s*\d{1,2}\s*[\/-]\s*\d{4})/i,
+    /Data\s+Base\s*:?\s*(\d{1,2}\s*[\/-]\s*\d{1,2}\s*[\/-]\s*\d{4})/i,
+    /Per[ií]odo\s+de\s+Refer[eê]ncia\s*:?\s*(\d{1,2}\s*[\/-]\s*\d{1,2}\s*[\/-]\s*\d{4})/i
+  ];
+  for(const source of [raw,flat])for(const p of patterns){const m=source.match(p);if(m)return normalizeFullDate(m[1])}
+  const dates=[];
+  const re=/(\d{1,2})\s*[\/-]\s*(\d{1,2})\s*[\/-]\s*(\d{4})/g;
+  let m;
+  while((m=re.exec(flat))){
+    const date=normalizeFullDate(m[0]);
+    if(!date)continue;
+    const before=flat.slice(Math.max(0,m.index-180),m.index);
+    const after=flat.slice(m.index+m[0].length,Math.min(flat.length,m.index+m[0].length+100));
+    const context=norm(before+' '+after);
+    let score=0;
+    if(expected&&date===expected)score+=500;
+    if(context.includes('referencia'))score+=180;
+    if(context.includes('data base'))score+=150;
+    if(context.includes('periodo'))score+=70;
+    if(context.includes('consignacoes intempestivas')||context.includes('suprimento de fundos'))score+=90;
+    if(context.includes('impresso em')||context.includes('emitido em')||context.includes('gerado em'))score-=180;
+    dates.push({date,score,index:m.index});
+  }
+  dates.sort((a,b)=>b.score-a.score||a.index-b.index);
+  return dates[0]&&dates[0].score>0?dates[0].date:'';
+}
+function specificReferenceCheck(def,text){if(!def.referenceOffset)return null;const expected=shiftReferenceDate(confRef(),def.referenceOffset),found=extractSpecificReference(text,expected);return{category:'competencia',status:found===expected?'ok':found?'error':'warn',detail:found===expected?`Data de referência específica ${found} correta`:`Data de referência específica encontrada: ${found||'não localizada'}; esperada para a competência selecionada: ${expected}`}}
 function parseBrDate(s){const m=String(s||'').match(/(\d{2})[\/-](\d{2})[\/-](\d{4})/);return m?new Date(Number(m[3]),Number(m[2])-1,Number(m[1])):null}
 function findEmission(text){const patterns=[/Impresso\s+(?:por\s+[^\n]+\s+)?em\s*(\d{2}[\/-]\d{2}[\/-]\d{4})/i,/Emitido\s+em\s*:?\s*(\d{2}[\/-]\d{2}[\/-]\d{4})/i,/PROCURADORIA-GERAL DA FAZENDA NACIONAL\s*(\d{2}[\/-]\d{2}[\/-]\d{4})/i,/(\d{2}\/\d{2}\/\d{4})\s+\d{2}:\d{2}:\d{2}/];for(const p of patterns){const m=String(text||'').match(p);if(m)return m[1].replace(/-/g,'/')}return''}
 function titleMatches(def,ntext,filename){const source=ntext+' '+norm(filename);return def.keywords.every(k=>source.includes(norm(k)))}
