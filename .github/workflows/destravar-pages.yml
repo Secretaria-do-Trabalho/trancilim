@@ -1,0 +1,64 @@
+name: Destravar GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  pages: write
+  contents: read
+
+jobs:
+  destravar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Cancelar execuções presas do Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for status in queued in_progress; do
+            ids=$(gh api \
+              "repos/${GITHUB_REPOSITORY}/actions/runs?status=${status}&per_page=100" \
+              --jq '.workflow_runs[]
+                | select(
+                    .path == "dynamic/pages/pages-build-deployment"
+                    or .name == "pages build and deployment"
+                  )
+                | .id')
+
+            for id in $ids; do
+              echo "Forçando cancelamento da execução $id"
+              gh api \
+                --method POST \
+                "repos/${GITHUB_REPOSITORY}/actions/runs/${id}/force-cancel" \
+                || true
+            done
+          done
+
+      - name: Cancelar implantação presa
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAGES_DEPLOYMENT_ID: 9a73ca1aba8b0f0692aadbea5f16439ed279f81e
+        run: |
+          echo "Cancelando implantação antiga do GitHub Pages"
+
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/${GITHUB_REPOSITORY}/pages/deployments/${PAGES_DEPLOYMENT_ID}/cancel" \
+            || true
+
+          sleep 30
+
+      - name: Solicitar nova publicação
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2026-03-10" \
+            "repos/${GITHUB_REPOSITORY}/pages/builds"
