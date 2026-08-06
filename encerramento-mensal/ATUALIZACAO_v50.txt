@@ -1,0 +1,9 @@
+ENCERRAMENTO MENSAL v50 — RELATÓRIO VII
+
+- O PDF do Relatório VII passa a ser o próprio documento assinado; não é necessário anexá-lo novamente em outro campo.
+- A conferência agora verifica a assinatura da gestora do patrimônio no PDF enviado.
+- A assinatura é reconhecida por texto visível de validação e também pela estrutura de assinatura digital do próprio PDF.
+- Quando a assinatura não for encontrada, o relatório apresenta pendência específica.
+- Corrigida a identificação da Unidade Gestora no Relatório VII quando o código aparece isolado no cabeçalho, como “590101 - Encerramento Mensal: 7/2026”.
+- Mantidos o PDF e o Excel do relatório na mesma linha de conferência.
+- Demais módulos e funcionalidades preservados.

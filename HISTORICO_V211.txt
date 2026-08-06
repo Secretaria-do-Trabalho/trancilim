@@ -1,0 +1,5 @@
+TRANCELIM v211
+Base: v210
+Módulo alterado: encerramento-mensal
+Versão interna do Encerramento Mensal: v50
+Ajustes: conferência da assinatura no próprio PDF do Relatório VII e correção da leitura da UG isolada no cabeçalho.
