@@ -1,0 +1,4 @@
+TRANCELIM v213
+Base: v212
+Encerramento Mensal: v52
+Alteração: cadastro explícito da justificativa e fluxo de anexo/conferência do documento assinado dentro da própria janela.

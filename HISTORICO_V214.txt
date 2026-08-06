@@ -1,0 +1,13 @@
+TRANCELIM COMPLETO v214
+Data: 06/08/2026
+
+Base acumulada: v213.
+
+Encerramento Mensal v53:
+- Exibição automática da data de referência ao lado do nome dos Relatórios VIII e IX na grade de conferência.
+- Relatório VIII: último dia do mês de 2 meses antes da competência.
+- Relatório IX: último dia do mês de 4 meses antes da competência.
+- Exemplo para 07/2026: VIII (31/05/2026) e IX (31/03/2026).
+- Correção de sintaxe e atualização do cache do conference.js.
+
+Todas as funcionalidades anteriores foram preservadas.

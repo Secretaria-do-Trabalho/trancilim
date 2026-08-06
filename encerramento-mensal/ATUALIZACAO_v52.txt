@@ -1,0 +1,9 @@
+ENCERRAMENTO MENSAL v52 — CADASTRO E ASSINATURA DA JUSTIFICATIVA
+
+- Incluído o botão "Cadastrar justificativa" dentro da janela do Anexo VI.
+- Após cadastrar, o sistema mantém a janela aberta e exibe logo abaixo a área para anexar o documento assinado.
+- Incluídos no próprio cadastro: visualizar, baixar, remover e conferir assinatura.
+- A justificativa fica salva antes da geração do Word/PDF.
+- A edição da justificativa preserva o documento assinado e a conferência já realizada.
+- Mantidos os botões Gerar Word e Gerar PDF.
+- Demais módulos e funcionalidades preservados.

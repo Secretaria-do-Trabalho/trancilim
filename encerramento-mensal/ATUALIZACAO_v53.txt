@@ -1,0 +1,19 @@
+TRANCELIM — Encerramento Mensal v53
+Base: TRANCELIM completo v213
+
+ALTERAÇÃO — DATAS DE REFERÊNCIA VISÍVEIS NA CONFERÊNCIA
+
+- Relatório VIII — Consignações intempestivas (código 011296): mostra ao lado do nome a data de referência calculada automaticamente como o último dia do mês situado 2 meses antes da competência selecionada.
+- Relatório IX — Suprimento de fundos inconsistentes (código 010635): mostra ao lado do nome a data de referência calculada automaticamente como o último dia do mês situado 4 meses antes da competência selecionada.
+- Para a competência 07/2026, a tela apresenta:
+  • Relatório VIII - Consignações intempestivas (31/05/2026)
+  • Relatório IX - Suprimento de fundos inconsistentes (31/03/2026)
+- A data é recalculada em todas as competências, inclusive nas mudanças de ano e em meses com 28, 29, 30 ou 31 dias.
+- Mantida a conferência interna das mesmas datas nos arquivos PDF e Excel.
+- Corrigida a sintaxe da rotina de conferência específica de PDF, evitando que o arquivo de conferência deixe de carregar no navegador.
+- Alterado o identificador de cache do arquivo conference.js para garantir que o navegador carregue a correção publicada.
+
+PRESERVAÇÃO
+
+- Mantidas todas as alterações cumulativas das versões v209 a v213.
+- Portal, login, Patrimônio, Prestação de Contas e demais módulos preservados.

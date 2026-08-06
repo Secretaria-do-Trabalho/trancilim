@@ -48,13 +48,13 @@ window.uploadSignedJustification=async function(id,input){
   if(typeof putBlob==='function')await putBlob(signedBlobKey(id),file);
   rec.signedDoc={name:file.name,size:file.size,type:file.type||'',uploadedAt:new Date().toISOString()};
   rec.signatureChecked=false;rec.signatureCheckedAt='';rec.signatureCheckedBy='';save();
-  if(typeof window.renderConference==='function')window.renderConference();
+  if(typeof window.renderConference==='function')window.renderConference();renderJustificationModalSignedPanel();
   if(typeof toast==='function')toast('Documento assinado anexado à justificativa.');
  }finally{input.value=''}
 };
 window.viewSignedJustification=function(id,download=false){const rec=findRecord(id);if(rec?.signedDoc&&typeof openStoredBlob==='function')openStoredBlob(signedBlobKey(id),rec.signedDoc.name,download)};
-window.removeSignedJustification=async function(id){const rec=findRecord(id);if(!rec)return;delete rec.signedDoc;rec.signatureChecked=false;rec.signatureCheckedAt='';rec.signatureCheckedBy='';if(typeof deleteBlob==='function')await deleteBlob(signedBlobKey(id));save();if(typeof window.renderConference==='function')window.renderConference()};
-window.toggleJustificationSignature=function(id){const rec=findRecord(id);if(!rec?.signedDoc){if(typeof toast==='function')toast('Anexe primeiro o documento assinado.');return}rec.signatureChecked=!rec.signatureChecked;rec.signatureCheckedAt=rec.signatureChecked?new Date().toISOString():'';rec.signatureCheckedBy=rec.signatureChecked?(JSON.parse(sessionStorage.getItem('trancilim_portal_session_v2')||'null')?.name||'Usuário'):'';save();if(typeof window.renderConference==='function')window.renderConference();if(typeof toast==='function')toast(rec.signatureChecked?'Assinatura conferida.':'Conferência da assinatura removida.')};
+window.removeSignedJustification=async function(id){const rec=findRecord(id);if(!rec)return;delete rec.signedDoc;rec.signatureChecked=false;rec.signatureCheckedAt='';rec.signatureCheckedBy='';if(typeof deleteBlob==='function')await deleteBlob(signedBlobKey(id));save();if(typeof window.renderConference==='function')window.renderConference();renderJustificationModalSignedPanel()};
+window.toggleJustificationSignature=function(id){const rec=findRecord(id);if(!rec?.signedDoc){if(typeof toast==='function')toast('Anexe primeiro o documento assinado.');return}rec.signatureChecked=!rec.signatureChecked;rec.signatureCheckedAt=rec.signatureChecked?new Date().toISOString():'';rec.signatureCheckedBy=rec.signatureChecked?(JSON.parse(sessionStorage.getItem('trancilim_portal_session_v2')||'null')?.name||'Usuário'):'';save();if(typeof window.renderConference==='function')window.renderConference();renderJustificationModalSignedPanel();if(typeof toast==='function')toast(rec.signatureChecked?'Assinatura conferida.':'Conferência da assinatura removida.')};
 
 function signedPanel(id){const rec=findRecord(id);if(!rec)return'';const doc=rec.signedDoc,checked=!!rec.signatureChecked;return `<div class="just-signed-box"><div class="just-signed-status"><span class="conf-badge ${checked?'ok':doc?'warn':'pending'}">${checked?'✓ Assinatura conferida':doc?'• Aguardando conferência':'○ Documento assinado pendente'}</span>${checked&&rec.signatureCheckedBy?`<small>Conferido por ${escHtml(rec.signatureCheckedBy)}</small>`:''}</div>${doc?`<div class="just-signed-file"><strong>${escHtml(doc.name)}</strong><div class="side-item-actions"><button class="btn tiny" onclick="viewSignedJustification('${id}')">Ver</button><button class="btn tiny" onclick="viewSignedJustification('${id}',true)">Baixar</button><button class="btn tiny ${checked?'':'success'}" onclick="toggleJustificationSignature('${id}')">${checked?'Desmarcar conferência':'Conferir assinatura'}</button><button class="btn tiny danger" onclick="removeSignedJustification('${id}')">Remover</button></div></div>`:`<label class="btn tiny primary" style="cursor:pointer">Subir documento assinado<input hidden type="file" accept=".pdf,.doc,.docx,image/*" onchange="uploadSignedJustification('${id}',this)"></label>`}</div>`}
 
@@ -82,7 +82,36 @@ const baseWord=window.exportJustificationWord,basePdf=window.exportJustification
 if(baseWord)window.exportJustificationWord=async function(){const out=await baseWord.apply(this,arguments);markGenerated('word');return out};
 if(basePdf)window.exportJustificationPdf=function(){const out=basePdf.apply(this,arguments);markGenerated('pdf');return out};
 
-function augmentAll(){installAnnexButtons();augmentSavedJustifications();appendJustificationsToComplementary()}
+
+function renderJustificationModalSignedPanel(){
+ const modal=document.getElementById('justification-modal');if(!modal)return;
+ let panel=document.getElementById('just-modal-signed-panel');
+ if(!panel){
+  panel=document.createElement('div');panel.id='just-modal-signed-panel';panel.style.cssText='margin-top:14px;padding-top:14px;border-top:1px solid #dbe5ea';
+  const body=modal.querySelector('.modal-body');body?.appendChild(panel);
+ }
+ const id=document.getElementById('just-edit-id')?.value||'';
+ if(!id){panel.innerHTML='<div class="just-signed-box"><span class="conf-badge pending">○ Cadastre primeiro a justificativa para anexar o documento assinado</span></div>';return}
+ panel.innerHTML='<div style="font-weight:800;margin-bottom:8px">Documento assinado da justificativa</div>'+signedPanel(id);
+}
+window.registerJustification=function(){
+ const d=(typeof justificationData==='function')?justificationData():null;if(!d)return;
+ const old=d.id?findRecord(d.id):null;
+ const signed=old?.signedDoc,checked=old?.signatureChecked,checkedAt=old?.signatureCheckedAt,checkedBy=old?.signatureCheckedBy;
+ const rec=(typeof saveJustificationData==='function')?saveJustificationData(d):null;if(!rec)return;
+ if(signed){rec.signedDoc=signed;rec.signatureChecked=!!checked;rec.signatureCheckedAt=checkedAt||'';rec.signatureCheckedBy=checkedBy||'';save();}
+ document.getElementById('just-edit-id').value=rec.id;
+ renderJustificationModalSignedPanel();augmentAll();
+ if(typeof toast==='function')toast('Justificativa cadastrada. Agora você pode anexar o documento assinado.');
+};
+function installRegisterButton(){
+ const modal=document.getElementById('justification-modal'),foot=modal?.querySelector('.modal-foot.just-actions');if(!foot||foot.querySelector('[data-register-justification]'))return;
+ const btn=document.createElement('button');btn.className='btn warning';btn.dataset.registerJustification='1';btn.textContent='Cadastrar justificativa';btn.onclick=window.registerJustification;
+ const cancel=foot.querySelector('button');cancel?.insertAdjacentElement('afterend',btn);
+ renderJustificationModalSignedPanel();
+}
+
+function augmentAll(){installAnnexButtons();installRegisterButton();augmentSavedJustifications();appendJustificationsToComplementary();if(document.getElementById('justification-modal')?.classList.contains('open'))renderJustificationModalSignedPanel()}
 const observer=new MutationObserver(()=>requestAnimationFrame(augmentAll));
 document.addEventListener('DOMContentLoaded',()=>{augmentAll();observer.observe(document.body,{childList:true,subtree:true})});
 setTimeout(augmentAll,300);
