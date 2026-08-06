@@ -1,0 +1,18 @@
+TRANCELIM v218 — PUBLICAÇÃO OTIMIZADA
+
+Base preservada: v217, com todas as alterações funcionais até a v215.
+
+Otimizações de publicação:
+- pacote contém somente os arquivos necessários para executar o sistema;
+- removidos históricos, READMEs, SQLs, arquivos temporários e cópias de desenvolvimento;
+- removidas imagens duplicadas sem referência no sistema;
+- removidos PDFs/XLSX originais já incorporados nos arquivos JavaScript do Anexo III;
+- workflow monta uma pasta _site mínima antes de publicar;
+- ações atualizadas para versões compatíveis com Node.js 24;
+- uma nova execução cancela automaticamente a anterior ainda em andamento.
+
+Módulos preservados:
+- Portal/Login;
+- Patrimônio;
+- Encerramento Mensal;
+- Prestação de Contas.
